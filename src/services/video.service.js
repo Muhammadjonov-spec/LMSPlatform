@@ -8,8 +8,8 @@ const ffmpeg = require('fluent-ffmpeg');
 
 class VideoService {
   async convertToHls(inputPath, outputFolder) {
-    // ffmpeg logikasi...
+    
   }
 }
 
-module.exports = new VideoService();
+module.exports = new VideoService()
