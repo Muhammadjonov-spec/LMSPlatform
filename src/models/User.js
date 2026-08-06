@@ -9,8 +9,8 @@ const UserSchema = new mongoose.Schema({
     role:{type:String, enum: ['student', 'teacher', 'admin', 'super_admin'], default: 'student'},
     authProvider:{type:String},
     isVerified:{type:Boolean, default:false},
-    enrolledCourses:[{type:mongoose.Schema.Types.ObjectId, ref:"Cource"}],
-    verificationCode:{type:Number},
+    enrolledCourses:[{type:mongoose.Schema.Types.ObjectId, ref:"Course"}],
+    verificationCode:{type:String},
     refreshToken:{type:String},
     sessionVersion:{type:Number, default:1}
 }, { timestamps: true })

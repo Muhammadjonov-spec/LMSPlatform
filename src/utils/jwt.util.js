@@ -1,12 +1,12 @@
 const jwt =require("jsonwebtoken")
-const  generateAccessToken=(userId)=>{
+const  generateAccessToken=(userId, sessionVersion)=>{
   const ACCESS_SECRET=process.env.ACCESS_SECRET
-  return jwt.sign({id:userId}, ACCESS_SECRET, {expiresIn: "7d"})
+  return jwt.sign({id:userId, sessionVersion:sessionVersion}, ACCESS_SECRET, {expiresIn: "7d"})
 } 
 
-const  generateRefreshToken=(userId)=>{
+const  generateRefreshToken=(userId, sessionVersion)=>{
   const REFRESH_SECRET=process.env.REFRESH_SECRET
-  return jwt.sign({id:userId}, REFRESH_SECRET, {expiresIn: "30"})
+  return jwt.sign({id:userId, sessionVersion:sessionVersion}, REFRESH_SECRET, {expiresIn: "30d"})
 } 
 
 const verifyAccessToken = (token) => {

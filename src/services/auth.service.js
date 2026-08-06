@@ -4,6 +4,7 @@ const {hashPassword, comparePassword}=require("../utils/hashPassword.util")
 const {generateAccessToken, generateRefreshToken, verifyAccessToken, verifyRefreshToken}=require("../utils/jwt.util")
 const {OAuth2Client}=require("google-auth-library")
 const {sendVerificationEmail}=require("../utils/email.util")
+const crypto=require("crypto")
 const googleClient= new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 class AuthService {
   async register(userData){
@@ -12,9 +13,10 @@ class AuthService {
       throw new AppError(400, "Bu email allaqachon ro'yxatdan o'tgan")
     }
     const hashedPassword=await hashPassword(userData.password)
-    const verifyToken=await verifyRefreshToken(userData)
+    const verifyToken=crypto.randomBytes(32).toString("hex")
     const newUser=await UserRepository.create({
       ...userData,
+      role: 'student',
       password:hashedPassword,
       isVerified:false,
       verificationToken:verifyToken
@@ -25,7 +27,7 @@ class AuthService {
   async verifyEmail(token){
     const user=await UserRepository.findOne({verificationToken:token})
     if(!user){
-      throw new Error("Tasdiqlash kodi yaroqsiz yoki eskirgan")
+      throw new AppError(400, "Tasdiqlash kodi yaroqsiz yoki eskirgan")
     }
     await UserRepository.update(user._id, {isVerified:true, verificationToken:null})
     return {message:"your accaunt is vericated. you can login application"}
@@ -37,7 +39,7 @@ class AuthService {
       throw new AppError(401, "Email yoki parol noto'g'ri")
     }
     if (!user.isVerified) {
-      throw new AppError("Iltimos, avval pochtangizga kelgan xat orqali akkauntingizni tasdiqlang!");
+      throw new AppError(403, "Iltimos, avval pochtangizga kelgan xat orqali akkauntingizni tasdiqlang!");
     }
     let isMatch=false
     try {
@@ -48,9 +50,11 @@ class AuthService {
     if(!isMatch){
       throw new AppError(400, "Email yoki parol noto'g'ri")
     }
-    const accessToken=generateAccessToken(user._id)
-    const refreshToken=generateRefreshToken(user._id)
-    await UserRepository.update(user._id, {refreshToken:refreshToken})
+    const newSessionVersion = user.sessionVersion + 1
+    const accessToken=generateAccessToken(user._id, newSessionVersion )
+    const refreshToken=generateRefreshToken(user._id, newSessionVersion)
+    
+    await UserRepository.update(user._id, {refreshToken:refreshToken, sessionVersion:newSessionVersion})
     return{user:{id:user._id,
       email:user.email,
       firstName: user.firstName,
@@ -63,7 +67,7 @@ class AuthService {
     }
     let payload
     try {
-      const ticket=await googleClient.verifyIdToken({idToken, audience:proccess.env.GOOGLE_CLIENT_ID})
+      const ticket=await googleClient.verifyIdToken({idToken, audience:process.env.GOOGLE_CLIENT_ID})
       payload=ticket.getPayload()
     } catch (error) {
       throw new AppError(402, `${error.message}`)
@@ -80,8 +84,9 @@ class AuthService {
     }else if(!user.googleId){
       await UserRepository.update(user._id, {googleId:sub, isVerified:true})
     }
-    const accessToken = generateAccessToken(user._id);
-    const refreshToken = generateRefreshToken(user._id);
+    let newSessionVersion=user.sessionVersion + 1
+    const accessToken = generateAccessToken(user._id, newSessionVersion);
+    const refreshToken = generateRefreshToken(user._id, newSessionVersion);
     await UserRepository.update(user._id, { refreshToken: refreshToken })
     return {
       user:{id:user._id,
@@ -91,6 +96,10 @@ class AuthService {
         avatar: user.avatar},
         accessToken, token:accessToken, refreshToken
     }
+  }
+  async logout(userId){
+
+    await UserRepository.update(userId, {refreshtoken:null, sessionVersion: user.sessionVersion + 1})
   }
 }
 module.exports = new AuthService();

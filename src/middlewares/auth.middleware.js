@@ -1,4 +1,6 @@
 const { verifyAccessToken }=require("../utils/jwt.util")
+const AppError=require("../utils/AppError")
+const UserRepository=require("../repositories/UserRepository")
 const isAuth = async (req, res, next) => {
   let token
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")){
@@ -9,7 +11,12 @@ const isAuth = async (req, res, next) => {
   }
   try {
     const decoded=verifyAccessToken(token)
-    req.user={id: decoded.id}
+    const user=await UserRepository.findById(decoded.id)
+    if (!user) return next(new AppError(401, "Bunday foydalanuvchi topilmadi"))
+    if(user.sessionVersion!==decoded.sessionVersion){
+      return next(new AppError(401, "Sessiya eskirgan. Boshqa qurilmadan kirilgan bo'lishi mumkin. Qaytadan kiring."))
+    }
+    req.user=user
     next()
   } catch (error) {
     return res.status(401).json({ success: false, message: "Yaroqsiz token" })
@@ -18,8 +25,10 @@ const isAuth = async (req, res, next) => {
 
 const restrictTo = (...roles) => {
   return (req, res, next) => {
-    // logic...
-  };
-};
-
-module.exports = { isAuth, restrictTo };
+    if(!roles.includes(req.user.role)){
+      return next(new AppError(403, "Sizda bu amalni bajarish uchun ruxsat yo'q (Faqat admin/o'qituvchilar uchun)"))
+    }
+    next()
+  }
+}
+module.exports = { isAuth, restrictTo }

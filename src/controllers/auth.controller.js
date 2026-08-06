@@ -1,7 +1,20 @@
 const AuthService = require('../services/auth.service');
 
 class AuthController {
- 
+ async register(req, res){
+  const result=await AuthService.register(req.body)
+  res.status(201).json({success:true, message:result.message})
+ }
+ async login(req, res){
+  const {email, password}=req.body
+  const result=await AuthService.login(email, password)
+  res.status(201).json({success:true, data:result})
+ }
+ async logout(req, res){
+  const userId=req.user._id
+  const result=await AuthService.logout(userId)
+  res.status(201).json({success:true, message:"Successfully logout"})
+ }
 }
 
 module.exports = new AuthController()
