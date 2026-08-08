@@ -39,13 +39,13 @@ class TeacherService{
     return populatedTeacher
   }
   async updateProfile(userId, updateData){
-    const teacher=await TeacherRepository.findOne(userId)
+    const teacher=await TeacherRepository.findOne({userId})
     if (!teacher) {
       throw new AppError(404, "Sizning o'qituvchi profilingiz yo'q")
     }
 
     const updatedProfile=await TeacherRepository.update(teacher._id, updateData)
-    return updateProfile
+    return updatedProfile
   }
 }
 
