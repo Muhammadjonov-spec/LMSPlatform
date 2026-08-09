@@ -1,6 +1,5 @@
-const express = require('express');
+const router = require('express').Router()
 const TeacherController = require("../controllers/teacher.controller")
-const router = express.Router();
 const {isAuth, restrictTo}=require("../middlewares/auth.middleware")
 
 router.post("/apply", isAuth, TeacherController.applyForTeacher )
