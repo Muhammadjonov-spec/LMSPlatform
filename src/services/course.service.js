@@ -1,31 +1,37 @@
-const OrderRepository = require('../repositories/OrderRepository');
-const UserRepository = require('../repositories/UserRepository');
+const CourseRepository = require('../repositories/CourseRepository');
 const AppError = require('../utils/AppError');
 
-class OrderService {
-  async createOrder(studentId, courseId, receiptImage) {
-    const newOrder = await OrderRepository.create({
-      student: studentId,
-      course: courseId,
-      receiptImage: receiptImage,
-      status: 'pending' 
-    });
-    return newOrder;
+class CourseService {
+  async createCourse(data, teacherId) {
+    const courseData = { ...data, teacher: teacherId };
+    return await CourseRepository.create(courseData);
   }
-  async approveOrder(orderId) {
-    const order = await OrderRepository.findById(orderId);
-    if (!order) throw new AppError(404, "Buyurtma topilmadi");
-    if (order.status === 'approved') {
-      throw new AppError(400, "Bu to'lov allaqachon tasdiqlangan");
+  async getCourseDetails(courseId, user) {
+    const course = await CourseRepository.findById(courseId);
+    if (!course) {
+      throw new AppError(404, "Kurs topilmadi");
     }
-    await OrderRepository.update(orderId, { status: 'approved' });
-    const student = await UserRepository.findById(order.student);
-    if (!student.enrolledCourses.includes(order.course)) {
-      student.enrolledCourses.push(order.course)
-      await UserRepository.update(student._id, { enrolledCourses: student.enrolledCourses });
+    let isEnrolled = false;
+    
+    if (user) {
+      const enrolled = user.enrolledCourses.find(c => c.toString() === courseId.toString());
+      if (enrolled || ['admin', 'super_admin', 'teacher'].includes(user.role)) {
+         isEnrolled = true;
+      }
     }
-    return { message: "To'lov tasdiqlandi va kurs o'quvchiga ochildi" };
+    if (!isEnrolled) {
+       const hiddenCourse = JSON.parse(JSON.stringify(course))
+       if (hiddenCourse.modules) {
+         hiddenCourse.modules.forEach(module => {
+           module.lessons.forEach(lesson => {
+             lesson.videoPath = null; 
+           });
+         });
+       }
+       return hiddenCourse
+    }
+    return course
   }
 }
 
-module.exports = new OrderService();
+module.exports = new CourseService()
