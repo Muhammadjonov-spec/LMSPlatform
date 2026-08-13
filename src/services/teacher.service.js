@@ -38,6 +38,13 @@ class TeacherService{
     const populatedTeacher = await TeacherRepository.model.findById(teacherId).populate("user", "firstName lastName email avatar")
     return populatedTeacher
   }
+
+  async addModulToCource(){
+
+  }
+  async addLessonToModule(){
+    
+  }
   async updateProfile(userId, updateData){
     const teacher=await TeacherRepository.findOne({userId})
     if (!teacher) {
