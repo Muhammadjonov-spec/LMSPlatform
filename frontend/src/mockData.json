@@ -1,0 +1,88 @@
+{
+  "signInAdmin": {
+    "data": {
+      "token": "mock-jwt-admin",
+      "role": "manager",
+      "user": { "id": 1, "email": "admin@gmail.com", "name": "Admin User" }
+    }
+  },
+  "signInSuperAdmin": {
+    "data": {
+      "token": "mock-jwt-superadmin",
+      "role": "manager",
+      "user": { "id": 2, "email": "superadmin@gmail.com", "name": "Super Admin User" }
+    }
+  },
+  "signInStudent": {
+    "data": {
+      "token": "mock-jwt-student",
+      "role": "student",
+      "user": { "id": 3, "email": "student@gmail.com", "name": "Student User" }
+    }
+  },
+  "overviews": {
+    "data": {
+      "totalStudents": 120,
+      "totalCourses": 15,
+      "totalRevenue": 24000
+    }
+  },
+  "courses": {
+    "data": [
+      {
+        "_id": "1",
+        "name": "Frontend Web Development",
+        "category": { "name": "Programming" },
+        "thumbnail_url": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=500&auto=format&fit=crop&q=60"
+      },
+      {
+        "_id": "2",
+        "name": "UI/UX Design Masterclass",
+        "category": { "name": "Design" },
+        "thumbnail_url": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&auto=format&fit=crop&q=60"
+      }
+    ]
+  },
+  "courseDetail": {
+    "data": {
+      "_id": "1",
+      "name": "Frontend Web Development",
+      "details": [
+        { "_id": "c1", "title": "Introduction to HTML", "type": "video", "youtubeId": "dQw4w9WgXcQ", "description": "In this lesson we learn HTML." },
+        { "_id": "c2", "title": "CSS Basics", "type": "video", "youtubeId": "jNQXAC9IVRw", "description": "Learning CSS styles." },
+        { "_id": "c3", "title": "JavaScript Fundamentals", "type": "text", "description": "Read this article on JS basics." }
+      ]
+    }
+  },
+  "students": {
+    "data": []
+  },
+  "categories": {
+    "data": [
+      { "id": 1, "name": "Frontend Dasturlash", "description": "HTML, CSS, JS, React kurslari", "courseCount": 15 },
+      { "id": 2, "name": "Backend Dasturlash", "description": "NodeJS, Python, PHP, Java kurslari", "courseCount": 12 },
+      { "id": 3, "name": "Dizayn (UI/UX)", "description": "Figma, Adobe XD, Photoshop kurslari", "courseCount": 8 },
+      { "id": 4, "name": "Mobil Dasturlash", "description": "Flutter, React Native, iOS, Android", "courseCount": 5 }
+    ]
+  },
+  "subscriptions": {
+    "data": [
+      { "id": 1, "name": "Free", "price": 0, "features": ["1 ta kursga kirish", "Asosiy materiallar", "Hamjamiyat yordami"], "isActive": true },
+      { "id": 2, "name": "Pro", "price": 490000, "features": ["Barcha kurslarga kirish", "Mentor yordami", "Sertifikat beriladi"], "isActive": true },
+      { "id": 3, "name": "Premium", "price": 990000, "features": ["Barcha kurslarga kirish", "Shaxsiy mentor (1 ga 1)", "Sertifikat va Ishga joylashish"], "isActive": true }
+    ]
+  },
+  "rewards": {
+    "leaderboard": [
+      { "id": 1, "studentName": "Ali Valiyev", "points": 1250, "rank": 1 },
+      { "id": 2, "studentName": "Sanjar Karimov", "points": 980, "rank": 2 },
+      { "id": 3, "studentName": "Olim Rustamov", "points": 850, "rank": 3 },
+      { "id": 4, "studentName": "Malika Tursunova", "points": 720, "rank": 4 }
+    ],
+    "badges": [
+      { "id": 1, "name": "Faol o'quvchi", "description": "Har kuni darslarni ko'rgani uchun", "icon": "🔥" },
+      { "id": 2, "name": "A'lochi", "description": "Uy vazifalarini 100% bajargan", "icon": "⭐" },
+      { "id": 3, "name": "Yordamchi", "description": "Boshqa o'quvchilarga yordam bergani uchun", "icon": "🤝" }
+    ]
+  }
+}
