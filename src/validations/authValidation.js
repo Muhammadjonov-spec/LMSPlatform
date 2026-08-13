@@ -1,11 +1,18 @@
- 
-// const registerSchema = Joi.object({
-//   name: Joi.string().required(),
-//   email: Joi.string().email().required(),
-//   password: Joi.string().min(6).required()
-// })
-// 2. Ushbu sxemalarni ishlatuvchi validatsiya middleware'ni yozing. (Agar xato bo'lsa AppError 400 qaytaradi).
-
 const Joi = require('joi');
 
-// Simalarni yozing va eksport qiling...
+const registerSchema = Joi.object({
+  firstName: Joi.string().min(2).required(),
+  lastName: Joi.string().min(2).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required()
+});
+
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required()
+});
+
+module.exports = {
+  registerSchema,
+  loginSchema
+};
