@@ -4,12 +4,23 @@ const CourseSchema = new mongoose.Schema({
   title:{type:String, required:true},
   description:{type:String, default:null},
   isPublished:{type:Boolean, default:false},
-  avarangeRating:{type:Stirng, default:null},
+  averageRating:{type:Number, default:0},
   price:{type:Number, default:null},
   discountPrise:{type:Number, default:null},
   thumbnail:{type:String},
   teacher:{type:mongoose.Types.ObjectId, ref:"Teacher", default:null},
-  category:{type:mongoose.Types.ObjectId, ref:"Category", default:null}
+  category:{type:mongoose.Types.ObjectId, ref:"Category", default:null},
+  lessons:[{ 
+    title: { type: String, required: true },
+    videoPath: { type: String, default: null },
+    status: { type: String, enum: ['processing', 'ready', 'failed'], default: 'processing' }
+    }],
+  modules: [{
+      title: { type: String, required: true },
+      lessons: [{
+          title: { type: String, required: true },
+          videoPath: { type: String, required: true }}
+      ]}]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Course', CourseSchema);
