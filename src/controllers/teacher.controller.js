@@ -25,4 +25,4 @@ class TeacherController{
   }
 }
 
-module.exports=new TeacherController()
+module.exports=new TeacherController()  

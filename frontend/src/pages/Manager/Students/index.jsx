@@ -5,8 +5,6 @@ import StudentItem from "./student-item";
 export default function ManageStudentsPage() {
   const students = useLoaderData();
 
-  console.log(students);
-
   return (
     <>
       <header className="flex items-center justify-between gap-[30px]">
@@ -30,9 +28,9 @@ export default function ManageStudentsPage() {
           <StudentItem
             key={item._id}
             id={item._id}
-            imageUrl={item.photo_url}
-            name={item.name}
-            totalCourse={item.courses.length}
+            imageUrl={item.photo_url || item.avatar}
+            name={item.name || `${item.firstName || ''} ${item.lastName || ''}`.trim()}
+            totalCourse={item.courses?.length ?? 0}
           />
         ))}
 

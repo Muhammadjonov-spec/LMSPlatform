@@ -4,14 +4,16 @@ import { MANAGER_SESSION, STRORAGE_KEY, STUDENT_SESSION } from "../utils/const";
 import { useNavigate, useRouteLoaderData, Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faUser, faSignOutAlt, faCog, faMoneyCheckAlt } from "@fortawesome/free-solid-svg-icons";
+import { useAuthStore } from "../store/authStore";
 
 export default function Header({ type = "manager" }) {
   const isManagerType = type !== "student";
   const session = useRouteLoaderData(isManagerType ? MANAGER_SESSION : STUDENT_SESSION);
   const navigate = useNavigate();
+  const { logout } = useAuthStore();
 
   const handleLogout = () => {
-    secureLocalStorage.removeItem(STRORAGE_KEY);
+    logout(); // Zustand store ni tozalash
     navigate("/sign-in", { replace: true });
   };
 

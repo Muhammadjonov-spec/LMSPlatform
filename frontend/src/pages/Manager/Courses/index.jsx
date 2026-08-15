@@ -5,8 +5,6 @@ import { Link, useLoaderData } from "react-router-dom";
 export default function ManageCoursePage() {
   const courses = useLoaderData();
 
-  console.log(courses);
-
   return (
     <>
       <header className="flex items-center justify-between gap-[30px]">
@@ -29,11 +27,11 @@ export default function ManageCoursePage() {
         {courses?.data?.map((item) => (
           <CardCouse
             key={item._id}
-            category={item.category.name}
+            category={item.category?.name || 'Kategoriya'}
             id={item._id}
             imageUrl={item.thumbnail_url}
-            name={item.name}
-            totalStudents={item.total_students}
+            name={item.name || item.title}
+            totalStudents={item.total_students ?? 0}
           />
         ))}
         <div id="Pagination" className="flex items-center gap-3">

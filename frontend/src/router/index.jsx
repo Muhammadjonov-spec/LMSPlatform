@@ -70,12 +70,11 @@ const router = createBrowserRouter([
   {
     path: "/courses/:id",
     loader: async ({ params }) => {
-      // Allow fetching without token for public access. If getCourseDetail needs a non-auth version, we handle it in mock.
-      // But getCourseDetail uses apiInstanceAuth which might fail without a token unless we mock it correctly.
-      try {
+           try {
         const course = await getCourseDetail(params.id);
         return course?.data;
-      } catch (e) {
+      } catch (error) {
+        
         return null;
       }
     },
@@ -90,8 +89,10 @@ const router = createBrowserRouter([
     loader: async () => {
       const session = secureLocalStorage.getItem(STRORAGE_KEY);
       if (session) {
-        if (session.role === "manager") throw redirect("/manager");
-        if (session.role === "student") throw redirect("/student");
+        // session format: { data: { role, token, user } } yoki { role, token, user }
+        const role = session?.data?.role || session?.role;
+        if (role === "manager" || role === "admin" || role === "super_admin" || role === "teacher") throw redirect("/manager");
+        if (role === "student") throw redirect("/student");
       }
       return true;
     },
@@ -102,8 +103,9 @@ const router = createBrowserRouter([
     loader: async () => {
       const session = secureLocalStorage.getItem(STRORAGE_KEY);
       if (session) {
-        if (session.role === "manager") throw redirect("/manager");
-        if (session.role === "student") throw redirect("/student");
+        const role = session?.data?.role || session?.role;
+        if (role === "manager" || role === "admin" || role === "super_admin" || role === "teacher") throw redirect("/manager");
+        if (role === "student") throw redirect("/student");
       }
       return true;
     },
@@ -122,11 +124,14 @@ const router = createBrowserRouter([
     id: MANAGER_SESSION,
     loader: async () => {
       const session = secureLocalStorage.getItem(STRORAGE_KEY);
+      // session format: { data: { role, token, user } } yoki { role, token, user }
+      const data = session?.data || session;
       const allowedRoles = ["teacher", "admin", "super_admin", "manager"];
-      if (!session || !allowedRoles.includes(session.role)) {
+      if (!data || !allowedRoles.includes(data.role)) {
         throw redirect("/sign-in");
       }
-      return session;
+      // Header uchun flat object qaytaramiz: { name, role, ... }
+      return { ...data.user, role: data.role, token: data.token };
     },
     element: <LayoutDashboard />,
     children: [
@@ -270,10 +275,12 @@ const router = createBrowserRouter([
     id: STUDENT_SESSION,
     loader: async () => {
       const session = secureLocalStorage.getItem(STRORAGE_KEY);
-      if (!session || session.role !== "student") {
+      const data = session?.data || session;
+      if (!data || data.role !== "student") {
         throw redirect("/sign-in");
       }
-      return session;
+      // Header uchun flat object qaytaramiz
+      return { ...data.user, role: data.role, token: data.token };
     },
     element: <LayoutDashboard isAdmin={false} />,
     children: [

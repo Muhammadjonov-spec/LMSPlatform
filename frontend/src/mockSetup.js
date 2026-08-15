@@ -19,10 +19,12 @@ const parseBody = (config) => {
 const handleSignIn = (config) => {
   const { email, password } = parseBody(config);
   
+  // Mock credentials
   if (email === 'admin@gmail.com' && password === 'admin123') {
     return [200, mockData.signInAdmin];
   }
-  if (email === 'superadmin@gmail.com' && password === 'superadmin123') {
+  // Real superadmin email (seed script dan)
+  if ((email === 'superadmin@gmail.com' || email === 'superadmin@edustack.uz') && password === 'superadmin123') {
     return [200, mockData.signInSuperAdmin];
   }
   if (email === 'student@gmail.com' && password === 'student123') {
@@ -118,6 +120,9 @@ mockAuth.onGet('/rewards').reply(200, mockData.rewards);
 
 // Mock students courses
 mockAuth.onGet('/courses/students').reply(200, mockData.courses);
+// Student course detail (preview=true)
+mockAuth.onGet(new RegExp('/courses/\\d+\\?preview=true')).reply(200, mockData.courseDetail);
+
 
 // Mock other unauthenticated & authenticated fallbacks
 mock.onAny().passThrough();

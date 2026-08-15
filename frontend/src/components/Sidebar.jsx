@@ -1,13 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useRouteLoaderData } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCube, faBook, faCrown, faUsers, faShieldAlt, faTrophy, faCog, faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faCube, faBook, faCrown, faUsers, faShieldAlt, faTrophy, faCog, faBars, faTimes, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { MANAGER_SESSION, STUDENT_SESSION } from "../utils/const";
 
 export default function Sidebar({ isAdmin = true }) {
   const location = useLocation();
   const session = useRouteLoaderData(isAdmin ? MANAGER_SESSION : STUDENT_SESSION);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Theme state — localStorage dan o'qiladi
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
+
+  // Theme o'zgarganda document ga class qo'shish
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
+
 
   const isActive = (path) => location.pathname === path;
 

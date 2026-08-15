@@ -11,6 +11,7 @@ import secureLocalStorage from "react-secure-storage";
 import { GoogleLogin } from "@react-oauth/google";
 import { postGoogleAuth } from "../../services/authServices";
 import ErrorToast from "../../components/common/ErrorToast";
+import { useAuthStore } from "../../store/authStore";
 
 export default function SignInPage() {
   const [authError, setAuthError] = useState("");
@@ -27,15 +28,16 @@ export default function SignInPage() {
   });
 
   const navigate = useNavigate();
+  const { login } = useAuthStore();
 
   const onSubmit = async (data) => {
     setAuthError("");
     try {
       const response = await mutateAsync(data);
+      // response format: { data: { token, role, user } }
+      login(response);
+
       const sessionData = response?.data || response;
-
-      secureLocalStorage.setItem(STRORAGE_KEY, sessionData);
-
       if (
         sessionData.role === "manager" ||
         sessionData.role === "admin" ||
@@ -139,8 +141,9 @@ export default function SignInPage() {
                 setAuthError("");
                 try {
                   const res = await postGoogleAuth(credentialResponse.credential);
+                  login(res);
+
                   const sessionData = res?.data || res;
-                  secureLocalStorage.setItem(STRORAGE_KEY, sessionData);
                   if (
                     sessionData.role === "manager" ||
                     sessionData.role === "admin" ||
