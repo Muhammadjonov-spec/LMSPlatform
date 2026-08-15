@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useRouteLoaderData } from "react-router-dom";
-import { MANAGER_SESSION } from "../../../utils/const";
+import { MANAGER_SESSION, STUDENT_SESSION } from "../../../utils/const";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faLock, faCamera, faServer } from "@fortawesome/free-solid-svg-icons";
 
 export default function SettingsPage() {
-  const session = useRouteLoaderData(MANAGER_SESSION);
+  const managerSession = useRouteLoaderData(MANAGER_SESSION);
+  const studentSession = useRouteLoaderData(STUDENT_SESSION);
+  const session = managerSession || studentSession;
 
   // Profile data
   const [profileData, setProfileData] = useState({

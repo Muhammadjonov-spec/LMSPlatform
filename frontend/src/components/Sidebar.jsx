@@ -2,18 +2,16 @@ import React, { useState } from "react";
 import { Link, useLocation, useRouteLoaderData } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCube, faBook, faCrown, faUsers, faShieldAlt, faTrophy, faCog, faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { useTheme } from "../context/ThemeContext";
 import { MANAGER_SESSION, STUDENT_SESSION } from "../utils/const";
 
 export default function Sidebar({ isAdmin = true }) {
   const location = useLocation();
   const session = useRouteLoaderData(isAdmin ? MANAGER_SESSION : STUDENT_SESSION);
-  const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   const isActive = (path) => location.pathname === path;
 
-  const getIconColor = (path) => isActive(path) ? (theme === 'dark' ? '#0B1120' : '#1E40AF') : '#ffffff';
+  const getIconColor = (path) => isActive(path) ? '#1E40AF' : '#ffffff';
 
   return (
     <>
