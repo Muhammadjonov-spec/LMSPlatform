@@ -10,7 +10,7 @@ const UserSchema = new mongoose.Schema({
     authProvider:{type:String},
     isVerified:{type:Boolean, default:false},
     enrolledCourses:[{type:mongoose.Schema.Types.ObjectId, ref:"Course"}],
-    verificationCode:{type:String},
+    verificationToken:{type:String},
     refreshToken:{type:String},
     sessionVersion:{type:Number, default:1}
 }, { timestamps: true })
