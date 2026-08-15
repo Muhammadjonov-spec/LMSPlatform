@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 200" width="100%" height="100%">
+  <defs>
+    <!-- Innovatsion va Energiya beruvchi Gradient (SaaS uslubida) -->
+    <linearGradient id="uniqueGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6D28D9"/> <!-- To'q Binafsha (Chuqur bilim) -->
+      <stop offset="50%" stop-color="#DB2777"/> <!-- Pushti (Faollik) -->
+      <stop offset="100%" stop-color="#F97316"/> <!-- Marjon/Zarg'aldoq (Energiya, O'sish) -->
+    </linearGradient>
+    
+    <!-- Yengil Soya effekti -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="5" stdDeviation="6" flood-color="#DB2777" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- ========================================= -->
+  <!-- 1. ALOHIDA IKONKA (Chap panel)            -->
+  <!-- ========================================= -->
+  <g transform="translate(10, 20)">
+    
+    <g transform="scale(1.3) translate(10, 10)" filter="url(#glow)">
+      <!-- HUB: Markaziy Yadro (Boshlanish nuqtasi) -->
+      <circle cx="20" cy="50" r="14" fill="url(#uniqueGradient)" />
+      
+      <!-- STACK 1: Birinchi qadam/qatlam -->
+      <path d="M 45 35 L 60 50 L 45 65" stroke="url(#uniqueGradient)" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      
+      <!-- STACK 2: Ikkinchi qadam (Kattaroq qamrov) -->
+      <path d="M 65 20 L 95 50 L 65 80" stroke="url(#uniqueGradient)" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      
+      <!-- STACK 3: Uchinchi qadam (Cheksiz o'sish) -->
+      <path d="M 85 5 L 130 50 L 85 95" stroke="url(#uniqueGradient)" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    
+  </g>
+
+  <!-- ========================================= -->
+  <!-- 2. IKONKA + NOMI (To'liq Logotip - O'ngda) -->
+  <!-- ========================================= -->
+  <g transform="translate(300, 20)">
+    
+    <!-- Ikonka (Kichikroq va matn bilan muvozanatda) -->
+    <g transform="scale(0.9) translate(0, 15)" filter="url(#glow)">
+      <circle cx="20" cy="50" r="14" fill="url(#uniqueGradient)" />
+      <path d="M 45 35 L 60 50 L 45 65" stroke="url(#uniqueGradient)" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 65 20 L 95 50 L 65 80" stroke="url(#uniqueGradient)" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 85 5 L 130 50 L 85 95" stroke="url(#uniqueGradient)" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Brend Nomi Tipografiyasi -->
+    <!-- Minimalist, qalin va o'qilishi juda qulay -->
+    <text x="145" y="95" font-family="'Inter', 'Work Sans', 'Helvetica Neue', sans-serif" font-size="82" font-weight="900" letter-spacing="-2">
+      <!-- Stack (Mustahkam poydevor rangida) -->
+      <tspan fill="#111827">Stack</tspan>
+      <!-- Hub (Loyiha ruhini beruvchi gradient) -->
+      <tspan fill="url(#uniqueGradient)">Hub</tspan>
+    </text>
+    
+  </g>
+</svg>
