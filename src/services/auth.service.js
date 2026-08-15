@@ -58,7 +58,8 @@ class AuthService {
     return{user:{id:user._id,
       email:user.email,
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      role:user.role
     }, accessToken, refreshToken}
   }
   async googleAuth(idToken){
@@ -78,6 +79,7 @@ class AuthService {
       user=await UserRepository.create({email:email,
         firstName:given_name || name || 'User',
         avatar: picture || null,
+        lastName: family_name || '',
         googleId: sub,
         isVerified: true
       })
@@ -91,6 +93,7 @@ class AuthService {
     return {
       user:{id:user._id,
         email:user.email,
+        role:user.role,
         firstName: user.firstName,
         lastName: user.lastName,
         avatar: user.avatar},
@@ -98,8 +101,11 @@ class AuthService {
     }
   }
   async logout(userId){
-
-    await UserRepository.update(userId, {refreshtoken:null, sessionVersion: user.sessionVersion + 1})
+    const user=await UserRepository.findOne({_id:userId})
+    if(user){
+      await UserRepository.update(userId, {refreshToken:null, sessionVersion: user.sessionVersion + 1})
+    }
+    
   }
 }
 module.exports = new AuthService();

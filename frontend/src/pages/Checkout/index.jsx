@@ -37,7 +37,7 @@ export default function Checkout() {
 
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-8 text-center">
           <p className="text-sm text-gray-600 mb-2">Quyidagi karta raqamiga to'lovni amalga oshiring:</p>
-          <div className="text-xl font-extrabold text-[#1E40AF] tracking-widest mb-1">8600 1234 5678 9012</div>
+          <div className="text-xl font-extrabold text-[#1E40AF] tracking-widest mb-1">9860 3501 4332 1650</div>
           <p className="text-xs font-semibold text-gray-500">Qabul qiluvchi: EduStack O'quv Markazi</p>
           <div className="mt-4 pt-4 border-t border-blue-200">
             <p className="text-sm text-gray-600">To'lov summasi:</p>

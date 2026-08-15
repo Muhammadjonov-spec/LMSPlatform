@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "../../components/Navbar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpSchema } from "../../utils/zodSchema";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { postSignup, postGoogleAuth } from "../../services/authServices";
+import { GoogleLogin } from "@react-oauth/google";
+import secureLocalStorage from "react-secure-storage";
+import { STRORAGE_KEY } from "../../utils/const";
 import Pricing from "./pricing";
+import ErrorToast from "../../components/common/ErrorToast";
 
 export default function signUpPage() {
-  const [dataSignUp, setDataSignUp] = React.useState(null);
-  const [mode, setMode] = React.useState("AUTH");
+  const [mode, setMode] = useState("AUTH");
+  const [dataSignUp, setDataSignUp] = useState(null);
+  const [authError, setAuthError] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -17,10 +25,51 @@ export default function signUpPage() {
     resolver: zodResolver(signUpSchema)
   });
 
-  const onSubmit = (data) => {
-    console.log(data);
-    setDataSignUp(data);
-    setMode("PRICING");
+  const { isPending, mutateAsync } = useMutation({
+    mutationFn: (data) => postSignup(data)
+  });
+  
+  const navigate = useNavigate();
+
+  const onSubmit = async (data) => {
+    setAuthError("");
+    try {
+      // Split name to firstName and lastName
+      const nameParts = data.name.trim().split(" ");
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(" ") || firstName;
+      
+      const payload = {
+        name: data.name,
+        firstName,
+        lastName,
+        email: data.email,
+        password: data.password
+      };
+      
+      const response = await mutateAsync(payload);
+      const sessionData = response?.data || response;
+      if (sessionData?.token) {
+        secureLocalStorage.setItem(STRORAGE_KEY, sessionData);
+        if (
+          sessionData.role === "manager" ||
+          sessionData.role === "admin" ||
+          sessionData.role === "super_admin" ||
+          sessionData.role === "teacher"
+        ) {
+          navigate("/manager");
+        } else {
+          navigate("/student");
+        }
+      } else {
+        alert("Registration successful! Please sign in to continue.");
+        navigate("/sign-in");
+      }
+    } catch (error) {
+      console.error("Sign up error:", error);
+      const msg = error?.response?.data?.message || error?.message || "Registration failed. Please check your details.";
+      setAuthError(msg);
+    }
   };
 
   return (
@@ -31,13 +80,6 @@ export default function signUpPage() {
 
           <nav className="flex items-center justify-between p-4 md:px-8 border-b border-black/10">
             <Navbar />
-            <div className="flex items-center space-x-4">
-              <Link to="/">
-                <div className="flex items-center justify-center gap-2 rounded-2xl border px-6 py-3 transition-all duration-300 bg-white border-[#1E40AF] hover:bg-gray-50">
-                  <span className="font-semibold text-[#1E40AF] whitespace-nowrap">Home</span>
-                </div>
-              </Link>
-            </div>
           </nav>
 
           <div className="flex flex-col-reverse lg:flex-row justify-center items-center gap-10 lg:gap-24 mt-10 lg:mt-16 w-full max-w-6xl mx-auto pb-10">
@@ -49,6 +91,12 @@ export default function signUpPage() {
                 <p className="text-white/80 text-sm mt-1">Sign up as a Student or Manager based on your role.</p>
               </div>
               <hr className="border-white/20" />
+
+              {authError && (
+                <div className="bg-red-500/20 border border-red-400 text-red-100 px-4 py-3 rounded-xl text-sm font-medium">
+                  {authError}
+                </div>
+              )}
               
               <div className="flex flex-col gap-2">
                 <span className="text-white font-medium text-sm">Full Name</span>
@@ -96,9 +144,50 @@ export default function signUpPage() {
               
               <button
                 type="submit"
-                className="w-full rounded-2xl p-4 text-center font-bold text-[#1E40AF] bg-white hover:bg-gray-50 transition-colors">
-                Create Account
+                disabled={isPending}
+                className="w-full rounded-2xl p-4 text-center font-bold text-[#1E40AF] bg-white hover:bg-gray-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
+                {isPending ? "Creating..." : "Create Account"}
               </button>
+
+              <div className="flex items-center gap-4 my-2">
+                <hr className="border-white/20 flex-1" />
+                <span className="text-white/80 text-sm">Or</span>
+                <hr className="border-white/20 flex-1" />
+              </div>
+
+              <div className="flex justify-center w-full mt-4">
+                <GoogleLogin
+                  onSuccess={async (credentialResponse) => {
+                    setAuthError("");
+                    try {
+                      const res = await postGoogleAuth(credentialResponse.credential);
+                      const sessionData = res?.data || res;
+                      secureLocalStorage.setItem(STRORAGE_KEY, sessionData);
+                      if (
+                        sessionData.role === "manager" ||
+                        sessionData.role === "admin" ||
+                        sessionData.role === "super_admin" ||
+                        sessionData.role === "teacher"
+                      ) {
+                        navigate("/manager");
+                      } else {
+                        navigate("/student");
+                      }
+                    } catch (error) {
+                      console.error("Google auth error:", error);
+                      const msg = error?.response?.data?.message || error?.message || "Google authentication failed";
+                      setAuthError(msg);
+                    }
+                  }}
+                  onError={() => {
+                    setAuthError("Google Sign Up failed");
+                  }}
+                  shape="pill"
+                  theme="filled_blue"
+                  text="signup_with"
+                  size="large"
+                />
+              </div>
               
               <div className="text-white/80 text-center text-sm">
                 Already have an account?{" "}
@@ -167,6 +256,7 @@ export default function signUpPage() {
               </div>
             </div>
           </div>
+          <ErrorToast message={authError} onClose={() => setAuthError("")} />
         </div>
       ) : (
         <Pricing data={dataSignUp} />

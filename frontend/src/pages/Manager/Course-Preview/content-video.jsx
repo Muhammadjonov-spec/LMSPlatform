@@ -2,23 +2,24 @@ import React from "react";
 import PropTypes from "prop-types";
 
 export default function ContentVideo({ content, handleNext }) {
-  const youtubeId = content?.youtubeId;
+  const videoUrl = content?.videoUrl;
 
   return (
     <div className="flex flex-col gap-6">
       <div className="w-full rounded-2xl overflow-hidden shadow-sm bg-black aspect-video relative">
-        {youtubeId ? (
-          <iframe
-            className="w-full h-full absolute inset-0"
-            src={`https://www.youtube.com/embed/${youtubeId}?si=IGeRBup7jYeDxLxr`}
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen></iframe>
+        {videoUrl ? (
+          <video
+            controls
+            controlsList="nodownload"
+            className="w-full h-full absolute inset-0 object-contain"
+            src={import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL.replace('/api/v1', '')}${videoUrl}` : `http://localhost:5000${videoUrl}`}
+          >
+            Your browser does not support the video tag.
+          </video>
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900 text-gray-400 gap-4">
             <span className="material-symbols-rounded text-6xl">videocam_off</span>
-            <p>Video unavailable</p>
+            <p>Video unavailable or processing...</p>
           </div>
         )}
       </div>

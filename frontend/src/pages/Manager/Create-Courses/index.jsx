@@ -199,7 +199,7 @@ export default function ManageCreateCoursePage() {
 
           <button
             type="submit"
-            disabled={isEditMode ? mutateUpdate.isLoading : mutateCreate.isLoading}
+            disabled={isEditMode ? mutateUpdate.isPending : mutateCreate.isPending}
             className="w-full rounded-full py-4 font-semibold text-white bg-[#1E40AF]">
             {isEditMode ? "Edit" : "Add"} Now
           </button>

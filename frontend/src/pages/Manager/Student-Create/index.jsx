@@ -177,7 +177,7 @@ export default function ManageStudentCreatePage() {
           </button>
           <button
             type="submit"
-            disabled={mutateCreate.isLoading || mutateUpdate.isLoading}
+            disabled={mutateCreate.isPending || mutateUpdate.isPending}
             className="w-full rounded-full p-[14px_20px] font-semibold text-white bg-[#1E40AF]">
             {student === undefined ? "Add" : "Edit"} Now
           </button>

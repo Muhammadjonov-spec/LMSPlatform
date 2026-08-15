@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,8 +8,12 @@ import { useMutation } from "@tanstack/react-query";
 import { postSignIn } from "../../services/authServices";
 import { STRORAGE_KEY } from "../../utils/const";
 import secureLocalStorage from "react-secure-storage";
+import { GoogleLogin } from "@react-oauth/google";
+import { postGoogleAuth } from "../../services/authServices";
+import ErrorToast from "../../components/common/ErrorToast";
 
 export default function SignInPage() {
+  const [authError, setAuthError] = useState("");
   const {
     register,
     handleSubmit,
@@ -18,45 +22,43 @@ export default function SignInPage() {
     resolver: zodResolver(signInSchema)
   });
 
-  const { isLoading, mutateAsync } = useMutation({
+  const { isPending, mutateAsync } = useMutation({
     mutationFn: (data) => postSignIn(data)
   });
 
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
+    setAuthError("");
     try {
       const response = await mutateAsync(data);
+      const sessionData = response?.data || response;
 
-      secureLocalStorage.setItem(STRORAGE_KEY, response.data);
+      secureLocalStorage.setItem(STRORAGE_KEY, sessionData);
 
-      if (response.data.role === "manager") {
+      if (
+        sessionData.role === "manager" ||
+        sessionData.role === "admin" ||
+        sessionData.role === "super_admin" ||
+        sessionData.role === "teacher"
+      ) {
         navigate("/manager");
       } else {
         navigate("/student");
       }
     } catch (error) {
-      console.log(error);
+      console.error("Sign in error:", error);
+      const msg = error?.response?.data?.message || error?.message || "Invalid credentials. Please try again.";
+      setAuthError(msg);
     }
   };
+
   return (
     <div className="relative flex flex-col min-h-screen p-4 md:p-8">
       <div className="absolute inset-0 bg-[#fff] -z-10 m-4 rounded-[20px] shadow-sm" />
 
       <nav className="flex items-center justify-between p-4 md:px-8 border-b border-black/10">
         <Navbar />
-        <div className="flex items-center space-x-4">
-          <Link to="/">
-            <div className="flex items-center justify-center gap-2 rounded-2xl border px-6 py-3 transition-all duration-300 bg-white border-[#1E40AF] hover:bg-gray-50">
-              <span className="font-semibold text-[#1E40AF] whitespace-nowrap">Home</span>
-            </div>
-          </Link>
-          <Link to="/sign-up">
-            <div className="flex items-center gap-3 w-fit rounded-full border px-6 py-3 transition-all duration-300 hover:bg-blue-800 bg-[#1E40AF] border-blue-800">
-              <span className="font-semibold text-white">Sign Up</span>
-            </div>
-          </Link>
-        </div>
       </nav>
 
       <div className="flex flex-col lg:flex-row justify-center items-center gap-10 lg:gap-24 mt-16 lg:mt-24 w-full max-w-6xl mx-auto">
@@ -65,7 +67,7 @@ export default function SignInPage() {
             Welcome back to <span className="text-[#1E40AF]">EduStack!</span>
           </h1>
           <p className="text-lg leading-[26px] text-black/50 mt-2 lg:mb-12">
-            Log in to continue your lessons. The system will automatically detect your role.
+            Log in to continue your lessons.
           </p>
         </div>
         
@@ -77,6 +79,12 @@ export default function SignInPage() {
             <p className="text-white/80 text-sm mt-1">Enter your email and password</p>
           </div>
           <hr className="border-white/20" />
+
+          {authError && (
+            <div className="bg-red-500/20 border border-red-400 text-red-100 px-4 py-3 rounded-xl text-sm font-medium">
+              {authError}
+            </div>
+          )}
 
           <div className="flex flex-col gap-2">
             <span className="text-white font-medium text-sm">Email Address</span>
@@ -113,13 +121,54 @@ export default function SignInPage() {
 
           <hr className="border-white/20 my-2" />
           <button
-            disabled={isLoading}
+            disabled={isPending}
             type="submit"
             className="w-full rounded-2xl p-4 text-center font-bold text-[#1E40AF] bg-white hover:bg-gray-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
-            {isLoading ? "Please wait..." : "Sign In"}
+            {isPending ? "Please wait..." : "Sign In"}
           </button>
+          
+          <div className="flex items-center gap-4 my-2">
+            <hr className="border-white/20 flex-1" />
+            <span className="text-white/80 text-sm">Or</span>
+            <hr className="border-white/20 flex-1" />
+          </div>
+
+          <div className="flex justify-center w-full mt-4">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                setAuthError("");
+                try {
+                  const res = await postGoogleAuth(credentialResponse.credential);
+                  const sessionData = res?.data || res;
+                  secureLocalStorage.setItem(STRORAGE_KEY, sessionData);
+                  if (
+                    sessionData.role === "manager" ||
+                    sessionData.role === "admin" ||
+                    sessionData.role === "super_admin" ||
+                    sessionData.role === "teacher"
+                  ) {
+                    navigate("/manager");
+                  } else {
+                    navigate("/student");
+                  }
+                } catch (error) {
+                  console.error("Google auth error:", error);
+                  const msg = error?.response?.data?.message || error?.message || "Google authentication failed";
+                  setAuthError(msg);
+                }
+              }}
+              onError={() => {
+                setAuthError("Google Sign In failed");
+              }}
+              shape="pill"
+              theme="filled_blue"
+              text="signin_with"
+              size="large"
+            />
+          </div>
         </form>
       </div>
+      <ErrorToast message={authError} onClose={() => setAuthError("")} />
     </div>
   );
 }

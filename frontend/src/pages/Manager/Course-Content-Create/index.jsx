@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { useForm } from "react-hook-form";
@@ -7,11 +7,14 @@ import { mutateContentSchema } from "../../../utils/zodSchema";
 import { useMutation } from "@tanstack/react-query";
 import { createContent, updateContent } from "../../../services/courseService";
 import { useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFileVideo, faHeading, faCrown } from "@fortawesome/free-solid-svg-icons";
 
 export default function ManageCourseContentCreatePage() {
   const content = useLoaderData();
   const { id, contentId } = useParams();
   const navigate = useNavigate();
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const {
     register,
@@ -24,7 +27,6 @@ export default function ManageCourseContentCreatePage() {
     defaultValues: {
       title: content?.title,
       type: content?.type,
-      youtubeId: content?.youtubeId,
       text: content?.text
     }
   });
@@ -39,16 +41,23 @@ export default function ManageCourseContentCreatePage() {
 
   const onSubmit = async (values) => {
     try {
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("type", values.type);
+      formData.append("courseId", id);
+
+      if (values.type === "video") {
+        if (values.video && values.video.length > 0) {
+          formData.append("video", values.video[0]);
+        }
+      } else if (values.type === "text") {
+        formData.append("text", values.text);
+      }
+
       if (content === undefined) {
-        await mutateCreate.mutateAsync({
-          ...values,
-          courseId: id
-        });
+        await mutateCreate.mutateAsync(formData);
       } else {
-        await mutateUpdate.mutateAsync({
-          ...values,
-          courseId: id
-        });
+        await mutateUpdate.mutateAsync(formData);
       }
 
       navigate(`/manager/courses/${id}`);
@@ -76,18 +85,18 @@ export default function ManageCourseContentCreatePage() {
           </div>
         </div>
       </header>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-[930px] rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-[930px] rounded-[30px] p-[30px] gap-[30px] bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/20">
         <div className="flex flex-col gap-[10px]">
           <label htmlFor="title" className="font-semibold">
             Content Title
           </label>
-          <div className="flex items-center w-full rounded-full border border-[#CFDBEF] gap-3 px-5 transition-all duration-300 focus-within:ring-2 focus-within:ring-[#1E40AF]">
-            <img src="/assets/images/icons/note-favorite-black.svg" className="w-6 h-6" alt="icon" />
+          <div className="flex items-center w-full rounded-full border border-gray-300 dark:border-white/20 gap-3 px-5 transition-all duration-300 bg-white/50 dark:bg-black/30 focus-within:ring-2 focus-within:ring-[#1E40AF]">
+            <FontAwesomeIcon icon={faHeading} className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             <input
               {...register("title")}
               type="text"
               id="title"
-              className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
+              className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               placeholder="Write better name for your course"
             />
           </div>
@@ -97,18 +106,18 @@ export default function ManageCourseContentCreatePage() {
           <label htmlFor="type" className="font-semibold">
             Select Type
           </label>
-          <div className="flex items-center w-full rounded-full border border-[#CFDBEF] gap-3 px-5 transition-all duration-300 focus-within:ring-2 focus-within:ring-[#1E40AF]">
-            <img src="/assets/images/icons/crown-black.svg" className="w-6 h-6" alt="icon" />
+          <div className="flex items-center w-full rounded-full border border-gray-300 dark:border-white/20 gap-3 px-5 transition-all duration-300 bg-white/50 dark:bg-black/30 focus-within:ring-2 focus-within:ring-[#1E40AF]">
+            <FontAwesomeIcon icon={faCrown} className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             <select
               {...register("type")}
               id="type"
               defaultValue={content?.type || ""}
-              className="appearance-none outline-none w-full py-3 px-2 -mx-2 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent">
+              className="appearance-none outline-none w-full py-3 px-2 -mx-2 font-semibold bg-transparent text-gray-900 dark:text-white">
               <option value="" hidden>
                 Choose content type
               </option>
-              <option value="video">Video</option>
-              <option value="text">Text</option>
+              <option value="video" className="text-black">Video</option>
+              <option value="text" className="text-black">Text</option>
             </select>
             <img src="/assets/images/icons/arrow-down.svg" className="w-6 h-6" alt="icon" />
           </div>
@@ -117,19 +126,20 @@ export default function ManageCourseContentCreatePage() {
         {type === "video" && (
           <div className="flex flex-col gap-[10px]">
             <label htmlFor="video" className="font-semibold">
-              Youtube Video ID
+              Upload Video (MP4)
             </label>
-            <div className="flex items-center w-full rounded-full border border-[#CFDBEF] gap-3 px-5 transition-all duration-300 focus-within:ring-2 focus-within:ring-[#1E40AF]">
-              <img src="/assets/images/icons/bill-black.svg" className="w-6 h-6" alt="icon" />
+            <div className="flex items-center w-full rounded-full border border-gray-300 dark:border-white/20 gap-3 px-5 transition-all duration-300 bg-white/50 dark:bg-black/30 focus-within:ring-2 focus-within:ring-[#1E40AF]">
+              <FontAwesomeIcon icon={faFileVideo} className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               <input
-                {...register("youtubeId")}
-                type="text"
+                {...register("video")}
+                type="file"
                 id="video"
-                className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
-                placeholder="Write tagline for better copy"
+                accept="video/mp4,video/x-m4v,video/*"
+                className="appearance-none outline-none w-full py-3 font-semibold bg-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1E40AF] file:text-white hover:file:bg-[#1e3a8a] cursor-pointer"
               />
             </div>
-            <span className="error-message text-[#FF435A]">{errors?.youtubeId?.message}</span>
+            {content?.videoUrl && <p className="text-sm text-green-500 mt-2">Video currently uploaded. Select a new one to replace.</p>}
+            <span className="error-message text-[#FF435A]">{errors?.video?.message}</span>
           </div>
         )}
         {type === "text" && (
@@ -159,7 +169,7 @@ export default function ManageCourseContentCreatePage() {
           </button>
           <button
             type="submit"
-            disabled={content === undefined ? mutateCreate.isLoading : mutateUpdate.isLoading}
+            disabled={content === undefined ? mutateCreate.isPending : mutateUpdate.isPending}
             className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#1E40AF] text-nowrap">
             {content === undefined ? "Add" : "Edit"} Content Now
           </button>

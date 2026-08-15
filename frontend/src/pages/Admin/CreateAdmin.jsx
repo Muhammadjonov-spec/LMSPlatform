@@ -8,7 +8,7 @@ export default function CreateAdmin() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const { mutateAsync, isLoading } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: (data) => adminService.createAdmin(data)
   });
 
@@ -67,8 +67,8 @@ export default function CreateAdmin() {
               onChange={(e) => setFormData({...formData, password: e.target.value})}
               required
             />
-            <Button type="submit" variant="primary" className="w-full mt-4" disabled={isLoading}>
-              {isLoading ? "Creating..." : "Create Admin Account"}
+            <Button type="submit" variant="primary" className="w-full mt-4" disabled={isPending}>
+              {isPending ? "Creating..." : "Create Admin Account"}
             </Button>
           </form>
         </CardBody>

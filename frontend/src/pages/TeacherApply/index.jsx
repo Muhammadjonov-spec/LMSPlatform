@@ -8,7 +8,7 @@ export default function TeacherApply() {
   const [formData, setFormData] = useState({ bio: "", experienceYears: "", youtube: "", linkedin: "" });
   const [message, setMessage] = useState("");
 
-  const { mutateAsync, isLoading } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: (data) => teacherService.applyForTeacher(data)
   });
 
@@ -63,8 +63,8 @@ export default function TeacherApply() {
                 value={formData.linkedin}
                 onChange={(e) => setFormData({...formData, linkedin: e.target.value})}
               />
-              <Button type="submit" variant="primary" className="w-full mt-4" disabled={isLoading}>
-                {isLoading ? "Submitting..." : "Submit Application"}
+              <Button type="submit" variant="primary" className="w-full mt-4" disabled={isPending}>
+                {isPending ? "Submitting..." : "Submit Application"}
               </Button>
             </form>
           )}

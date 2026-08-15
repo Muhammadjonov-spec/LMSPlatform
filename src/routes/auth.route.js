@@ -76,5 +76,6 @@ router.post("/login", validate(loginSchema), authController.login);
  *         description: Muvaffaqiyatli chiqildi
  */
 router.post("/logout", isAuth, authController.logout);
+router.post("/google", authController.googleAuth);
 
 module.exports = router;

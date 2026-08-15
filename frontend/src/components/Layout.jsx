@@ -15,9 +15,9 @@ export default function LayoutDashboard({ isAdmin = true }) {
       {isPreviewPage ? (
         <Outlet />
       ) : (
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120] text-gray-900 dark:text-gray-100 transition-colors duration-300">
           <Sidebar isAdmin={isAdmin} />
-          <main className="flex flex-col flex-1 gap-[30px] p-[30px] ml-[290px]">
+          <main className="flex flex-col flex-1 gap-[30px] p-[15px] md:p-[30px] md:ml-[290px] w-full transition-all duration-300">
             <Header type={session?.role} />
             <Outlet />
           </main>

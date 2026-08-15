@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 export default function Pricing({ data }) {
   console.log(data);
 
-  const { isLoading, mutateAsync } = useMutation({
+  const { isPending, mutateAsync } = useMutation({
     mutationFn: () => postSignup(data)
   });
 
@@ -26,16 +26,9 @@ export default function Pricing({ data }) {
 
   return (
     <div className="relative flex flex-col flex-1 p-[10px]">
-      <div class="absolute w-[calc(100%-20px)] min-h-[calc(100vh-20px)] h-[calc(100%-20px)] bg-[#fff] -z-10 rounded-[20px]"></div>
+      <div className="absolute w-[calc(100%-20px)] min-h-[calc(100vh-20px)] h-[calc(100%-20px)] bg-[#fff] -z-10 rounded-[20px]"></div>
       <nav className="flex items-center justify-between p-8 border-b border-black/25 py-4">
         <Navbar />
-        <div className="flex items-center gap-3">
-          <Link to="/manager/sign-in">
-            <div className="flex items-center justify-center gap-2 rounded-[16px] border px-6 py-3 transition-all duration-300 bg-[#ffffff] border-[#1E40AF] hover:bg-[#f5f5f5dc] hover:border-[#1E40AF]">
-              <span className="font-semibold text-[#1E40AF] whitespace-nowrap ">My Dashboard</span>
-            </div>
-          </Link>
-        </div>
       </nav>
       <header className="flex flex-col items-center gap-5 text-center mt-[30px]">
         <h1 className="font-extrabold text-[46px] leading-[69px] text-black">
@@ -47,7 +40,7 @@ export default function Pricing({ data }) {
           Whether you’re just starting out or managing a team of learners, we’ve got the right plan for you.
         </p>
       </header>
-      <div className="grid grid-cols-3 gap-[30px] max-w-[1440px] mx-auto mt-[60px]">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[30px] max-w-[1440px] mx-auto mt-[60px] px-4">
         <div className="card flex flex-col h-fit rounded-[20px] border border-[#262A56] p-[30px] gap-[30px] bg-[#ffffff]">
           <div>
             <p className="font-extrabold text-[46px] leading-[69px] text-black">
@@ -104,9 +97,9 @@ export default function Pricing({ data }) {
           <button
             type="button"
             onClick={submitData}
-            disabled={isLoading}
+            disabled={isPending}
             className="flex items-center justify-center gap-2 rounded-full border px-6 py-2 transition-all duration-300 bg-white border-[#1E40AF] hover:bg-[#f5f5f5] hover:border-[#1E40AF]">
-            <span className="text-[18px] text-[#1E40AF] font-medium">{isLoading ? "Processing..." : "Get Started"}</span>
+            <span className="text-[18px] text-[#1E40AF] font-medium">{isPending ? "Processing..." : "Get Started"}</span>
           </button>
 
           <hr className="border-white/60" />
@@ -178,6 +171,6 @@ export default function Pricing({ data }) {
   );
 }
 
-Pricing.PropTypes = {
+Pricing.propTypes = {
   data: PropTypes.object
 };

@@ -111,6 +111,28 @@ export default function PublicCourseDetail() {
                 className="w-full py-4 rounded-xl bg-[#1E40AF] text-white font-bold text-lg hover:bg-blue-800 transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-1">
                 Buy Now
               </button>
+
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Talabalar sharhlari</h3>
+                <div className="space-y-4">
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 text-[#1E40AF] flex items-center justify-center font-bold text-xs">J</div>
+                      <span className="font-semibold text-sm">Jamshid O.</span>
+                      <div className="ml-auto text-yellow-500 text-sm">★★★★★</div>
+                    </div>
+                    <p className="text-xs text-gray-600">Juda zo'r kurs! Menga ayniqsa amaliyot qismlari yoqdi. O'z soham bo'yicha ko'p yangi narsalarni o'rgandim.</p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold text-xs">S</div>
+                      <span className="font-semibold text-sm">Sevara N.</span>
+                      <div className="ml-auto text-yellow-500 text-sm">★★★★☆</div>
+                    </div>
+                    <p className="text-xs text-gray-600">Tushuntirishlar aniq va tushunarli. Kichik kamchiliklar bor, lekin umumiy olganda tavsiya qilaman.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

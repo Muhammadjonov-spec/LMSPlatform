@@ -15,6 +15,11 @@ import CategoriesPage from "../pages/Manager/Categories";
 import SubscriptionPage from "../pages/Manager/Subscription";
 import RewardsPage from "../pages/Manager/Rewards";
 import SettingsPage from "../pages/Manager/Settings";
+import StudentSettingsPage from "../pages/Student/StudentSettings";
+import StudentSubscriptionPage from "../pages/Student/StudentSubscription";
+import StudentRewardsPage from "../pages/Student/StudentRewards";
+import OrdersApproval from "../pages/Admin/OrdersApproval";
+import CreateAdmin from "../pages/Admin/CreateAdmin";
 import StudentPage from "../pages/Student/StudentOverview";
 import { MANAGER_SESSION, STRORAGE_KEY, STUDENT_SESSION } from "../utils/const";
 import secureLocalStorage from "react-secure-storage";
@@ -28,12 +33,39 @@ import StudentsCourseList from "../pages/Manager/Student-Course";
 import StudentForm from "../pages/Manager/Student-Course/student-form";
 import { getOverviews } from "../services/overvieService";
 import PublicCourseDetail from "../pages/PublicCourseDetail";
+import PublicCourses from "../pages/PublicCourses";
 import Checkout from "../pages/Checkout";
+import TeacherApply from "../pages/TeacherApply";
+
+import HelpCenter from "../pages/Support/HelpCenter";
+import TermsOfService from "../pages/Support/TermsOfService";
+import PrivacyPolicy from "../pages/Support/PrivacyPolicy";
+import ContactUs from "../pages/Support/ContactUs";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <LandingPage />
+  },
+  {
+    path: "/support/help",
+    element: <HelpCenter />
+  },
+  {
+    path: "/support/terms",
+    element: <TermsOfService />
+  },
+  {
+    path: "/support/privacy",
+    element: <PrivacyPolicy />
+  },
+  {
+    path: "/support/contact",
+    element: <ContactUs />
+  },
+  {
+    path: "/courses",
+    element: <PublicCourses />
   },
   {
     path: "/courses/:id",
@@ -82,11 +114,16 @@ const router = createBrowserRouter([
     element: <SuccesCheckoutPage />
   },
   {
+    path: "/teacher/apply",
+    element: <TeacherApply />
+  },
+  {
     path: "/manager",
     id: MANAGER_SESSION,
     loader: async () => {
       const session = secureLocalStorage.getItem(STRORAGE_KEY);
-      if (!session || session.role !== "manager") {
+      const allowedRoles = ["teacher", "admin", "super_admin", "manager"];
+      if (!session || !allowedRoles.includes(session.role)) {
         throw redirect("/sign-in");
       }
       return session;
@@ -217,6 +254,14 @@ const router = createBrowserRouter([
       {
         path: "/manager/settings",
         element: <SettingsPage />
+      },
+      {
+        path: "/manager/admin/orders",
+        element: <OrdersApproval />
+      },
+      {
+        path: "/manager/admin/users",
+        element: <CreateAdmin />
       }
     ]
   },
@@ -252,21 +297,21 @@ const router = createBrowserRouter([
         path: "/student/subscription",
         loader: async () => {
           const subscriptions = await getSubscriptions();
-          return subscriptions;
+          return subscriptions?.data || [];
         },
-        element: <SubscriptionPage />
+        element: <StudentSubscriptionPage />
       },
       {
         path: "/student/rewards",
         loader: async () => {
           const rewards = await getRewards();
-          return rewards;
+          return rewards?.data || [];
         },
-        element: <RewardsPage />
+        element: <StudentRewardsPage />
       },
       {
         path: "/student/settings",
-        element: <SettingsPage />
+        element: <StudentSettingsPage />
       }
     ]
   }

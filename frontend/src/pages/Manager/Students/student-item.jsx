@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
 import { deleteStudent } from "../../../services/studentServices";
 import ConfirmModal from "../../../components/common/confirmModal";
-import ErrorToast from "../../../components/common/errorToast";
-import { useConfirmModal } from "../../../components/common/useConfirmModal";
+import ErrorToast from "../../../components/common/ErrorToast";
+import { useConfirmModal } from "../../../components/common/UseConfirmModal";
 
 export default function StudentItem({
   imageUrl = "/assets/images/photos/photo-3.png",
@@ -16,7 +16,7 @@ export default function StudentItem({
   const revalidator = useRevalidator();
   const confirmModal = useConfirmModal();
   const [error, setError] = useState(null);
-  const { isLoading, mutateAsync } = useMutation({
+  const { isPending, mutateAsync } = useMutation({
     mutationFn: () => deleteStudent(id),
     onError: (err) => {
       setError(err.message || "Failed to delete course");
@@ -39,7 +39,7 @@ export default function StudentItem({
   };
 
   const handleCloseModal = () => {
-    if (!isLoading) {
+    if (!isPending) {
       confirmModal.close();
     }
   };
@@ -68,7 +68,7 @@ export default function StudentItem({
           </Link>
           <button
             type="button"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={handleDeleteClick}
             className="w-fit rounded-full p-[14px_20px] bg-[#FF435A] font-semibold text-white text-nowrap">
             Delete
@@ -91,7 +91,7 @@ export default function StudentItem({
         }
         confirmText="Delete"
         cancelText="Cancel"
-        isLoading={isLoading}
+        isLoading={isPending}
         variant="danger"
       />
     </>

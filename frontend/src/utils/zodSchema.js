@@ -23,24 +23,24 @@ export const mutateContentSchema = z
   .object({
     title: z.string().min(5),
     type: z.string().min(3, { message: "Type is required" }),
-    youtubeId: z.string().optional(),
+    video: z.any().optional(),
     text: z.string().optional()
   })
   .superRefine((val, ctx) => {
-    const parseVideoId = z.string().min(4).safeParse(val.youtubeId);
     const parseText = z.string().min(4).safeParse(val.text);
 
-    if (val.type === "Video") {
-      if (!parseVideoId.success) {
+    if (val.type === "video") {
+      // In create mode, if type is video, a file is required (we will handle edit mode logic later or allow empty if it's edit)
+      if (!val.video || (val.video.length === 0 && !val.video.name)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Youtube ID is required for video content",
-          path: ["youtubeId"]
+          message: "Video file is required",
+          path: ["video"]
         });
       }
     }
 
-    if (val.type === "Text") {
+    if (val.type === "text") {
       if (!parseText.success) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,

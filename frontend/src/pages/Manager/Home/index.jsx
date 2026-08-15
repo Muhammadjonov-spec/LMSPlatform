@@ -8,24 +8,30 @@ export default function ManagerHome() {
 
   return (
     <>
-      <header className="flex items-center justify-between gap-[30px]">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-extrabold text-[28px] leading-[42px]">Dashboard Overview</h1>
           <p className="text-[#838C9D] mt-[1]">Here's a quick summary of your courses, achievements, and upcoming tasks.</p>
         </div>
         <div className="flex items-center gap-3">
-          <a href="#" className="w-fit rounded-[16px] border border-[#1E40AF] p-[14px_20px] font-semibold text-nowrap">
+          <button 
+            onClick={() => alert("Customize funksiyasi tez orada ishga tushadi")}
+            className="w-fit rounded-[16px] border border-[#1E40AF] p-[14px_20px] font-semibold text-nowrap hover:bg-[#1E40AF]/5 transition-colors"
+          >
             Customize
-          </a>
-          <a href="" className="w-fit rounded-[16px] p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#1E40AF] text-nowrap">
+          </button>
+          <button 
+            onClick={() => alert("Ma'lumotlarni yuklab olish tez orada ishga tushadi")}
+            className="w-fit rounded-[16px] p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#1E40AF] text-nowrap hover:bg-blue-800 transition-colors"
+          >
             Export Data
-          </a>
+          </button>
         </div>
       </header>
 
-      <section id="Stats" className="grid grid-cols-2 gap-[30px] rounded-[30px] p-[30px] bg-[#F8FAFB]">
+      <section id="Stats" className="grid grid-cols-1 lg:grid-cols-2 gap-[30px] rounded-[30px] p-4 sm:p-[30px] bg-[#F8FAFB]">
         <div className="flex flex-col gap-[30px]">
-          <div className="w-full h-[100px] bg-white rounded-[20px] shadow-[0_4px_10px_0_#E0E2EF] p-1 flex items-center justify-between">
+          <div className="w-full bg-white rounded-[20px] shadow-[0_4px_10px_0_#E0E2EF] p-1 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-3 px-4">
               <div className="w-[40px] h-[40px] rounded-[10px] bg-[#F8FAFB] shadow-[0_2px_6px_0_#E0E2EF] flex items-center justify-center">
                 <img src="/assets/images/icons/student-blue.svg" className="w-[30px]" />
@@ -112,7 +118,7 @@ export default function ManagerHome() {
         </div>
       </section>
 
-      <div className="grid grid-cols-2 gap-[30px]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[30px]">
         <Courses />
       </div>
     </>

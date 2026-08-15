@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
 import { deleteCourse } from "../../../services/courseService";
 import ConfirmModal from "../../../components/common/confirmModal";
-import ErrorToast from "../../../components/common/errorToast";
-import { useConfirmModal } from "../../../components/common/useConfirmModal";
+import ErrorToast from "../../../components/common/ErrorToast";
+import { useConfirmModal } from "../../../components/common/UseConfirmModal";
 
 export default function CardCourse({
   id,
@@ -18,7 +18,7 @@ export default function CardCourse({
   const confirmModal = useConfirmModal();
   const [error, setError] = useState(null);
 
-  const { isLoading, mutateAsync } = useMutation({
+  const { isPending, mutateAsync } = useMutation({
     mutationFn: () => deleteCourse(id),
     onError: (err) => {
       setError(err.message || "Failed to delete course");
@@ -41,7 +41,7 @@ export default function CardCourse({
   };
 
   const handleCloseModal = () => {
-    if (!isLoading) {
+    if (!isPending) {
       confirmModal.close();
     }
   };
@@ -78,7 +78,7 @@ export default function CardCourse({
           </Link>
           <button
             type="button"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={handleDeleteClick}
             className="w-fit rounded-[16px] bg-[#FF435A] text-white p-[14px_20px] font-semibold text-nowrap hover:bg-[#E63950] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={`Delete ${name} course`}>
@@ -110,7 +110,7 @@ export default function CardCourse({
         }
         confirmText="Delete"
         cancelText="Cancel"
-        isLoading={isLoading}
+        isLoading={isPending}
         variant="danger"
       />
     </>

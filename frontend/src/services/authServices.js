@@ -1,6 +1,14 @@
-import apiInstance from "../utils/axios";
+import apiInstance, { apiInstanceAuth } from "../utils/axios";
 
 export const postSignup = async (data) =>
-  apiInstance.post("/sign-up", data).then((res) => res.data);
+  apiInstance.post("/auth/register", data).then((res) => res.data);
+
 export const postSignIn = async (data) =>
-  apiInstance.post("/sign-in", data).then((res) => res.data);
+  apiInstance.post("/auth/login", data).then((res) => res.data);
+
+export const postGoogleAuth = async (idToken) =>
+  apiInstance.post("/auth/google", { idToken, credential: idToken }).then((res) => res.data);
+
+export const postLogout = async () =>
+  apiInstanceAuth.post("/auth/logout").then((res) => res.data);
+

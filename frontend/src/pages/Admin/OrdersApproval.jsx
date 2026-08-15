@@ -9,7 +9,7 @@ export default function OrdersApproval() {
     queryFn: () => orderService.getPendingOrders()
   });
 
-  const { mutateAsync: approveMutate, isLoading: isApproving } = useMutation({
+  const { mutateAsync: approveMutate, isPending: isApproving } = useMutation({
     mutationFn: (id) => orderService.approveOrder(id)
   });
 

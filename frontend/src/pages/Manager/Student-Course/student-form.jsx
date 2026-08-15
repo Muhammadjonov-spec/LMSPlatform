@@ -23,7 +23,7 @@ export default function StudentForm() {
 
   console.log(data);
 
-  const { isLoading, mutateAsync } = useMutation({
+  const { isPending, mutateAsync } = useMutation({
     mutationFn: (data) => addStudentsCourse(data, id)
   });
 
@@ -78,7 +78,7 @@ export default function StudentForm() {
           </button>
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isPending}
             className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF]">
             Add Now
           </button>

@@ -15,6 +15,11 @@ class AuthController {
   const result=await AuthService.logout(userId)
   res.status(201).json({success:true, message:"Successfully logout"})
  }
+ async googleAuth(req, res) {
+  const { idToken } = req.body;
+  const result = await AuthService.googleAuth(idToken);
+  res.status(200).json({ success: true, data: result });
+ }
 }
 
 module.exports = new AuthController()
