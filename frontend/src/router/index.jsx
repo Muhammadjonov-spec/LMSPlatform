@@ -20,6 +20,7 @@ import StudentSubscriptionPage from "../pages/Shared/Subscription";
 import StudentRewardsPage from "../pages/Shared/Rewards";
 import OrdersApproval from "../pages/Admin/OrdersApproval";
 import CreateAdmin from "../pages/Admin/CreateAdmin";
+import TeacherApproval from "../pages/Admin/TeacherApproval";
 import StudentPage from "../pages/Student/StudentOverview";
 import { MANAGER_SESSION, STRORAGE_KEY, STUDENT_SESSION } from "../utils/const";
 import secureLocalStorage from "react-secure-storage";
@@ -41,6 +42,7 @@ import HelpCenter from "../pages/Support/HelpCenter";
 import TermsOfService from "../pages/Support/TermsOfService";
 import PrivacyPolicy from "../pages/Support/PrivacyPolicy";
 import ContactUs from "../pages/Support/ContactUs";
+import VerifyEmailPage from "../pages/VerifyEmail";
 
 const router = createBrowserRouter([
   {
@@ -62,6 +64,10 @@ const router = createBrowserRouter([
   {
     path: "/support/contact",
     element: <ContactUs />
+  },
+  {
+    path: "/verify-email",
+    element: <VerifyEmailPage />
   },
   {
     path: "/courses",
@@ -197,7 +203,7 @@ const router = createBrowserRouter([
         element: <ManageCourseDetailPage />
       },
       {
-        path: "courses/:id/create",
+        path: "courses/:id/modules/:moduleId/lessons/create",
         element: <ManageCourseContentCreatePage />
       },
       {
@@ -323,6 +329,10 @@ const router = createBrowserRouter([
       {
         path: "/manager/admin/users",
         element: <CreateAdmin />
+      },
+      {
+        path: "/manager/admin/teachers",
+        element: <TeacherApproval />
       }
     ]
   },

@@ -10,6 +10,10 @@ export default function SettingsPage() {
   const session = managerSession || studentSession;
 
   // Profile data
+  const fullName = session?.firstName && session?.lastName
+    ? `${session.firstName} ${session.lastName}`
+    : session?.firstName || session?.name || "Foydalanuvchi";
+
   const [profileData, setProfileData] = useState({
     firstName: session?.firstName || session?.name?.split(" ")[0] || "",
     lastName: session?.lastName || session?.name?.split(" ").slice(1).join(" ") || "",
@@ -117,16 +121,16 @@ export default function SettingsPage() {
               <div className="relative">
                 <div
                   className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-md"
-                  style={{ backgroundColor: `hsl(${(session?.name || "U").charCodeAt(0) * 7 % 360}, 70%, 60%)` }}
+                  style={{ backgroundColor: `hsl(${(fullName).charCodeAt(0) * 7 % 360}, 70%, 60%)` }}
                 >
-                  {session?.name?.charAt(0)?.toUpperCase() || "U"}
+                  {fullName?.charAt(0)?.toUpperCase() || "U"}
                 </div>
                 <button className="absolute bottom-0 right-0 w-7 h-7 bg-[#1E40AF] text-white rounded-full flex items-center justify-center shadow-md hover:bg-blue-800 transition-colors">
                   <FontAwesomeIcon icon={faCamera} className="w-3 h-3" />
                 </button>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{session?.name || "Foydalanuvchi"}</h3>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{fullName}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{session?.email || "email@example.com"}</p>
                 <span className="inline-block mt-1 px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-[#1E40AF] dark:text-blue-300 text-xs font-semibold rounded-md uppercase">
                   {session?.role}

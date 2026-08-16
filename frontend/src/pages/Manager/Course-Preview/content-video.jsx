@@ -86,7 +86,7 @@ function Mp4Player({ src }) {
 }
 
 export default function ContentVideo({ content, handleNext }) {
-  const videoUrl = content?.videoUrl;
+  const videoUrl = content?.videoPath || content?.videoUrl;
   const youtubeId = content?.youtubeId;
   const videoSrc = getVideoSrc(videoUrl);
 
@@ -157,6 +157,7 @@ export default function ContentVideo({ content, handleNext }) {
 
 ContentVideo.propTypes = {
   content: PropTypes.shape({
+    videoPath: PropTypes.string,
     videoUrl: PropTypes.string,
     youtubeId: PropTypes.string,
     title: PropTypes.string,

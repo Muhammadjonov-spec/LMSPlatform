@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useRouteLoaderData } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCube, faBook, faCrown, faUsers, faShieldAlt, faTrophy, faCog, faBars, faTimes, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faCube, faBook, faCrown, faUsers, faShieldAlt, faTrophy, faCog, faBars, faTimes, faMoon, faSun, faGraduationCap, faChalkboardTeacher } from "@fortawesome/free-solid-svg-icons";
 import { MANAGER_SESSION, STUDENT_SESSION } from "../utils/const";
 
 export default function Sidebar({ isAdmin = true }) {
@@ -136,6 +136,17 @@ export default function Sidebar({ isAdmin = true }) {
                           </div>
                         </Link>
                       </li>
+                      <li>
+                        <Link to="/manager/admin/teachers" onClick={() => setIsOpen(false)}>
+                          <div
+                            className={`flex items-center gap-3 w-full rounded-[16px] border p-[14px_20px] transition-all duration-300 border-white/30 backdrop-blur-sm ${
+                              isActive("/manager/admin/teachers") ? "bg-white text-[#1E40AF] dark:text-[#0B1120] shadow-[0_0_15px_rgba(255,255,255,0.5)]" : "bg-transparent text-white hover:bg-white/20"
+                            }`}>
+                            <FontAwesomeIcon icon={faChalkboardTeacher} className="w-5 h-5" color={getIconColor("/manager/admin/teachers")} />
+                            <span className="font-semibold">O'qituvchilarni tasdiqlash</span>
+                          </div>
+                        </Link>
+                      </li>
                     </>
                   )}
                   
@@ -183,6 +194,20 @@ export default function Sidebar({ isAdmin = true }) {
                   </div>
                 </Link>
               </li>
+
+              {!isAdmin && session?.role === "student" && (
+                <li>
+                  <Link to="/teacher/apply" onClick={() => setIsOpen(false)}>
+                    <div
+                      className={`flex items-center gap-3 w-full rounded-[16px] border p-[14px_20px] transition-all duration-300 border-white/30 backdrop-blur-sm ${
+                        isActive("/teacher/apply") ? "bg-white text-[#1E40AF] dark:text-[#0B1120] shadow-[0_0_15px_rgba(255,255,255,0.5)]" : "bg-transparent text-white hover:bg-white/20"
+                      }`}>
+                      <FontAwesomeIcon icon={faGraduationCap} className="w-5 h-5" color={getIconColor("/teacher/apply")} />
+                      <span className="font-semibold">O'qituvchi bo'lish</span>
+                    </div>
+                  </Link>
+                </li>
+              )}
 
               <li>
                 <Link to={isAdmin ? "/manager/settings" : "/student/settings"} onClick={() => setIsOpen(false)}>

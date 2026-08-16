@@ -19,6 +19,10 @@ class TeacherService{
     return{ message: "Arizangiz muvaffaqiyatli qabul qilindi. Admin tasdiqlashini kuting.", teacher: newTeacher}
   }
 
+  async getPendingTeachers() {
+    return await TeacherRepository.model.find({ isApproved: false }).populate("user", "firstName lastName email avatar role");
+  }
+
   async approveTeacher(teacherId){
     const teacher=await TeacherRepository.findById(teacherId)
     if(!teacher){
@@ -27,6 +31,7 @@ class TeacherService{
     if(teacher.isApproved){
       throw new AppError(400, "bu oqituvchi allaqachon tasdiqlangan")
     }
+    await TeacherRepository.update(teacherId, {isApproved: true})
     await UserRepository.update(teacher.user, {role:"teacher"})
     return {message:"O'qituvchi muvaffaqiyatli tasdiqlandi va unga ruxsatlar berildi"}
   }

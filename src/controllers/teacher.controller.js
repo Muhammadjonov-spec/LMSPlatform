@@ -23,6 +23,10 @@ class TeacherController{
     res.status(200).json({success:true, data:result})
 
   }
+  async getPendingTeachers(req, res){
+    const result = await TeacherService.getPendingTeachers()
+    res.status(200).json({success:true, data:result})
+  }
 }
 
 module.exports=new TeacherController()  

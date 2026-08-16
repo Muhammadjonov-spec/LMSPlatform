@@ -13,7 +13,7 @@ class AuthController {
  async verifyEmail(req, res){
   const { token } = req.params
   await AuthService.verifyEmail(token)
-  res.redirect('https://lms.sardorbekcoder.uz/sign-in?verified=true')
+  res.status(200).json({success: true, message: "Email muvaffaqiyatli tasdiqlandi"})
  }
  async logout(req, res){
   const userId=req.user._id

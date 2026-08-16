@@ -26,8 +26,12 @@ export default function Header({ type = "manager" }) {
     return `hsl(${h}, 70%, 60%)`;
   };
 
-  const initial = session?.name?.charAt(0)?.toUpperCase() ?? "U";
-  const avatarColor = stringToHsl(session?.name ?? "User");
+  const fullName = session?.firstName && session?.lastName
+    ? `${session.firstName} ${session.lastName}`
+    : session?.firstName || session?.name || "Foydalanuvchi";
+
+  const initial = fullName?.charAt(0)?.toUpperCase() ?? "U";
+  const avatarColor = stringToHsl(fullName ?? "User");
 
   return (
     <div id="TopBar" className="flex items-center justify-between gap-[30px]">
@@ -46,7 +50,7 @@ export default function Header({ type = "manager" }) {
 
       <div className="relative flex items-center justify-end gap-[14px] group">
         <div className="text-right hidden sm:block">
-          <p className="font-semibold text-gray-900 dark:text-gray-100">{session?.name}</p>
+          <p className="font-semibold text-gray-900 dark:text-gray-100">{fullName}</p>
           <p className="text-sm leading-[21px] text-gray-500 dark:text-gray-400">{session?.role}</p>
         </div>
 

@@ -8,16 +8,27 @@ export default function ManageCoursePreviewPage({ isAdmin = true }) {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [activeContent, setActiveContent] = useState(course?.details?.[0]);
+  const allLessons = course?.modules?.reduce((acc, module, mIndex) => {
+    const lessons = module.lessons?.map((lesson, lIndex) => ({
+      ...lesson,
+      type: "video",
+      moduleTitle: module.title,
+      moduleIndex: mIndex,
+      lessonIndex: lIndex,
+    })) || [];
+    return [...acc, ...lessons];
+  }, []) || [];
+
+  const [activeContent, setActiveContent] = useState(allLessons[0]);
 
   const handleChangeContent = (content) => {
     setActiveContent(content);
   };
 
   const handleNextContent = (content) => {
-    const currIndex = course?.details?.findIndex((val) => val._id === content._id);
-    if (currIndex < course?.details?.length - 1) {
-      handleChangeContent(course.details[currIndex + 1]);
+    const currIndex = allLessons.findIndex((val) => val._id === content._id);
+    if (currIndex < allLessons.length - 1) {
+      handleChangeContent(allLessons[currIndex + 1]);
     }
   };
 
@@ -39,7 +50,7 @@ export default function ManageCoursePreviewPage({ isAdmin = true }) {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
             <span className="material-symbols-rounded text-[#1E40AF] text-sm">emoji_events</span>
-            <span className="text-sm font-semibold text-[#1E40AF]">0 / {course?.details?.length || 0}</span>
+            <span className="text-sm font-semibold text-[#1E40AF]">0 / {allLessons.length || 0}</span>
           </div>
         </div>
       </header>
@@ -68,7 +79,7 @@ export default function ManageCoursePreviewPage({ isAdmin = true }) {
           
           <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
             <div className="flex flex-col gap-3">
-              {course?.details?.map((item, index) => (
+              {allLessons.map((item, index) => (
                 <button 
                   key={item._id} 
                   type="button" 
@@ -93,6 +104,7 @@ export default function ManageCoursePreviewPage({ isAdmin = true }) {
                     )}
                   </div>
                   <div className="flex-1">
+                    <p className="text-xs text-[#1E40AF] font-bold mb-1">{item.moduleTitle}</p>
                     <h4 className={`font-semibold text-sm leading-tight mb-1 ${isActive(item) ? "text-[#1E40AF]" : "text-gray-800"}`}>
                       {item.title}
                     </h4>

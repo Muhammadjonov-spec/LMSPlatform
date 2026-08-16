@@ -12,3 +12,5 @@ export const postGoogleAuth = async (idToken) =>
 export const postLogout = async () =>
   apiInstanceAuth.post("/auth/logout").then((res) => res.data);
 
+export const verifyEmailToken = async (token) =>
+  apiInstance.get(`/auth/verify/${token}`).then((res) => res.data);

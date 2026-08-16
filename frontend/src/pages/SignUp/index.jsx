@@ -47,24 +47,10 @@ export default function signUpPage() {
         password: data.password
       };
       
-      const response = await mutateAsync(payload);
-      const sessionData = response?.data || response;
-      if (sessionData?.token) {
-        secureLocalStorage.setItem(STRORAGE_KEY, sessionData);
-        if (
-          sessionData.role === "manager" ||
-          sessionData.role === "admin" ||
-          sessionData.role === "super_admin" ||
-          sessionData.role === "teacher"
-        ) {
-          navigate("/manager");
-        } else {
-          navigate("/student");
-        }
-      } else {
-        alert("Registration successful! Please sign in to continue.");
-        navigate("/sign-in");
-      }
+      await mutateAsync(payload);
+      // Register muvaffaqiyatli bo'ldi — foydalanuvchi emailni tasdiqlashi kerak
+      // Hech qanday token qaytmaydi, shuning uchun login qilmaymiz
+      navigate("/sign-in?registered=true");
     } catch (error) {
       console.error("Sign up error:", error);
       const msg = error?.response?.data?.message || error?.message || "Registration failed. Please check your details.";

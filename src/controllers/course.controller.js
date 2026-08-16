@@ -1,9 +1,19 @@
 const CourseService=require("../services/course.service")
 
 class CourseController {
+  async getAllCourses(req, res) {
+    const result = await CourseService.getAllCourses(req.user);
+    res.status(200).json({ success: true, data: result });
+  }
+
   async createCourse(req, res){
     const  teacherId=req.user._id
     const data=req.body
+    
+    // Map frontend fields to backend model schema if needed
+    if (data.name && !data.title) data.title = data.name;
+    if (data.categoryId && !data.category) data.category = data.categoryId;
+
     const result=await CourseService.createCourse(data, teacherId)
     res.status(201).json({success:true, data:result})
   }

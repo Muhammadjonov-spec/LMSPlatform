@@ -9,7 +9,7 @@ const sendVerificationEmail=async(userEmail, verificationToken)=>{
         pass:process.env.EMAIL_PASS
       }
     })
-    const verifyUrl=`${process.env.BACKEND_URL || 'http://localhost:6002'}/api/auth/verify/${verificationToken}`
+    const verifyUrl=`${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${verificationToken}`
     const mailOptions={
       from:`"EduStack"<${process.env.EMAIL_USER}>`,
       to:userEmail,

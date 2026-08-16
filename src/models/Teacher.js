@@ -8,6 +8,7 @@ const TeacherSchema=new mongoose.Schema({
   socialLinks: { youtube: { type: String, trim: true }, linkedin: { type: String, trim: true }, github: { type: String, trim: true }, website: { type: String, trim: true }
   },
   
+  isApproved: {type: Boolean, default: false}
 })
 
 module.exports=mongoose.model("Teacher", TeacherSchema)

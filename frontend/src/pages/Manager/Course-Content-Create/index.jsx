@@ -5,14 +5,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { mutateContentSchema } from "../../../utils/zodSchema";
 import { useMutation } from "@tanstack/react-query";
-import { createContent, updateContent } from "../../../services/courseService";
+import { createLesson, updateContent } from "../../../services/courseService";
 import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileVideo, faHeading, faCrown } from "@fortawesome/free-solid-svg-icons";
 
 export default function ManageCourseContentCreatePage() {
   const content = useLoaderData();
-  const { id, contentId } = useParams();
+  const { id, moduleId, contentId } = useParams();
   const navigate = useNavigate();
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -32,7 +32,7 @@ export default function ManageCourseContentCreatePage() {
   });
 
   const mutateCreate = useMutation({
-    mutationFn: (data) => createContent(data)
+    mutationFn: (data) => createLesson(data, id, moduleId)
   });
 
   const mutateUpdate = useMutation({
@@ -44,7 +44,6 @@ export default function ManageCourseContentCreatePage() {
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("type", values.type);
-      formData.append("courseId", id);
 
       if (values.type === "video") {
         if (values.video && values.video.length > 0) {

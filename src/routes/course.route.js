@@ -2,6 +2,8 @@ const CourseController=require("../controllers/course.controller")
 const router=require("express").Router()
 const {isAuth, restrictTo}=require("../middlewares/auth.middleware")
 const { uploadVideo } = require('../middlewares/upload.middleware')
+
+router.get("/", isAuth, restrictTo("teacher", "admin", "super_admin"), CourseController.getAllCourses)
 router.post("/create", isAuth, restrictTo("teacher", "admin", "super_admin"), CourseController.createCourse)
 router.get("/:id", isAuth, CourseController.getCourceDetails)
 

@@ -7,6 +7,19 @@ class CourseService {
     const courseData = { ...data, teacher: teacherId };
     return await CourseRepository.create(courseData);
   }
+
+  async getAllCourses(user) {
+    if (user.role === 'teacher') {
+      const Teacher = require('../models/Teacher');
+      const teacherProfile = await Teacher.findOne({ user: user._id });
+      if (!teacherProfile) return [];
+      return await CourseRepository.model.find({ teacher: teacherProfile._id }).populate('category');
+    } else if (['admin', 'super_admin'].includes(user.role)) {
+      return await CourseRepository.model.find().populate('category');
+    }
+    return [];
+  }
+
   async getCourseDetails(courseId, user) {
     const course = await CourseRepository.findById(courseId);
     if (!course) {

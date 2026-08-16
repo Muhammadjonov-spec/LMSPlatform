@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -15,6 +15,9 @@ import { useAuthStore } from "../../store/authStore";
 
 export default function SignInPage() {
   const [authError, setAuthError] = useState("");
+  const [searchParams] = useSearchParams();
+  const isRegistered = searchParams.get("registered") === "true";
+  const isVerified = searchParams.get("verified") === "true";
   const {
     register,
     handleSubmit,
@@ -81,6 +84,18 @@ export default function SignInPage() {
             <p className="text-white/80 text-sm mt-1">Enter your email and password</p>
           </div>
           <hr className="border-white/20" />
+
+          {isVerified && (
+            <div className="bg-green-500/20 border border-green-400 text-green-100 px-4 py-3 rounded-xl text-sm font-medium">
+              ✅ Email muvaffaqiyatli tasdiqlandi! Endi tizimga kirishingiz mumkin.
+            </div>
+          )}
+
+          {isRegistered && !isVerified && (
+            <div className="bg-yellow-500/20 border border-yellow-400 text-yellow-100 px-4 py-3 rounded-xl text-sm font-medium">
+              📧 Ro'yxatdan o'tdingiz! Emailingizni tekshiring va tasdiqlash havolasini bosing.
+            </div>
+          )}
 
           {authError && (
             <div className="bg-red-500/20 border border-red-400 text-red-100 px-4 py-3 rounded-xl text-sm font-medium">

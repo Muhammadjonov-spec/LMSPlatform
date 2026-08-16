@@ -32,6 +32,14 @@ export const createContent = async (data) =>
     headers: { "Content-Type": "multipart/form-data" }
   }).then((res) => res.data);
 
+export const addModule = async (data, courseId) =>
+  apiInstanceAuth.post(`/courses/${courseId}/modules`, data).then(res => res.data);
+
+export const createLesson = async (data, courseId, moduleId) =>
+  apiInstanceAuth.post(`/courses/${courseId}/modules/${moduleId}/lessons`, data, {
+    headers: { "Content-Type": "multipart/form-data" }
+  }).then(res => res.data);
+
 export const getDetailContent = async (id) => apiInstanceAuth.get(`/courses/contents/${id}`).then((res) => res.data);
 
 export const updateContent = async (data, id) => 
