@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
-import { getCourses, getCategories } from "../../services/courseService";
+import { getPublicCourses, getCategories } from "../../services/courseService";
 
 export default function PublicCourses() {
   const [courses, setCourses] = useState([]);
@@ -14,7 +14,7 @@ export default function PublicCourses() {
     const fetchData = async () => {
       try {
         const [courseRes, catRes] = await Promise.all([
-          getCourses(),
+          getPublicCourses(),
           getCategories()
         ]);
         if (courseRes && courseRes.data) setCourses(courseRes.data);

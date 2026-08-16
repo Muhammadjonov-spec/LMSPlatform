@@ -24,7 +24,7 @@ import TeacherApproval from "../pages/Admin/TeacherApproval";
 import StudentPage from "../pages/Student/StudentOverview";
 import { MANAGER_SESSION, STRORAGE_KEY, STUDENT_SESSION } from "../utils/const";
 import secureLocalStorage from "react-secure-storage";
-import { getCategories, getCourseDetail, getCourses, getDetailContent, getStudentsCourse } from "../services/courseService";
+import { getCategories, getCourseDetail, getPublicCourseDetail, getCourses, getDetailContent, getStudentsCourse } from "../services/courseService";
 import { getCategories as getCategoriesList } from "../services/categoryService";
 import { getSubscriptions } from "../services/subscriptionService";
 import { getRewards } from "../services/rewardService";
@@ -77,7 +77,7 @@ const router = createBrowserRouter([
     path: "/courses/:id",
     loader: async ({ params }) => {
            try {
-        const course = await getCourseDetail(params.id);
+        const course = await getPublicCourseDetail(params.id);
         return course?.data;
       } catch (error) {
         

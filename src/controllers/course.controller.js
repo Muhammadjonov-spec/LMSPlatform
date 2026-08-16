@@ -6,11 +6,20 @@ class CourseController {
     res.status(200).json({ success: true, data: result });
   }
 
+  async getPublicCourses(req, res) {
+    const result = await CourseService.getPublicCourses();
+    res.status(200).json({ success: true, data: result });
+  }
+
+  async getPublicCourseDetails(req, res){
+    const courseId = req.params.id;
+    const result = await CourseService.getCourseDetails(courseId, null);
+    res.status(200).json({ success: true, data: result });
+  }
+
   async createCourse(req, res){
     const  teacherId=req.user._id
     const data=req.body
-    
-    // Map frontend fields to backend model schema if needed
     if (data.name && !data.title) data.title = data.name;
     if (data.categoryId && !data.category) data.category = data.categoryId;
 

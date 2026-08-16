@@ -1,9 +1,13 @@
-import { apiInstanceAuth } from "../utils/axios";
+import apiInstance, { apiInstanceAuth } from "../utils/axios";
 
 export const getCourses = async () => apiInstanceAuth.get("/courses").then((res) => res.data);
+export const getPublicCourses = async () => apiInstance.get("/courses/public").then((res) => res.data);
 
 export const getCourseDetail = async (id, isPreview = false) =>
   apiInstanceAuth.get(`/courses/${id}${isPreview ? "?preview=true" : ""}`).then((res) => res.data);
+
+export const getPublicCourseDetail = async (id) =>
+  apiInstance.get(`/courses/public/${id}`).then((res) => res.data);
 
 export const getCategories = async () => apiInstanceAuth.get("/categories").then((res) => res.data);
 

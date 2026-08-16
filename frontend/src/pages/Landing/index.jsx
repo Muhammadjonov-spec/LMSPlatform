@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
-import { getCourses } from "../../services/courseService";
+import { getPublicCourses } from "../../services/courseService";
 
 export default function LandingPage() {
   const [popularCourses, setPopularCourses] = useState([]);
@@ -10,7 +10,7 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await getCourses();
+        const res = await getPublicCourses();
         if (res && res.data) {
           setPopularCourses(res.data.slice(0, 3)); // show top 3 courses
         }

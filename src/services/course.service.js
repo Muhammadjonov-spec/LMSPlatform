@@ -8,6 +8,10 @@ class CourseService {
     return await CourseRepository.create(courseData);
   }
 
+  async getPublicCourses() {
+    return await CourseRepository.model.find().populate('category');
+  }
+
   async getAllCourses(user) {
     if (user.role === 'teacher') {
       const Teacher = require('../models/Teacher');

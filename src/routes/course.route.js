@@ -4,6 +4,8 @@ const {isAuth, restrictTo}=require("../middlewares/auth.middleware")
 const { uploadVideo } = require('../middlewares/upload.middleware')
 
 router.get("/", isAuth, restrictTo("teacher", "admin", "super_admin"), CourseController.getAllCourses)
+router.get("/public", CourseController.getPublicCourses)
+router.get("/public/:id", CourseController.getPublicCourseDetails)
 router.post("/create", isAuth, restrictTo("teacher", "admin", "super_admin"), CourseController.createCourse)
 router.get("/:id", isAuth, CourseController.getCourceDetails)
 
