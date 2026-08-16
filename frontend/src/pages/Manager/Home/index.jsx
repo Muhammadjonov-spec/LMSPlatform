@@ -2,6 +2,7 @@ import React from "react";
 import Courses from "./courses";
 import Students from "./students";
 import { Link, useLoaderData } from "react-router-dom";
+import EmptyState from "../../../components/EmptyState";
 
 export default function ManagerHome() {
   const overview = useLoaderData();
@@ -29,7 +30,13 @@ export default function ManagerHome() {
         </div>
       </header>
 
-      <section id="Stats" className="grid grid-cols-1 lg:grid-cols-2 gap-[30px] rounded-[30px] p-4 sm:p-[30px] bg-[#F8FAFB] dark:bg-white/5 border border-transparent dark:border-white/10 mt-8">
+      {!overview ? (
+        <div className="mt-8">
+          <EmptyState title="Dashboard statistikasi mavjud emas" message="Hozircha tizimda yetarli ma'lumot yo'q yoki orqa qism (backend) API ulanmagan." />
+        </div>
+      ) : (
+        <>
+          <section id="Stats" className="grid grid-cols-1 lg:grid-cols-2 gap-[30px] rounded-[30px] p-4 sm:p-[30px] bg-[#F8FAFB] dark:bg-white/5 border border-transparent dark:border-white/10 mt-8">
         <div className="flex flex-col gap-[30px]">
           <div className="w-full bg-white dark:bg-white/10 rounded-[20px] shadow-[0_4px_10px_0_#E0E2EF] dark:shadow-none p-4 sm:p-6 grid grid-cols-2 lg:grid-cols-4 gap-y-6 gap-x-4 border border-transparent dark:border-white/10">
             <div className="flex items-center gap-3 pr-2 border-r border-transparent sm:border-[#D3D6E4] sm:dark:border-white/10">
@@ -115,6 +122,8 @@ export default function ManagerHome() {
       <div className="w-full mt-[30px]">
         <Courses />
       </div>
+      </>
+      )}
     </div>
   );
 }

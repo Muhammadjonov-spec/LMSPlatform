@@ -124,8 +124,8 @@ export default function ManageCreateCoursePage() {
 
               <select {...register("categoryId")} className="w-full outline-none bg-transparent font-semibold">
                 <option value="">Choose one category</option>
-                {data?.categories?.data?.map((item) => (
-                  <option key={item._id} value={item._id}>
+                {(data?.categories?.data || data?.categories || []).map((item) => (
+                  <option key={item._id || item.id} value={item._id || item.id}>
                     {item.name}
                   </option>
                 ))}

@@ -138,41 +138,61 @@ const router = createBrowserRouter([
       {
         index: true,
         loader: async () => {
-          const overviews = await getOverviews();
-          return overviews?.data;
+          try {
+            const overviews = await getOverviews();
+            return overviews?.data || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <ManagerHomePage />
       },
       {
         path: "courses",
         loader: async () => {
-          const data = await getCourses();
-          return data;
+          try {
+            const data = await getCourses();
+            return data || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <ManageCoursePage />
       },
       {
         path: "courses/create",
         loader: async () => {
-          const categories = await getCategories();
-          return { categories, course: null };
+          try {
+            const categories = await getCategories();
+            return { categories: categories || [], course: null };
+          } catch (e) {
+            return { categories: [], course: null };
+          }
         },
         element: <ManageCreateCoursePage />
       },
       {
         path: "courses/edit/:id",
         loader: async ({ params }) => {
-          const categories = await getCategories();
-          const course = await getCourseDetail(params.id);
-          return { categories, course: course?.data ?? null };
+          try {
+            const categories = await getCategories();
+            const course = await getCourseDetail(params.id);
+            return { categories: categories || [], course: course?.data ?? null };
+          } catch (e) {
+            return { categories: [], course: null };
+          }
         },
         element: <ManageCreateCoursePage />
       },
       {
         path: "courses/:id",
         loader: async ({ params }) => {
-          const course = await getCourseDetail(params.id);
-          return course?.data;
+          try {
+            const course = await getCourseDetail(params.id);
+            return course?.data || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <ManageCourseDetailPage />
       },
@@ -183,24 +203,36 @@ const router = createBrowserRouter([
       {
         path: "courses/:id/edit/:contentId",
         loader: async ({ params }) => {
-          const content = await getDetailContent(params.contentId);
-          return content?.data;
+          try {
+            const content = await getDetailContent(params.contentId);
+            return content?.data || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <ManageCourseContentCreatePage />
       },
       {
         path: "courses/:id/preview",
         loader: async ({ params }) => {
-          const course = await getCourseDetail(params.id, true);
-          return course?.data;
+          try {
+            const course = await getCourseDetail(params.id, true);
+            return course?.data || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <ManageCoursePreviewPage />
       },
       {
         path: "/manager/students",
         loader: async () => {
-          const students = await getStudents();
-          return students?.data;
+          try {
+            const students = await getStudents();
+            return students?.data || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <ManageStudentsPage />
       },
@@ -211,48 +243,72 @@ const router = createBrowserRouter([
       {
         path: "/manager/students/edit/:id",
         loader: async ({ params }) => {
-          const student = await getDetailStudent(params.id);
-          return student?.data;
+          try {
+            const student = await getDetailStudent(params.id);
+            return student?.data || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <ManageStudentCreatePage />
       },
       {
         path: "/manager/courses/students/:id",
         loader: async ({ params }) => {
-          const course = await getStudentsCourse(params.id);
-          return course?.data;
+          try {
+            const course = await getStudentsCourse(params.id);
+            return course?.data || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <StudentsCourseList />
       },
       {
         path: "/manager/courses/students/:id/add",
         loader: async () => {
-          const students = await getStudents();
-          return students?.data;
+          try {
+            const students = await getStudents();
+            return students?.data || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <StudentForm />
       },
       {
         path: "/manager/categories",
         loader: async () => {
-          const categories = await getCategoriesList();
-          return categories;
+          try {
+            const categories = await getCategoriesList();
+            return categories || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <CategoriesPage />
       },
       {
         path: "/manager/subscription",
         loader: async () => {
-          const subscriptions = await getSubscriptions();
-          return subscriptions;
+          try {
+            const subscriptions = await getSubscriptions();
+            return subscriptions || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <SubscriptionPage />
       },
       {
         path: "/manager/rewards",
         loader: async () => {
-          const rewards = await getRewards();
-          return rewards;
+          try {
+            const rewards = await getRewards();
+            return rewards || null;
+          } catch (e) {
+            return null;
+          }
         },
         element: <RewardsPage />
       },

@@ -2,7 +2,7 @@ import axios from "axios";
 import secureLocalStorage from "react-secure-storage";
 import { STRORAGE_KEY } from "./const";
 
-const baseURL = import.meta?.env?.VITE_API_URL ?? "http://localhost:5000/api/v1";
+const baseURL = import.meta?.env?.VITE_API_URL ?? "http://localhost:5000/api";
 
 const apiInstance = axios.create({
   baseURL,

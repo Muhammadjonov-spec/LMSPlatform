@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { updateSubscription } from "../../../services/subscriptionService";
+import EmptyState from "../../../components/EmptyState";
 
 export default function SubscriptionPage() {
   const initialData = useLoaderData();
@@ -40,6 +41,14 @@ export default function SubscriptionPage() {
     }
     setIsModalOpen(false);
   };
+
+  if (!initialData) {
+    return (
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <EmptyState title="Tariflar mavjud emas" message="Hozircha hech qanday tarif topilmadi yoki API hali yozilmagan." />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8 relative">

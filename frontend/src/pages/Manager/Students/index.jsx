@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLoaderData } from "react-router-dom";
 import StudentItem from "./student-item";
+import EmptyState from "../../../components/EmptyState";
 
 export default function ManageStudentsPage() {
   const students = useLoaderData();
@@ -24,15 +25,19 @@ export default function ManageStudentsPage() {
         </div>
       </header>
       <section id="CourseList" className="flex flex-col w-full rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]">
-        {students?.map((item) => (
-          <StudentItem
-            key={item._id}
-            id={item._id}
-            imageUrl={item.photo_url || item.avatar}
-            name={item.name || `${item.firstName || ''} ${item.lastName || ''}`.trim()}
-            totalCourse={item.courses?.length ?? 0}
-          />
-        ))}
+        {!students || students.length === 0 ? (
+          <EmptyState title="O'quvchilar mavjud emas" message="Hozircha hech qanday o'quvchi qo'shilmagan yoki tizim API ulanmagan." />
+        ) : (
+          students.map((item) => (
+            <StudentItem
+              key={item._id}
+              id={item._id}
+              imageUrl={item.photo_url || item.avatar}
+              name={item.name || `${item.firstName || ''} ${item.lastName || ''}`.trim()}
+              totalCourse={item.courses?.length ?? 0}
+            />
+          ))
+        )}
 
         <div id="Pagination" className="flex items-center gap-3">
           <button

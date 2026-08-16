@@ -8,6 +8,9 @@ class UserRepository extends BaseRepository {
   async findByEmail(email){
     return await this.model.findOne({email}).lean()
   }
+  async findByEmailWithPassword(email){
+    return await this.model.findOne({email}).select("+password").lean()
+  }
   async searchUsers(query){
     return await this.model.find({$or:[{ firstName: { $regex: query, $options: "i" } },
         { lastName: { $regex: query, $options: "i" } },

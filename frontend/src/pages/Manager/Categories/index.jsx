@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { createCategory, deleteCategory } from "../../../services/categoryService";
+import EmptyState from "../../../components/EmptyState";
 
 export default function CategoriesPage() {
   const initialData = useLoaderData();
@@ -93,7 +94,11 @@ export default function CategoriesPage() {
                   ))}
                 </tbody>
               </table>
-              {categories.length === 0 && <div className="text-center py-10 text-gray-500">Hech narsa topilmadi.</div>}
+              {categories.length === 0 && (
+                <div className="p-6">
+                  <EmptyState title="Kategoriyalar mavjud emas" message="Hozircha hech qanday kategoriya qo'shilmagan yoki API ma'lumot qaytarmadi." />
+                </div>
+              )}
             </div>
           </div>
         </div>

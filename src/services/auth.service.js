@@ -34,7 +34,7 @@ class AuthService {
   }
   async login(email, password){
     if (!email || !password) {throw new AppError(401, "Iltimos, email va parolni kiriting")}
-    const user=await UserRepository.findByEmail(email).select("+password")
+    const user=await UserRepository.findByEmailWithPassword(email)
     if(!user){
       throw new AppError(401, "Email yoki parol noto'g'ri")
     }

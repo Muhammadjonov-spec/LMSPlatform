@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
+import EmptyState from "../../../components/EmptyState";
 
 export default function RewardsPage() {
   const initialData = useLoaderData();
@@ -22,6 +23,14 @@ export default function RewardsPage() {
       setBadges(badges.filter(b => b.id !== id));
     }
   };
+
+  if (!initialData) {
+    return (
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <EmptyState title="Yutuqlar va Gamifikatsiya mavjud emas" message="Hozircha hech qanday ma'lumot topilmadi yoki API hali yozilmagan." />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8 space-y-12 relative">
