@@ -55,11 +55,16 @@ export default function ManageCreateCoursePage() {
 
       if (isEditMode) {
         await mutateUpdate.mutateAsync(formData);
+        navigate("/manager/courses");
       } else {
-        await mutateCreate.mutateAsync(formData);
+        const result = await mutateCreate.mutateAsync(formData);
+        const newCourseId = result?.data?._id || result?._id;
+        if(newCourseId) {
+          navigate(`/manager/courses/${newCourseId}`);
+        } else {
+          navigate("/manager/courses");
+        }
       }
-
-      navigate("/manager/courses");
     } catch (error) {
       console.error(error);
     }
