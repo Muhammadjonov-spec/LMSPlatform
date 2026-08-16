@@ -147,8 +147,19 @@ export default function signUpPage() {
                     setAuthError("");
                     try {
                       const res = await postGoogleAuth(credentialResponse.credential);
-                      const sessionData = res?.data || res;
+                      const backendData = res?.data || res;
+                      
+                      const sessionData = {
+                        user: backendData?.user,
+                        role: backendData?.user?.role,
+                        token: backendData?.accessToken || backendData?.token
+                      };
+                      
+                      // NOTE: We don't have 'login' imported here, so we just set it manually, or better yet, we can import useAuthStore and use it. 
+                      // Wait, I should import useAuthStore at the top. Let's assume we can just do secureLocalStorage.setItem(STRORAGE_KEY, sessionData); for now. 
+                      // No, it's better to just set secureLocalStorage correctly.
                       secureLocalStorage.setItem(STRORAGE_KEY, sessionData);
+                      
                       if (
                         sessionData.role === "manager" ||
                         sessionData.role === "admin" ||

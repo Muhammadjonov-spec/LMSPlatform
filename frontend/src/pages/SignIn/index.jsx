@@ -37,10 +37,16 @@ export default function SignInPage() {
     setAuthError("");
     try {
       const response = await mutateAsync(data);
-      // response format: { data: { token, role, user } }
-      login(response);
+      const backendData = response?.data || response;
+      
+      const sessionData = {
+        user: backendData?.user,
+        role: backendData?.user?.role,
+        token: backendData?.accessToken || backendData?.token
+      };
+      
+      login(sessionData);
 
-      const sessionData = response?.data || response;
       if (
         sessionData.role === "manager" ||
         sessionData.role === "admin" ||
@@ -156,9 +162,16 @@ export default function SignInPage() {
                 setAuthError("");
                 try {
                   const res = await postGoogleAuth(credentialResponse.credential);
-                  login(res);
+                  const backendData = res?.data || res;
+                  
+                  const sessionData = {
+                    user: backendData?.user,
+                    role: backendData?.user?.role,
+                    token: backendData?.accessToken || backendData?.token
+                  };
 
-                  const sessionData = res?.data || res;
+                  login(sessionData);
+
                   if (
                     sessionData.role === "manager" ||
                     sessionData.role === "admin" ||
