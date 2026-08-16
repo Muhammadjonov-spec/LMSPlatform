@@ -10,6 +10,11 @@ class AuthController {
   const result=await AuthService.login(email, password)
   res.status(201).json({success:true, data:result})
  }
+ async verifyEmail(req, res){
+  const { token } = req.params
+  await AuthService.verifyEmail(token)
+  res.redirect('https://lms.sardorbekcoder.uz/sign-in?verified=true')
+ }
  async logout(req, res){
   const userId=req.user._id
   const result=await AuthService.logout(userId)
@@ -23,3 +28,4 @@ class AuthController {
 }
 
 module.exports = new AuthController()
+

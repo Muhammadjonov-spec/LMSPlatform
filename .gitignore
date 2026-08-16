@@ -1,5 +1,11 @@
 node_modules/
+frontend/node_modules/
 
 .env
+frontend/.env
+
 .agents
 
+# Build artifacts
+frontend/dist/
+dist/
