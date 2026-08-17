@@ -79,6 +79,27 @@ class UserService {
     await UserRepository.model.findByIdAndDelete(id);
     return true;
   }
+
+  async getStudents() {
+    return await UserRepository.model.find({ role: 'student' }).select('-password').lean();
+  }
+
+  async getStudentById(id) {
+    const student = await UserRepository.model.findOne({ _id: id, role: 'student' }).select('-password').lean();
+    if (!student) {
+      throw new AppError(404, "Talaba topilmadi");
+    }
+    return student;
+  }
+
+  async getStudentCourses(userId) {
+    const student = await UserRepository.model
+      .findById(userId)
+      .populate('enrolledCourses')
+      .select('enrolledCourses')
+      .lean();
+    return student ? student.enrolledCourses : [];
+  }
 }
 
 module.exports = new UserService();

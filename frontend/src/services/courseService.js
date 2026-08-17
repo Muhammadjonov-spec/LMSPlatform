@@ -11,21 +11,23 @@ export const getPublicCourseDetail = async (id) =>
 
 export const getCategories = async () => apiInstanceAuth.get("/categories").then((res) => res.data);
 
-export const createCourse = async (data) =>
+export const createCourse = async (data, onUploadProgress) =>
   apiInstanceAuth
     .post("/courses/create", data, {
       headers: {
         "Content-Type": "multipart/form-data"
-      }
+      },
+      onUploadProgress
     })
     .then((res) => res.data);
 
-export const updateCourse = async (data, id) =>
+export const updateCourse = async (data, id, onUploadProgress) =>
   apiInstanceAuth
     .put(`/courses/${id}`, data, {
       headers: {
         "Content-Type": "multipart/form-data"
-      }
+      },
+      onUploadProgress
     })
     .then((res) => res.data);
 

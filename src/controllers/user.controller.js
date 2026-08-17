@@ -20,6 +20,21 @@ class UserController {
     await UserService.deleteUser(req.params.id, req.user);
     res.status(200).json({ success: true, message: "Foydalanuvchi muvaffaqiyatli o'chirildi" });
   }
+
+  async getStudents(req, res) {
+    const students = await UserService.getStudents();
+    res.status(200).json({ success: true, data: students });
+  }
+
+  async getStudentById(req, res) {
+    const student = await UserService.getStudentById(req.params.id);
+    res.status(200).json({ success: true, data: student });
+  }
+
+  async getStudentCourses(req, res) {
+    const courses = await UserService.getStudentCourses(req.user._id);
+    res.status(200).json({ success: true, data: courses });
+  }
 }
 
 module.exports = new UserController();

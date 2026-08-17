@@ -41,16 +41,25 @@ export default function ManageCreateCoursePage() {
   const [file, setFile] = useState(null);
   const inputFileRef = useRef(null);
 
+  const [uploadProgress, setUploadProgress] = useState(0);
+
   const mutateCreate = useMutation({
-    mutationFn: (payload) => createCourse(payload)
+    mutationFn: (payload) => createCourse(payload, (progressEvent) => {
+      const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+      setUploadProgress(percentCompleted);
+    })
   });
 
   const mutateUpdate = useMutation({
-    mutationFn: (payload) => updateCourse(payload, id)
+    mutationFn: (payload) => updateCourse(payload, id, (progressEvent) => {
+      const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+      setUploadProgress(percentCompleted);
+    })
   });
 
   const onSubmit = async (values) => {
     try {
+      setUploadProgress(0);
       const formData = new FormData();
       formData.append("name", values.name);
       if (file) formData.append("previewVideo", file);
@@ -76,6 +85,8 @@ export default function ManageCreateCoursePage() {
       console.error(error);
     }
   };
+
+  const isPending = mutateCreate.isPending || mutateUpdate.isPending;
 
   return (
     <>
@@ -238,12 +249,35 @@ export default function ManageCreateCoursePage() {
 
           <button
             type="submit"
-            disabled={isEditMode ? mutateUpdate.isPending : mutateCreate.isPending}
+            disabled={isPending}
             className="w-full rounded-full py-4 font-semibold text-white bg-[#1E40AF]">
             {isEditMode ? "Edit" : "Add"} Now
           </button>
         </div>
       </form>
+
+      {/* Upload Progress Modal */}
+      {isPending && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl flex flex-col items-center text-center">
+            <div className="w-16 h-16 border-4 border-gray-100 border-t-[#1E40AF] rounded-full animate-spin mb-4"></div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Yuklanmoqda...</h3>
+            <p className="text-sm text-gray-500 mb-6">Iltimos, oyna yopilguncha kuting. Video hajmi kattaligi sababli bu biroz vaqt olishi mumkin.</p>
+            
+            {uploadProgress > 0 && (
+              <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden relative">
+                <div 
+                  className="bg-[#1E40AF] h-full transition-all duration-300 ease-out" 
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white drop-shadow-md">
+                  {uploadProgress}%
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
