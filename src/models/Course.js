@@ -7,7 +7,9 @@ const CourseSchema = new mongoose.Schema({
   averageRating:{type:Number, default:0},
   price:{type:Number, default:null},
   discountPrise:{type:Number, default:null},
+  isFree:{type:Boolean, default:false},
   thumbnail:{type:String},
+  previewVideo:{type:String, default:null},
   teacher:{type:mongoose.Types.ObjectId, ref:"Teacher", default:null},
   category:{type:mongoose.Types.ObjectId, ref:"Category", default:null},
   lessons:[{ 

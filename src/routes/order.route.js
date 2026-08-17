@@ -4,6 +4,7 @@ const router=require("express").Router()
 const {uploadImage}=require("../middlewares/upload.middleware")
 
 router.post("/:id/buy", isAuth, uploadImage.single("receiptImage"), OrderController.createOrder)
-router.patch("/:id/approve", isAuth, restrictTo("admin", "super_admin"), OrderController.approveOrder)
+router.get("/pending", isAuth, restrictTo("admin", "super_admin"), OrderController.getPendingOrders)
+router.put("/:id/approve", isAuth, restrictTo("admin", "super_admin"), OrderController.approveOrder)
 
 module.exports=router

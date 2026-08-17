@@ -13,6 +13,13 @@ class OrderService {
     })
     return newOrder
   }
+
+  async getPendingOrders() {
+    return await OrderRepository.model
+      .find({ status: 'pending' })
+      .populate('student', 'firstName lastName email name')
+      .populate('course', 'title');
+  }
   async approveOrder(orderId) {
     const order = await OrderRepository.findById(orderId);
     if (!order) throw new AppError(404, "Buyurtma topilmadi"); 

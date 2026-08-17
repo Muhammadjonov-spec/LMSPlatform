@@ -12,11 +12,13 @@ export const createCourseSchema = z.object({
   categoryId: z.string().min(5, { message: "Please select a category" }),
   tagline: z.string().min(5),
   description: z.string().min(10),
-  thumbnail: z.any().refine((file) => file?.name, { message: "Thumbnail is required" })
+  isFree: z.boolean().default(false).optional(),
+  price: z.string().optional(),
+  previewVideo: z.any().refine((file) => file?.name, { message: "Video is required" })
 });
 
 export const updateCourseSchema = createCourseSchema.partial({
-  thumbnail: true
+  previewVideo: true
 });
 
 export const mutateContentSchema = z

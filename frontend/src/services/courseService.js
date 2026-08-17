@@ -13,7 +13,7 @@ export const getCategories = async () => apiInstanceAuth.get("/categories").then
 
 export const createCourse = async (data) =>
   apiInstanceAuth
-    .post("/courses", data, {
+    .post("/courses/create", data, {
       headers: {
         "Content-Type": "multipart/form-data"
       }

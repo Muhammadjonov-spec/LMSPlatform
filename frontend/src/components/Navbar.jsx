@@ -24,7 +24,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <div className="flex items-center justify-between w-full">
         <Link to="/" className="flex items-center gap-3">
           <img src="/assets/images/logos/edustack-icon.svg" className="w-10 h-10 flex shrink-0 drop-shadow-md" alt="logo" />

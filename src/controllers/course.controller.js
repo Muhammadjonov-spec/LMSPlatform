@@ -18,13 +18,26 @@ class CourseController {
   }
 
   async createCourse(req, res){
-    const  teacherId=req.user._id
-    const data=req.body
+    const teacherId = req.user._id;
+    const data = req.body;
+    
     if (data.name && !data.title) data.title = data.name;
     if (data.categoryId && !data.category) data.category = data.categoryId;
+    
+    if (req.file) {
+      data.previewVideo = req.file.path;
+    }
+    
+    if (data.isFree === 'true' || data.isFree === true) {
+      data.isFree = true;
+      data.price = 0;
+    } else {
+      data.isFree = false;
+      data.price = Number(data.price) || 0;
+    }
 
-    const result=await CourseService.createCourse(data, teacherId)
-    res.status(201).json({success:true, data:result})
+    const result = await CourseService.createCourse(data, teacherId);
+    res.status(201).json({ success: true, data: result });
   }
   async getCourceDetails(req, res){
     const user=req.user._id
