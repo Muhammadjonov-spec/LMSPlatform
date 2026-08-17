@@ -59,7 +59,7 @@ class AuthService {
       email:user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      role:user.role
+      role: user.role || 'student'
     }, accessToken, refreshToken}
   }
   async googleAuth(idToken){
@@ -93,7 +93,7 @@ class AuthService {
     return {
       user:{id:user._id,
         email:user.email,
-        role:user.role,
+        role: user.role || 'student',
         firstName: user.firstName,
         lastName: user.lastName,
         avatar: user.avatar},

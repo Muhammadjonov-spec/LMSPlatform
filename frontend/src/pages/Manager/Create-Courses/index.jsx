@@ -114,7 +114,7 @@ export default function ManageCreateCoursePage() {
               <input
                 {...register("name")}
                 placeholder="Write better name for your course"
-                className="w-full outline-none bg-transparent font-semibold placeholder:font-normal"
+                className="w-full outline-none bg-transparent font-semibold placeholder:font-normal text-ellipsis overflow-hidden whitespace-nowrap"
               />
             </div>
             <span className="text-[#FF435A] text-sm">{errors?.name?.message}</span>
@@ -131,7 +131,7 @@ export default function ManageCreateCoursePage() {
               <input
                 {...register("tagline")}
                 placeholder="Write tagline for better copy"
-                className="w-full outline-none bg-transparent font-semibold placeholder:font-normal"
+                className="w-full outline-none bg-transparent font-semibold placeholder:font-normal text-ellipsis overflow-hidden whitespace-nowrap"
               />
             </div>
             <span className="text-[#FF435A] text-sm">{errors?.tagline?.message}</span>

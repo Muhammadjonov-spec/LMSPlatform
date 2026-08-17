@@ -18,7 +18,7 @@ class CourseController {
   }
 
   async createCourse(req, res){
-    const teacherId = req.user._id;
+    const user = req.user;
     const data = req.body;
     
     if (data.name && !data.title) data.title = data.name;
@@ -36,7 +36,7 @@ class CourseController {
       data.price = Number(data.price) || 0;
     }
 
-    const result = await CourseService.createCourse(data, teacherId);
+    const result = await CourseService.createCourse(data, user);
     res.status(201).json({ success: true, data: result });
   }
   async getCourceDetails(req, res){
@@ -48,20 +48,66 @@ class CourseController {
 
   async addModule(req, res) {
     const courseId = req.params.id;
-    const teacherId = req.user._id;
+    const user = req.user;
     const { moduleTitle } = req.body;
-    const result = await CourseService.addModule(moduleTitle, teacherId, courseId);
+    const result = await CourseService.addModule(moduleTitle, user, courseId);
     res.status(201).json({ success: true, data: result });
   }
 
   async addLesson(req, res) {
     const { courseId, moduleId } = req.params;
-    const teacherId = req.user._id;
+    const user = req.user;
     const { title } = req.body
     if(!req.file) throw new AppError(400, "Iltimos videoni yuklang")
     const inputPath=req.file.path
-    const result = await CourseService.addLesson(title, inputPath, courseId, moduleId, teacherId);
+    const result = await CourseService.addLesson(title, inputPath, courseId, moduleId, user);
     res.status(201).json({ success: true, message: "Dars qabul qilindi. Video orqa fonda tayyorlanmoqda...", data: result });
+  }
+  async updateCourse(req, res) {
+    const courseId = req.params.id;
+    const user = req.user;
+    const data = req.body;
+    
+    if (data.name && !data.title) data.title = data.name;
+    if (data.categoryId && !data.category) data.category = data.categoryId;
+    
+    if (req.file) {
+      data.previewVideo = req.file.path;
+    }
+    
+    if (data.isFree === 'true' || data.isFree === true) {
+      data.isFree = true;
+      data.price = 0;
+    } else {
+      data.isFree = false;
+      data.price = Number(data.price) || 0;
+    }
+
+    const result = await CourseService.updateCourse(courseId, data, user);
+    res.status(200).json({ success: true, data: result });
+  }
+
+  async getDetailContent(req, res) {
+    const contentId = req.params.id;
+    const result = await CourseService.getDetailContent(contentId, req.user);
+    res.status(200).json({ success: true, data: result });
+  }
+
+  async updateContent(req, res) {
+    const contentId = req.params.id;
+    const user = req.user;
+    const data = req.body;
+    if (req.file) {
+      data.videoPath = req.file.path;
+    }
+    const result = await CourseService.updateContent(contentId, data, user);
+    res.status(200).json({ success: true, data: result });
+  }
+
+  async deleteDetailContent(req, res) {
+    const contentId = req.params.id;
+    const result = await CourseService.deleteDetailContent(contentId, req.user);
+    res.status(200).json({ success: true, data: result });
   }
 }
 
