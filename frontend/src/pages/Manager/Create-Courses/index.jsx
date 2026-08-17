@@ -83,6 +83,7 @@ export default function ManageCreateCoursePage() {
       }
     } catch (error) {
       console.error(error);
+      alert(error?.response?.data?.message || error?.message || "Kutilmagan xatolik yuz berdi");
     }
   };
 

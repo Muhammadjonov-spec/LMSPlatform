@@ -5,8 +5,8 @@ export const teacherService = {
     const res = await apiInstanceAuth.post("/teachers/apply", data);
     return res.data;
   },
-  getPendingTeachers: async () => {
-    const res = await apiInstanceAuth.get("/teachers/pending");
+  getAllApplications: async () => {
+    const res = await apiInstanceAuth.get("/teachers/all");
     return res.data;
   },
   approveTeacher: async (id) => {

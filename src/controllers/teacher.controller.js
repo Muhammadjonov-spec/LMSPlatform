@@ -33,8 +33,8 @@ class TeacherController{
     const result = await TeacherService.getMyApplication(userId);
     res.status(200).json({ success: true, data: result });
   }
-  async getPendingTeachers(req, res){
-    const result = await TeacherService.getPendingTeachers()
+  async getAllApplications(req, res){
+    const result = await TeacherService.getAllApplications()
     res.status(200).json({success:true, data:result})
   }
 }

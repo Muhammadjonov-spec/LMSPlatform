@@ -33,8 +33,8 @@ class TeacherService{
     return{ message: "Arizangiz muvaffaqiyatli qabul qilindi. Admin tasdiqlashini kuting.", teacher: newTeacher}
   }
 
-  async getPendingTeachers() {
-    return await TeacherRepository.model.find({ status: 'pending' }).populate("user", "firstName lastName email avatar role");
+  async getAllApplications() {
+    return await TeacherRepository.model.find({}).populate("user", "firstName lastName email avatar role").sort({ _id: -1 });
   }
 
   async approveTeacher(teacherId){

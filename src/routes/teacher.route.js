@@ -3,7 +3,7 @@ const TeacherController = require("../controllers/teacher.controller")
 const {isAuth, restrictTo}=require("../middlewares/auth.middleware")
 
 router.post("/apply", isAuth, TeacherController.applyForTeacher )
-router.get("/pending", isAuth, restrictTo("admin", "super_admin"), TeacherController.getPendingTeachers)
+router.get("/all", isAuth, restrictTo("admin", "super_admin"), TeacherController.getAllApplications)
 router.get("/my-application", isAuth, TeacherController.getMyApplication)
 router.get("/:id", isAuth, TeacherController.getTeacherProfile)
 router.put("/:id/approve", isAuth, restrictTo("admin", "super_admin"), TeacherController.approvedTeacher)
