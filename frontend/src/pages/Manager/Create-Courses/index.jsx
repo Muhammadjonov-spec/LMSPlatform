@@ -38,9 +38,6 @@ export default function ManageCreateCoursePage() {
     if (categoryId) setValue("categoryId", String(categoryId));
   }, [data?.course, setValue]);
 
-  const [file, setFile] = useState(null);
-  const inputFileRef = useRef(null);
-
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const mutateCreate = useMutation({
@@ -62,7 +59,6 @@ export default function ManageCreateCoursePage() {
       setUploadProgress(0);
       const formData = new FormData();
       formData.append("name", values.name);
-      if (file) formData.append("previewVideo", file);
       formData.append("tagline", values.tagline);
       formData.append("categoryId", String(values.categoryId));
       formData.append("description", values.description);
@@ -186,43 +182,6 @@ export default function ManageCreateCoursePage() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="font-semibold">Add a Preview Video</label>
-
-          <div className="relative h-[220px] w-full border border-[#CFDBEF] rounded-[20px] overflow-hidden bg-white">
-            {file ? (
-              <video
-                src={URL.createObjectURL(file)}
-                controls
-                className="w-full h-full object-cover cursor-pointer bg-black"
-                onClick={(e) => { e.preventDefault(); inputFileRef?.current?.click(); }}
-              />
-            ) : (
-              <button
-                type="button"
-                onClick={() => inputFileRef?.current?.click()}
-                className="w-full h-full flex flex-col items-center justify-center gap-3 text-[#838C9D]">
-                <img src="/assets/images/icons/gallery-add-black.svg" className="w-6" />
-                <span>Upload preview video</span>
-              </button>
-            )}
-          </div>
-
-          <input
-            ref={inputFileRef}
-            type="file"
-            accept="video/*"
-            className="hidden"
-            onChange={(e) => {
-              if (e.target.files) {
-                setFile(e.target.files[0]);
-                setValue("previewVideo", e.target.files[0], { shouldValidate: true });
-              }
-            }}
-          />
-
-          <span className="text-[#FF435A] text-sm">{errors?.previewVideo?.message}</span>
-        </div>
 
         <div className="flex flex-col gap-2">
           <label className="font-semibold">Description</label>

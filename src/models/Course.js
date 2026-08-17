@@ -21,8 +21,12 @@ const CourseSchema = new mongoose.Schema({
       title: { type: String, required: true },
       lessons: [{
           title: { type: String, required: true },
-          videoPath: { type: String, required: true }}
-      ]}]
+          type: { type: String, enum: ['video', 'text'], default: 'video' },
+          videoPath: { type: String, default: null },
+          text: { type: String, default: null },
+          status: { type: String, enum: ['processing', 'ready', 'failed'], default: 'processing' }
+      }]
+  }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Course', CourseSchema);

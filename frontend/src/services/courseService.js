@@ -50,16 +50,18 @@ export const createContent = async (data) =>
 export const addModule = async (data, courseId) =>
   apiInstanceAuth.post(`/courses/${courseId}/modules`, data).then(res => res.data);
 
-export const createLesson = async (data, courseId, moduleId) =>
+export const createLesson = async (data, courseId, moduleId, onUploadProgress) =>
   apiInstanceAuth.post(`/courses/${courseId}/modules/${moduleId}/lessons`, data, {
-    headers: { "Content-Type": "multipart/form-data" }
+    headers: { "Content-Type": "multipart/form-data" },
+    onUploadProgress
   }).then(res => res.data);
 
 export const getDetailContent = async (id) => apiInstanceAuth.get(`/courses/contents/${id}`).then((res) => res.data);
 
-export const updateContent = async (data, id) => 
+export const updateContent = async (data, id, onUploadProgress) => 
   apiInstanceAuth.put(`/courses/contents/${id}`, data, {
-    headers: { "Content-Type": "multipart/form-data" }
+    headers: { "Content-Type": "multipart/form-data" },
+    onUploadProgress
   }).then((res) => res.data);
 
 export const deleteDetailContent = async (id) => apiInstanceAuth.delete(`/courses/contents/${id}`).then((res) => res.data);

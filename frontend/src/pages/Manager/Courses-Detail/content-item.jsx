@@ -7,7 +7,7 @@ import ConfirmModal from "../../../components/common/confirmModal";
 import ErrorToast from "../../../components/common/ErrorToast";
 import { useConfirmModal } from "../../../components/common/UseConfirmModal";
 
-export default function ContentItem({ id, index, type, title, courseId }) {
+export default function ContentItem({ id, index, type, title, courseId, status }) {
   const revalidator = useRevalidator();
   const confirmModal = useConfirmModal();
   const [error, setError] = useState(null);
@@ -79,24 +79,46 @@ export default function ContentItem({ id, index, type, title, courseId }) {
               <img src={`/assets/images/icons/${currentType.icon}`} className="w-5 h-5" alt="" aria-hidden="true" />
               <p className="text-[#838C9D]">{currentType.label}</p>
             </div>
+            
+            {type === "video" && status === "processing" && (
+              <div className="mt-[6px] bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
+                Qayta ishlanmoqda...
+              </div>
+            )}
+            
+            {type === "video" && status === "failed" && (
+              <div className="mt-[6px] bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">
+                Yuklashda xatolik
+              </div>
+            )}
           </div>
         </div>
 
         <div className="flex justify-end items-center gap-3">
           <button
             type="button"
-            disabled={isPending}
+            disabled={isPending || status === "processing"}
             onClick={handleDeleteClick}
             className="w-fit rounded-full p-[14px_20px] bg-[#FF435A] font-semibold text-white text-nowrap hover:bg-[#E63950] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={`Delete ${title} content`}>
             Delete
           </button>
-          <Link
-            to={`/manager/courses/${courseId}/edit/${id}`}
-            className="w-fit rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap hover:bg-gray-50 transition-colors"
-            aria-label={`Edit ${title} content`}>
-            Edit Content
-          </Link>
+          
+          {status === "processing" ? (
+            <button
+              disabled
+              className="w-fit rounded-full border border-gray-300 bg-gray-100 text-gray-400 p-[14px_20px] font-semibold text-nowrap cursor-not-allowed">
+              Edit Content
+            </button>
+          ) : (
+            <Link
+              to={`/manager/courses/${courseId}/edit/${id}`}
+              className="w-fit rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap hover:bg-gray-50 transition-colors"
+              aria-label={`Edit ${title} content`}>
+              Edit Content
+            </Link>
+          )}
         </div>
       </div>
 
@@ -128,5 +150,6 @@ ContentItem.propTypes = {
   index: PropTypes.number.isRequired,
   type: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  courseId: PropTypes.string.isRequired
+  courseId: PropTypes.string.isRequired,
+  status: PropTypes.string
 };

@@ -86,11 +86,12 @@ export default function TableContent({ modules, courseId }) {
                 module.lessons?.map((lesson, lIndex) => (
                   <ContentItem
                     key={lesson._id}
-                    type="video"
+                    type={lesson.type || "video"}
                     title={lesson.title}
                     id={lesson._id}
                     index={lIndex + 1}
                     courseId={courseId}
+                    status={lesson.status}
                   />
                 ))
               )}
