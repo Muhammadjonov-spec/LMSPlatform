@@ -1,5 +1,5 @@
 const CourseService=require("../services/course.service")
-
+const AppError = require('../utils/AppError');
 class CourseController {
   async getAllCourses(req, res) {
     const result = await CourseService.getAllCourses(req.user);
@@ -40,10 +40,20 @@ class CourseController {
     res.status(201).json({ success: true, data: result });
   }
   async getCourceDetails(req, res){
-    const user=req.user._id
+    const user=req.user
     const courseId=req.params.id
     const result=await CourseService.getCourseDetails(courseId, user)
     res.status(200).json({success: true, data: result})
+  }
+
+  async updateThumbnail(req, res) {
+    const courseId = req.params.id;
+    if (!req.file) {
+      throw new AppError(400, "Iltimos rasmni yuklang");
+    }
+    const thumbnailPath = req.file.path;
+    const result = await CourseService.updateCourse(courseId, { thumbnail: thumbnailPath }, req.user);
+    res.status(200).json({ success: true, data: result });
   }
 
   async addModule(req, res) {

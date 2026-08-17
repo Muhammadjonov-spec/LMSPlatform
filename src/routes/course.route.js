@@ -1,7 +1,7 @@
 const CourseController=require("../controllers/course.controller")
 const router=require("express").Router()
 const {isAuth, restrictTo, checkTeacherProfile}=require("../middlewares/auth.middleware")
-const { uploadVideo } = require('../middlewares/upload.middleware')
+const { uploadVideo, uploadImage } = require('../middlewares/upload.middleware')
 
 router.get("/", isAuth, restrictTo("teacher", "admin", "super_admin"), CourseController.getAllCourses)
 router.get("/public", CourseController.getPublicCourses)
@@ -10,6 +10,7 @@ router.post("/create", isAuth, restrictTo("teacher", "admin", "super_admin"), ch
 router.get("/:id", isAuth, CourseController.getCourceDetails)
 
 router.put("/:id", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, uploadVideo.single("previewVideo"), CourseController.updateCourse)
+router.put("/:id/thumbnail", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, uploadImage.single("thumbnail"), CourseController.updateThumbnail)
 router.get("/contents/:id", isAuth, CourseController.getDetailContent)
 router.put("/contents/:id", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, uploadVideo.single("video"), CourseController.updateContent)
 router.delete("/contents/:id", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, CourseController.deleteDetailContent)

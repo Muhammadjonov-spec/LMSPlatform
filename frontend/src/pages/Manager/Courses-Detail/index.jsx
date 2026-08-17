@@ -1,13 +1,51 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import TableContent from "./table-content";
-import { Link, useLoaderData, useParams } from "react-router-dom";
+import { Link, useLoaderData, useParams, useRevalidator } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { updateThumbnail } from "../../../services/courseService";
 
 export default function ManageCourseDetailPage() {
   const { id } = useParams();
 
   const course = useLoaderData();
-  console.log("Course data:", course);
-  console.log("Course details:", course?.data?.details);
+  const revalidator = useRevalidator();
+  const fileInputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const { mutateAsync: uploadThumb } = useMutation({
+    mutationFn: (data) => updateThumbnail(data, id),
+    onSuccess: () => {
+      revalidator.revalidate();
+      setIsUploading(false);
+    },
+    onError: (err) => {
+      setIsUploading(false);
+      alert(err?.response?.data?.message || "Rasm yuklashda xatolik yuz berdi");
+    }
+  });
+
+  const handleThumbnailClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("thumbnail", file);
+    await uploadThumb(formData);
+  };
+
+  const getImageUrl = (path) => {
+    if (!path) return "/assets/images/placeholder.png";
+    if (path.startsWith("http")) return path;
+    const baseUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || "http://localhost:5000";
+    return `${baseUrl}/${path.replace(/\\/g, '/')}`;
+  };
 
   return (
     <>
@@ -18,7 +56,7 @@ export default function ManageCourseDetailPage() {
       </div>
       <header className="flex items-center justify-between gap-[30px]">
         <div>
-          <h1 className="font-extrabold text-[28px] leading-[42px]">{course?.name}</h1>
+          <h1 className="font-extrabold text-[28px] leading-[42px]">{course?.title || course?.name}</h1>
         </div>
         <div className="flex items-center gap-3">
           <Link
@@ -34,8 +72,22 @@ export default function ManageCourseDetailPage() {
         </div>
       </header>
       <section id="CourseInfo" className="flex gap-[50px]">
-        <div id="Thumbnail" className="flex shrink-0 w-[480px] h-[250px] rounded-[20px] bg-[#D9D9D9] overflow-hidden">
-          <img src={course?.thumbnail_url} className="w-full h-full object-cover" alt="thumbnail" />
+        <div 
+          id="Thumbnail" 
+          onClick={handleThumbnailClick}
+          className="flex shrink-0 w-[480px] h-[250px] rounded-[20px] bg-[#D9D9D9] overflow-hidden relative cursor-pointer group"
+        >
+          <img src={getImageUrl(course?.thumbnail || course?.thumbnail_url)} className="w-full h-full object-cover transition-opacity group-hover:opacity-70" alt="thumbnail" />
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
+            <span className="text-white font-bold">{isUploading ? "Yuklanmoqda..." : "Rasmni o'zgartirish"}</span>
+          </div>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            accept="image/*" 
+            className="hidden" 
+          />
         </div>
         <div className="grid grid-cols-2 gap-5 w-full">
           <div className="flex flex-col rounded-[20px] border border-[#CFDBEF] p-5 gap-4">

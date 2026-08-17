@@ -30,6 +30,16 @@ export const updateCourse = async (data, id, onUploadProgress) =>
     })
     .then((res) => res.data);
 
+export const updateThumbnail = async (data, id, onUploadProgress) =>
+  apiInstanceAuth
+    .put(`/courses/${id}/thumbnail`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      },
+      onUploadProgress
+    })
+    .then((res) => res.data);
+
 export const deleteCourse = async (id) => apiInstanceAuth.delete(`/courses/${id}`).then((res) => res.data);
 
 export const createContent = async (data) => 
