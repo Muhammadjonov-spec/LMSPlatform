@@ -10,6 +10,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 
 const routes = require('./routes/index');
+const errorHandler = require('./middlewares/error-handler.middleware');
+
 app.use('/api', routes);
+
+app.use(errorHandler);
 
 module.exports = app;

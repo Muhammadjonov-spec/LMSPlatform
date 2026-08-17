@@ -91,7 +91,7 @@ class AuthService {
     let newSessionVersion = currentSessionVersion + 1;
     const accessToken = generateAccessToken(user._id, newSessionVersion);
     const refreshToken = generateRefreshToken(user._id, newSessionVersion);
-    await UserRepository.update(user._id, { refreshToken: refreshToken })
+    await UserRepository.update(user._id, { refreshToken: refreshToken, sessionVersion: newSessionVersion })
     return {
       user:{id:user._id,
         email:user.email,
