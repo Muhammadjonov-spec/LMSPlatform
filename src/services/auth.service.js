@@ -50,7 +50,8 @@ class AuthService {
     if(!isMatch){
       throw new AppError(400, "Email yoki parol noto'g'ri")
     }
-    const newSessionVersion = user.sessionVersion + 1
+    const currentSessionVersion = user.sessionVersion || 0;
+    const newSessionVersion = currentSessionVersion + 1
     const accessToken=generateAccessToken(user._id, newSessionVersion )
     const refreshToken=generateRefreshToken(user._id, newSessionVersion)
     
@@ -86,7 +87,8 @@ class AuthService {
     }else if(!user.googleId){
       await UserRepository.update(user._id, {googleId:sub, isVerified:true})
     }
-    let newSessionVersion=user.sessionVersion + 1
+    const currentSessionVersion = user.sessionVersion || 0;
+    let newSessionVersion = currentSessionVersion + 1;
     const accessToken = generateAccessToken(user._id, newSessionVersion);
     const refreshToken = generateRefreshToken(user._id, newSessionVersion);
     await UserRepository.update(user._id, { refreshToken: refreshToken })

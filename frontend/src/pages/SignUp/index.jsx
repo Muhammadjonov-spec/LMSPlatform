@@ -40,7 +40,6 @@ export default function signUpPage() {
       const lastName = nameParts.slice(1).join(" ") || firstName;
       
       const payload = {
-        name: data.name,
         firstName,
         lastName,
         email: data.email,
