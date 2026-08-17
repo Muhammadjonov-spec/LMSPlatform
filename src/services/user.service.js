@@ -1,4 +1,5 @@
 const UserRepository = require('../repositories/UserRepository');
+const TeacherRepository = require('../repositories/TeacherRepository');
 const AppError = require('../utils/AppError');
 const { hashPassword } = require('../utils/hashPassword.util');
 const { sendVerificationEmail } = require('../utils/email.util');
@@ -31,6 +32,17 @@ class UserService {
       verificationToken: verifyToken
     });
 
+    if (newUser.role === 'teacher') {
+      await TeacherRepository.create({
+        user: newUser._id,
+        bio: "Admin tomonidan qo'shilgan o'qituvchi",
+        experties: [],
+        experienceYears: 0,
+        status: 'approved',
+        isApproved: true
+      });
+    }
+
     await sendVerificationEmail(newUser.email, verifyToken);
     
     return {
@@ -56,6 +68,25 @@ class UserService {
       email,
       role
     });
+
+    if (role === 'teacher') {
+      const existingProfile = await TeacherRepository.findByUserId(id);
+      if (!existingProfile) {
+        await TeacherRepository.create({
+          user: id,
+          bio: "Admin tomonidan roli o'zgartirilgan o'qituvchi",
+          experties: [],
+          experienceYears: 0,
+          status: 'approved',
+          isApproved: true
+        });
+      } else if (!existingProfile.isApproved) {
+        await TeacherRepository.update(existingProfile._id, {
+          status: 'approved',
+          isApproved: true
+        });
+      }
+    }
 
     return {
       _id: updatedUser._id,

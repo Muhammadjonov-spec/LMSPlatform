@@ -1,6 +1,7 @@
 const { verifyAccessToken }=require("../utils/jwt.util")
 const AppError=require("../utils/AppError")
 const UserRepository=require("../repositories/UserRepository")
+const TeacherRepository = require("../repositories/TeacherRepository");
 const isAuth = async (req, res, next) => {
   let token
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")){
@@ -31,4 +32,17 @@ const restrictTo = (...roles) => {
     next()
   }
 }
-module.exports = { isAuth, restrictTo }
+
+
+const checkTeacherProfile = async (req, res, next) => {
+  if (req.user.role === 'teacher') {
+    const teacherProfile = await TeacherRepository.findByUserId(req.user._id);
+    if (!teacherProfile) {
+      return next(new AppError(403, "Teacher profile not found"));
+    }
+    req.teacherProfile = teacherProfile;
+  }
+  next();
+};
+
+module.exports = { isAuth, restrictTo, checkTeacherProfile }
