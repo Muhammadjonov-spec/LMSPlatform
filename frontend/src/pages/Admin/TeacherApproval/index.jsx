@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { teacherService } from "../../../services/teacherService";
 import { Button } from "../../../components/ui";
 
 export default function TeacherApproval() {
   const queryClient = useQueryClient();
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const { data: pendingTeachers, isLoading, isError } = useQuery({
     queryKey: ["pendingTeachers"],
@@ -15,12 +19,43 @@ export default function TeacherApproval() {
     mutationFn: (id) => teacherService.approveTeacher(id),
     onSuccess: () => {
       queryClient.invalidateQueries(["pendingTeachers"]);
+      setIsViewModalOpen(false);
       alert("O'qituvchi muvaffaqiyatli tasdiqlandi!");
     },
     onError: (err) => {
       alert(err?.response?.data?.message || err?.message || "Xatolik yuz berdi");
     }
   });
+
+  const { mutate: reject, isPending: isRejecting } = useMutation({
+    mutationFn: ({ id, reason }) => teacherService.rejectTeacher(id, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["pendingTeachers"]);
+      setIsRejectModalOpen(false);
+      setIsViewModalOpen(false);
+      setRejectReason("");
+      alert("O'qituvchi arizasi bekor qilindi!");
+    },
+    onError: (err) => {
+      alert(err?.response?.data?.message || err?.message || "Xatolik yuz berdi");
+    }
+  });
+
+  const handleOpenRejectModal = (teacher) => {
+    setSelectedTeacher(teacher);
+    setIsRejectModalOpen(true);
+  };
+
+  const handleRejectSubmit = (e) => {
+    e.preventDefault();
+    if (!rejectReason.trim()) return alert("Bekor qilish sababini yozing");
+    reject({ id: selectedTeacher._id, reason: rejectReason });
+  };
+
+  const handleViewDetails = (teacher) => {
+    setSelectedTeacher(teacher);
+    setIsViewModalOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -39,7 +74,7 @@ export default function TeacherApproval() {
   }
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-8 relative">
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">O'qituvchi arizalari</h1>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -84,39 +119,141 @@ export default function TeacherApproval() {
                 </div>
                 
                 <div>
-                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">O'zi haqida (Bio):</span>
-                  <p className="text-sm text-gray-800 dark:text-gray-200 line-clamp-3" title={teacher.bio}>
-                    {teacher.bio}
-                  </p>
+                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Telefon raqam:</span>
+                  <p className="text-sm text-gray-800 dark:text-gray-200">{teacher.phone || "Ko'rsatilmagan"}</p>
                 </div>
-
-                {(teacher.socialLinks?.youtube || teacher.socialLinks?.linkedin) && (
-                  <div>
-                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Ijtimoiy tarmoqlar:</span>
-                    <div className="flex gap-3 mt-1">
-                      {teacher.socialLinks?.youtube && (
-                        <a href={teacher.socialLinks.youtube} target="_blank" rel="noreferrer" className="text-red-600 hover:underline text-sm font-medium">YouTube</a>
-                      )}
-                      {teacher.socialLinks?.linkedin && (
-                        <a href={teacher.socialLinks.linkedin} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-sm font-medium">LinkedIn</a>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
 
-              <div className="mt-auto">
+              <div className="mt-auto flex flex-col gap-2">
                 <Button 
-                  variant="primary" 
-                  className="w-full bg-green-600 hover:bg-green-700 border-transparent text-white"
-                  onClick={() => approve(teacher._id)}
-                  disabled={isApproving}
+                  variant="outline" 
+                  className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
+                  onClick={() => handleViewDetails(teacher)}
                 >
-                  {isApproving ? "Tasdiqlanmoqda..." : "Tasdiqlash"}
+                  Ko'rish
                 </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    className="w-full bg-red-600 hover:bg-red-700 text-white border-transparent"
+                    onClick={() => handleOpenRejectModal(teacher)}
+                    disabled={isRejecting || isApproving}
+                  >
+                    Bekor qilish
+                  </Button>
+                  <Button 
+                    variant="primary" 
+                    className="w-full bg-green-600 hover:bg-green-700 border-transparent text-white"
+                    onClick={() => approve(teacher._id)}
+                    disabled={isApproving || isRejecting}
+                  >
+                    {isApproving ? "..." : "Tasdiqlash"}
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Reject Modal */}
+      {isRejectModalOpen && selectedTeacher && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <h3 className="text-xl font-bold mb-4 text-gray-900">Arizani bekor qilish</h3>
+            <p className="text-gray-600 mb-4 text-sm">
+              Siz <strong>{selectedTeacher.user?.firstName} {selectedTeacher.user?.lastName}</strong> ning arizasini bekor qilmoqchisiz. Iltimos, sababini ko'rsating.
+            </p>
+            <form onSubmit={handleRejectSubmit}>
+              <textarea
+                className="w-full border border-gray-300 rounded-xl p-3 mb-4 outline-none focus:border-blue-500 min-h-[100px]"
+                placeholder="Bekor qilish sababini yozing..."
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                required
+              />
+              <div className="flex gap-3 justify-end">
+                <Button type="button" variant="outline" onClick={() => setIsRejectModalOpen(false)}>Yopish</Button>
+                <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white" disabled={isRejecting}>
+                  {isRejecting ? "Bekor qilinmoqda..." : "Bekor qilish"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* View Modal */}
+      {isViewModalOpen && selectedTeacher && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-start mb-6">
+              <h3 className="text-2xl font-bold text-gray-900">O'qituvchi arizasi</h3>
+              <button onClick={() => setIsViewModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
+                <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-2xl overflow-hidden shrink-0">
+                  {selectedTeacher.user?.avatar ? (
+                    <img src={selectedTeacher.user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    selectedTeacher.user?.firstName?.charAt(0) || "U"
+                  )}
+                </div>
+                <div>
+                  <h4 className="font-bold text-xl text-gray-900">{selectedTeacher.user?.firstName} {selectedTeacher.user?.lastName}</h4>
+                  <p className="text-gray-500">{selectedTeacher.user?.email}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-1">Tajriba</p>
+                  <p className="text-gray-900 font-medium">{selectedTeacher.experienceYears} yil</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-1">Telefon raqam</p>
+                  <p className="text-gray-900 font-medium">{selectedTeacher.phone || "Kiritilmagan"}</p>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">O'zi haqida (Bio)</p>
+                <p className="text-gray-900 leading-relaxed whitespace-pre-wrap">{selectedTeacher.bio}</p>
+              </div>
+
+              {selectedTeacher.socialLinks?.linkedin && (
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-2">LinkedIn Profil</p>
+                  <a href={selectedTeacher.socialLinks.linkedin} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                    {selectedTeacher.socialLinks.linkedin}
+                  </a>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 justify-end mt-8 border-t border-gray-100 pt-6">
+              <Button type="button" variant="outline" onClick={() => setIsViewModalOpen(false)}>Yopish</Button>
+              <Button 
+                className="bg-red-600 hover:bg-red-700 text-white"
+                onClick={() => { setIsViewModalOpen(false); handleOpenRejectModal(selectedTeacher); }}
+              >
+                Bekor qilish
+              </Button>
+              <Button 
+                variant="primary" 
+                className="bg-green-600 hover:bg-green-700 text-white"
+                onClick={() => approve(selectedTeacher._id)}
+                disabled={isApproving}
+              >
+                {isApproving ? "Tasdiqlanmoqda..." : "Tasdiqlash"}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -215,7 +215,7 @@ export default function ManageCreateCoursePage() {
             onChange={(e) => {
               if (e.target.files) {
                 setFile(e.target.files[0]);
-                setValue("previewVideo", e.target.files[0]);
+                setValue("previewVideo", e.target.files[0], { shouldValidate: true });
               }
             }}
           />
