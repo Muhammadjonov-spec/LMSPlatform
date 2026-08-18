@@ -16,7 +16,8 @@ export const createCourse = async (data, onUploadProgress) => {
     headers: {
       "Content-Type": "multipart/form-data"
     },
-    onUploadProgress
+    onUploadProgress,
+    timeout: 0
   }).then((res) => res.data);
 };
 
@@ -26,7 +27,8 @@ export const updateCourse = async (data, id, onUploadProgress) =>
       headers: {
         "Content-Type": "multipart/form-data"
       },
-      onUploadProgress
+      onUploadProgress,
+      timeout: 0
     })
     .then((res) => res.data);
 
@@ -36,7 +38,8 @@ export const updateThumbnail = async (data, id, onUploadProgress) =>
       headers: {
         "Content-Type": "multipart/form-data"
       },
-      onUploadProgress
+      onUploadProgress,
+      timeout: 0
     })
     .then((res) => res.data);
 
@@ -44,7 +47,8 @@ export const deleteCourse = async (id) => apiInstanceAuth.delete(`/courses/${id}
 
 export const createContent = async (data) => 
   apiInstanceAuth.post("/courses/contents", data, {
-    headers: { "Content-Type": "multipart/form-data" }
+    headers: { "Content-Type": "multipart/form-data" },
+    timeout: 0
   }).then((res) => res.data);
 
 export const addModule = async (data, courseId) =>
@@ -53,7 +57,8 @@ export const addModule = async (data, courseId) =>
 export const createLesson = async (data, courseId, moduleId, onUploadProgress) =>
   apiInstanceAuth.post(`/courses/${courseId}/modules/${moduleId}/lessons`, data, {
     headers: { "Content-Type": "multipart/form-data" },
-    onUploadProgress
+    onUploadProgress,
+    timeout: 0
   }).then(res => res.data);
 
 export const getDetailContent = async (id) => apiInstanceAuth.get(`/courses/contents/${id}`).then((res) => res.data);
@@ -61,7 +66,8 @@ export const getDetailContent = async (id) => apiInstanceAuth.get(`/courses/cont
 export const updateContent = async (data, id, onUploadProgress) => 
   apiInstanceAuth.put(`/courses/contents/${id}`, data, {
     headers: { "Content-Type": "multipart/form-data" },
-    onUploadProgress
+    onUploadProgress,
+    timeout: 0
   }).then((res) => res.data);
 
 export const deleteDetailContent = async (id) => apiInstanceAuth.delete(`/courses/contents/${id}`).then((res) => res.data);
