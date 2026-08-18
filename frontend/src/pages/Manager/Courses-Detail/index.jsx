@@ -43,8 +43,9 @@ export default function ManageCourseDetailPage() {
   const getImageUrl = (path) => {
     if (!path) return "/assets/images/placeholder.png";
     if (path.startsWith("http")) return path;
-    const baseUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || "http://localhost:5000";
-    return `${baseUrl}/${path.replace(/\\/g, '/')}`;
+    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    const separator = path.startsWith('/') ? '' : '/';
+    return `${baseUrl}${separator}${path.replace(/\\/g, '/')}`;
   };
 
   return (

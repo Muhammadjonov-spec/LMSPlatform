@@ -41,9 +41,18 @@ class CourseService {
     
     if (user) {
       const enrolled = user.enrolledCourses.find(c => c.toString() === courseId.toString());
-      if (enrolled || ['admin', 'super_admin', 'teacher'].includes(user.role)) {
+      if (enrolled || ['admin', 'super_admin'].includes(user.role)) {
          isEnrolled = true;
+      } else if (user.role === 'teacher') {
+         const teacherProfile = await TeacherRepository.findByUserId(user._id);
+         if (teacherProfile && course.teacher?.toString() === teacherProfile._id.toString()) {
+            isEnrolled = true;
+         }
       }
+    }
+    
+    if (course.isFree) {
+       isEnrolled = true;
     }
     if (!isEnrolled) {
        const hiddenCourse = JSON.parse(JSON.stringify(course))
@@ -54,9 +63,12 @@ class CourseService {
            });
          });
        }
+       hiddenCourse.isEnrolled = false;
        return hiddenCourse
     }
-    return course
+    const fullCourse = JSON.parse(JSON.stringify(course))
+    fullCourse.isEnrolled = true;
+    return fullCourse
   }
   async addModule(moduleTitle, user, courseId) {
     const course = await CourseRepository.findById(courseId)
@@ -222,8 +234,6 @@ class CourseService {
         const lesson = m.lessons[lIndex];
         if (lesson.videoPath) {
           try {
-            // lesson.videoPath is like /videos/lesson_123/index.m3u8
-            // we should delete the folder lesson_123
             const folderName = lesson.videoPath.split('/')[2];
             if (folderName) {
               const videoFolder = path.join(__dirname, '..', '..', 'public', 'videos', folderName);
@@ -232,7 +242,7 @@ class CourseService {
               }
             }
           } catch (err) {
-            console.error("Error deleting lesson video folder:", err);
+            throw new AppError(500, `Error deleting lesson video folder: ${err}`);
           }
         }
       }

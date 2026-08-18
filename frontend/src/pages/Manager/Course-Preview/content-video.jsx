@@ -10,7 +10,8 @@ const getVideoSrc = (videoUrl) => {
   const base = import.meta.env.VITE_API_URL
     ? import.meta.env.VITE_API_URL.replace("/api/v1", "").replace("/api", "")
     : "http://localhost:5000";
-  return `${base}${videoUrl}`;
+  const separator = videoUrl.startsWith('/') ? '' : '/';
+  return `${base}${separator}${videoUrl}`;
 };
 
 // HLS video player (Chrome/Firefox uchun hls.js ishlatiladi)

@@ -88,7 +88,7 @@ export default function PublicCourseDetail() {
             <div className="bg-white rounded-[20px] border border-gray-200 p-8 shadow-lg sticky top-24">
               <div className="text-center mb-6">
                 <h3 className="text-gray-500 font-medium mb-2">Price</h3>
-                <div className="text-4xl font-extrabold text-gray-900">{price.toLocaleString()} UZS</div>
+                <div className="text-4xl font-extrabold text-gray-900">{course.isFree ? "BEMINNAT" : `${price.toLocaleString()} UZS`}</div>
               </div>
 
               <ul className="flex flex-col gap-4 mb-8">
@@ -106,11 +106,19 @@ export default function PublicCourseDetail() {
                 </li>
               </ul>
 
-              <button 
-                onClick={() => navigate(`/checkout/${course._id}`)}
-                className="w-full py-4 rounded-xl bg-[#1E40AF] text-white font-bold text-lg hover:bg-blue-800 transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-1">
-                Buy Now
-              </button>
+              {(course.isFree || course.isEnrolled) ? (
+                <button 
+                  onClick={() => navigate(`/student/courses/${course._id}`)}
+                  className="w-full py-4 rounded-xl bg-green-600 text-white font-bold text-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                  Start Learning
+                </button>
+              ) : (
+                <button 
+                  onClick={() => navigate(`/checkout/${course._id}`)}
+                  className="w-full py-4 rounded-xl bg-[#1E40AF] text-white font-bold text-lg hover:bg-blue-800 transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                  Buy Now
+                </button>
+              )}
 
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Talabalar sharhlari</h3>

@@ -1,6 +1,6 @@
 import React from "react";
 import CardCourse from "./CardCourse";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, Link } from "react-router-dom";
 import { STRORAGE_KEY } from "../../../utils/const";
 import secureLocalStorage from "react-secure-storage";
 import { getImageUrl } from "../../../utils/helpers";
@@ -43,6 +43,9 @@ export default function StudentPage() {
       <section className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <h2 className="font-extrabold text-2xl text-gray-900">My Courses</h2>
+          <Link to="/" className="px-5 py-2.5 bg-white border border-[#1E40AF] text-[#1E40AF] rounded-xl font-bold hover:bg-gray-50 transition-colors flex items-center gap-2">
+            Browse Courses
+          </Link>
         </div>
         
         {courses && courses.length > 0 ? (

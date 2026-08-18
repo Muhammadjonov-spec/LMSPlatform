@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ContentText from "./content-text";
 import ContentVideo from "./content-video";
 import { Link, useLoaderData, useParams, useNavigate } from "react-router-dom";
+import { getProgress, markLessonCompleted } from "../../../services/progressService";
 
 export default function ManageCoursePreviewPage({ isAdmin = true }) {
   const course = useLoaderData();
@@ -20,12 +21,38 @@ export default function ManageCoursePreviewPage({ isAdmin = true }) {
   }, []) || [];
 
   const [activeContent, setActiveContent] = useState(allLessons[0]);
+  const [progressData, setProgressData] = React.useState(null);
+
+  React.useEffect(() => {
+    if (!isAdmin) {
+      getProgress(id).then(res => setProgressData(res.data)).catch(console.error);
+    }
+  }, [id, isAdmin]);
+
+  const completedLessons = progressData?.completedLessons || [];
+  const percentComplete = allLessons.length > 0 
+    ? Math.round((completedLessons.length / allLessons.length) * 100) 
+    : 0;
 
   const handleChangeContent = (content) => {
     setActiveContent(content);
   };
 
-  const handleNextContent = (content) => {
+  const handleNextContent = async (content) => {
+    if (!isAdmin) {
+      try {
+        await markLessonCompleted(id, content._id);
+        setProgressData(prev => {
+           if(prev && prev.completedLessons.includes(content._id)) return prev;
+           return {
+             ...prev,
+             completedLessons: [...(prev?.completedLessons || []), content._id]
+           }
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
     const currIndex = allLessons.findIndex((val) => val._id === content._id);
     if (currIndex < allLessons.length - 1) {
       handleChangeContent(allLessons[currIndex + 1]);
@@ -50,7 +77,7 @@ export default function ManageCoursePreviewPage({ isAdmin = true }) {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
             <span className="material-symbols-rounded text-[#1E40AF] text-sm">emoji_events</span>
-            <span className="text-sm font-semibold text-[#1E40AF]">0 / {allLessons.length || 0}</span>
+            <span className="text-sm font-semibold text-[#1E40AF]">{completedLessons.length} / {allLessons.length || 0}</span>
           </div>
         </div>
       </header>
@@ -72,9 +99,9 @@ export default function ManageCoursePreviewPage({ isAdmin = true }) {
           <div className="p-6 border-b border-gray-200 flex-shrink-0">
             <h2 className="font-bold text-xl text-gray-900">Course Contents</h2>
             <div className="w-full bg-gray-100 rounded-full h-2 mt-4 overflow-hidden">
-              <div className="bg-green-500 h-2 rounded-full transition-all" style={{ width: '0%' }}></div>
+              <div className="bg-green-500 h-2 rounded-full transition-all" style={{ width: `${percentComplete}%` }}></div>
             </div>
-            <p className="text-xs text-gray-500 mt-2 text-right">0% completed</p>
+            <p className="text-xs text-gray-500 mt-2 text-right">{percentComplete}% completed</p>
           </div>
           
           <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
@@ -95,9 +122,11 @@ export default function ManageCoursePreviewPage({ isAdmin = true }) {
                 >
                   <div className={`
                     w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5
-                    ${isActive(item) ? "bg-[#1E40AF] text-white" : "bg-gray-100 text-gray-400 group-hover:bg-blue-100 group-hover:text-[#1E40AF]"}
+                    ${completedLessons.includes(item._id) ? "bg-green-100 text-green-600" : isActive(item) ? "bg-[#1E40AF] text-white" : "bg-gray-100 text-gray-400 group-hover:bg-blue-100 group-hover:text-[#1E40AF]"}
                   `}>
-                    {isActive(item) ? (
+                    {completedLessons.includes(item._id) ? (
+                      <span className="material-symbols-rounded text-sm">check</span>
+                    ) : isActive(item) ? (
                       <span className="material-symbols-rounded text-sm">play_arrow</span>
                     ) : (
                       <span className="text-xs font-bold">{index + 1}</span>
