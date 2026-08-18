@@ -12,7 +12,7 @@ export default function SettingsPage() {
   // Profile data
   const fullName = session?.firstName && session?.lastName
     ? `${session.firstName} ${session.lastName}`
-    : session?.firstName || session?.name || "Foydalanuvchi";
+    : session?.firstName || session?.name || "User";
 
   const [profileData, setProfileData] = useState({
     firstName: session?.firstName || session?.name?.split(" ")[0] || "",
@@ -41,54 +41,54 @@ export default function SettingsPage() {
 
   const handleProfileSave = (e) => {
     e.preventDefault();
-    setSaveMessage("Profil ma'lumotlari muvaffaqiyatli saqlandi!");
+    setSaveMessage("Profile data saved successfully!");
     setTimeout(() => setSaveMessage(""), 3000);
   };
 
   const handlePasswordSave = (e) => {
     e.preventDefault();
     if (profileData.newPassword !== profileData.confirmPassword) {
-      setSaveMessage("Yangi parollar mos kelmaydi!");
+      setSaveMessage("New passwords do not match!");
       setTimeout(() => setSaveMessage(""), 3000);
       return;
     }
     if (profileData.newPassword.length < 6) {
-      setSaveMessage("Parol kamida 6 belgidan iborat bo'lishi kerak!");
+      setSaveMessage("Password must be at least 6 characters long!");
       setTimeout(() => setSaveMessage(""), 3000);
       return;
     }
-    setSaveMessage("Parol muvaffaqiyatli o'zgartirildi!");
+    setSaveMessage("Password changed successfully!");
     setProfileData({ ...profileData, currentPassword: "", newPassword: "", confirmPassword: "" });
     setTimeout(() => setSaveMessage(""), 3000);
   };
 
   const handleSystemSave = (e) => {
     e.preventDefault();
-    setSaveMessage("Tizim sozlamalari saqlandi!");
+    setSaveMessage("System settings saved!");
     setTimeout(() => setSaveMessage(""), 3000);
   };
 
   const tabs = [
-    { id: "profile", label: "Profil", icon: faUser },
-    { id: "security", label: "Xavfsizlik", icon: faLock }
+    { id: "profile", label: "Profile", icon: faUser },
+    { id: "security", label: "Security", icon: faLock }
   ];
 
   if (session?.role === 'super_admin') {
-    tabs.push({ id: "system", label: "Tizim", icon: faServer });
+    tabs.push({ id: "system", label: "System", icon: faServer });
   }
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Sozlamalar</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          Shaxsiy hisobingiz {session?.role === 'super_admin' ? "va tizim sozlamalarini" : ""} boshqaring
+          Manage your personal account {session?.role === 'super_admin' ? "and system settings" : ""}
         </p>
       </div>
 
       {saveMessage && (
         <div className={`mb-6 px-4 py-3 rounded-xl text-sm font-medium ${
-          saveMessage.includes("muvaffaqiyatli") || saveMessage.includes("saqlandi")
+          saveMessage.includes("successfully") || saveMessage.includes("saved")
             ? "bg-green-50 text-green-700 border border-green-200"
             : "bg-red-50 text-red-700 border border-red-200"
         }`}>
@@ -141,7 +141,7 @@ export default function SettingsPage() {
             <form onSubmit={handleProfileSave} className="p-6 sm:p-8 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ism</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
                   <input
                     type="text"
                     name="firstName"
@@ -151,7 +151,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Familiya</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
                   <input
                     type="text"
                     name="lastName"
@@ -163,7 +163,7 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email manzil</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
                 <input
                   type="email"
                   name="email"
@@ -175,7 +175,7 @@ export default function SettingsPage() {
 
               <div className="pt-4 flex justify-end">
                 <button type="submit" className="inline-flex justify-center rounded-lg bg-[#1E40AF] py-2.5 px-6 text-sm font-semibold text-white shadow-sm hover:bg-blue-800 transition-colors">
-                  Saqlash
+                  Save
                 </button>
               </div>
             </form>
@@ -185,11 +185,11 @@ export default function SettingsPage() {
         {activeTab === "security" && (
           <div className="bg-white dark:bg-white/5 rounded-xl shadow-sm border border-gray-200 dark:border-white/10 overflow-hidden">
             <div className="p-6 sm:p-8 border-b border-gray-100 dark:border-white/10">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Parolni o'zgartirish</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Change Password</h3>
             </div>
             <form onSubmit={handlePasswordSave} className="p-6 sm:p-8 space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Joriy parol</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
                 <input
                   type="password"
                   name="currentPassword"
@@ -200,7 +200,7 @@ export default function SettingsPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Yangi parol</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
                 <input
                   type="password"
                   name="newPassword"
@@ -211,7 +211,7 @@ export default function SettingsPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Parolni tasdiqlang</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
                 <input
                   type="password"
                   name="confirmPassword"
@@ -223,7 +223,7 @@ export default function SettingsPage() {
               </div>
               <div className="pt-4 flex justify-end">
                 <button type="submit" className="inline-flex justify-center rounded-lg bg-[#1E40AF] py-2.5 px-6 text-sm font-semibold text-white shadow-sm hover:bg-blue-800 transition-colors">
-                  Parolni o'zgartirish
+                  Change Password
                 </button>
               </div>
             </form>
@@ -234,10 +234,10 @@ export default function SettingsPage() {
           <div className="bg-white dark:bg-white/5 rounded-xl shadow-sm border border-gray-200 dark:border-white/10 overflow-hidden">
             <form onSubmit={handleSystemSave} className="p-6 sm:p-8 space-y-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b dark:border-white/10 pb-2 mb-4">Asosiy Ma'lumotlar</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b dark:border-white/10 pb-2 mb-4">Basic Information</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Platforma nomi</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Platform Name</label>
                     <input
                       type="text"
                       value={systemData.platformName}
@@ -246,7 +246,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Qo'llab-quvvatlash Email manzili</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Support Email Address</label>
                     <input
                       type="email"
                       value={systemData.supportEmail}
@@ -258,7 +258,7 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b dark:border-white/10 pb-2 mb-4">Xavfsizlik va Ruxsatlar</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b dark:border-white/10 pb-2 mb-4">Security and Permissions</h3>
                 <div className="space-y-4">
                   <div className="flex items-start">
                     <div className="flex h-5 items-center">
@@ -271,8 +271,8 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="ml-3 text-sm">
-                      <label htmlFor="allowRegistration" className="font-medium text-gray-700 dark:text-gray-300">O'quvchilar ro'yxatdan o'ta oladi</label>
-                      <p className="text-gray-500">Yangi o'quvchilar platformada o'zlari akkaunt yarata oladilar.</p>
+                      <label htmlFor="allowRegistration" className="font-medium text-gray-700 dark:text-gray-300">Students can register</label>
+                      <p className="text-gray-500">New students can create their own accounts on the platform.</p>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -286,15 +286,15 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="ml-3 text-sm">
-                      <label htmlFor="requireVerification" className="font-medium text-gray-700 dark:text-gray-300">Emailni tasdiqlash majburiy</label>
-                      <p className="text-gray-500">Ro'yxatdan o'tgandan keyin email tasdiqlanmaguncha tizimga kirish taqiqlanadi.</p>
+                      <label htmlFor="requireVerification" className="font-medium text-gray-700 dark:text-gray-300">Email verification required</label>
+                      <p className="text-gray-500">Login is disabled until the email is verified after registration.</p>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="pt-4 flex justify-end">
                 <button type="submit" className="inline-flex justify-center rounded-md bg-[#1E40AF] py-2 px-6 text-sm font-medium text-white hover:bg-blue-800">
-                  Saqlash
+                  Save
                 </button>
               </div>
             </form>

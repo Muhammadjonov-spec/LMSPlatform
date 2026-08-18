@@ -83,7 +83,7 @@ export default function ManageCourseContentCreatePage() {
           {content === undefined ? "Add" : "Edit"} Content
         </span>
       </div>
-      <header className="flex items-center justify-between gap-[30px]">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-[30px]">
         <div className="flex items-center gap-[30px]">
           <div>
             <h1 className="font-extrabold text-[28px] leading-[42px]">{content === undefined ? "Add" : "Edit"} Content</h1>
@@ -91,7 +91,7 @@ export default function ManageCourseContentCreatePage() {
           </div>
         </div>
       </header>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-[930px] rounded-[30px] p-[30px] gap-[30px] bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/20">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full max-w-[930px] rounded-[30px] p-5 sm:p-[30px] gap-6 sm:gap-[30px] bg-white/50 dark:bg-black/20 backdrop-blur-md border border-white/20">
         <div className="flex flex-col gap-[10px]">
           <label htmlFor="title" className="font-semibold">
             Content Title
@@ -169,14 +169,14 @@ export default function ManageCourseContentCreatePage() {
           </div>
         )}
 
-        <div className="flex items-center gap-[14px]">
-          <button type="button" className="w-full rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap">
+        <div className="flex flex-col sm:flex-row items-center gap-[14px]">
+          <button type="button" className="w-full sm:w-auto flex-1 rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-center">
             Save as Draft
           </button>
           <button
             type="submit"
             disabled={content === undefined ? mutateCreate.isPending : mutateUpdate.isPending}
-            className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#1E40AF] text-nowrap disabled:opacity-50">
+            className="w-full sm:w-auto flex-1 rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#1E40AF] text-center disabled:opacity-50">
             {content === undefined ? "Add" : "Edit"} Content Now
           </button>
         </div>
@@ -187,8 +187,8 @@ export default function ManageCourseContentCreatePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl flex flex-col items-center text-center">
             <div className="w-16 h-16 border-4 border-gray-100 border-t-[#1E40AF] rounded-full animate-spin mb-4"></div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Yuklanmoqda...</h3>
-            <p className="text-sm text-gray-500 mb-6">Iltimos, oyna yopilguncha kuting. Video hajmi kattaligi sababli bu biroz vaqt olishi mumkin.</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Uploading...</h3>
+            <p className="text-sm text-gray-500 mb-6">Please wait until the window closes. Due to the large size of the video, this may take some time.</p>
             
             {uploadProgress > 0 && (
               <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden relative">

@@ -8,6 +8,7 @@ router.get("/public", CourseController.getPublicCourses)
 router.get("/public/:id", CourseController.getPublicCourseDetails)
 router.post("/create", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, uploadVideo.single("previewVideo"), CourseController.createCourse)
 router.get("/:id", isAuth, CourseController.getCourceDetails)
+router.delete("/:id", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, CourseController.deleteCourse)
 
 router.put("/:id", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, uploadVideo.single("previewVideo"), CourseController.updateCourse)
 router.put("/:id/thumbnail", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, uploadImage.single("thumbnail"), CourseController.updateThumbnail)

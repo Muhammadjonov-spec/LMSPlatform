@@ -79,7 +79,7 @@ export default function ManageCreateCoursePage() {
       }
     } catch (error) {
       console.error(error);
-      alert(error?.response?.data?.message || error?.message || "Kutilmagan xatolik yuz berdi");
+      alert(error?.response?.data?.message || error?.message || "An unexpected error occurred");
     }
   };
 
@@ -87,7 +87,7 @@ export default function ManageCreateCoursePage() {
 
   return (
     <>
-      <header className="flex items-center justify-between mb-10">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-10">
         <div>
           <h1 className="font-extrabold text-[28px] leading-[42px]">{isEditMode ? "Edit" : "Add"} Course</h1>
           <p className="text-[#838C9D] mt-[2px]">
@@ -95,7 +95,7 @@ export default function ManageCreateCoursePage() {
           </p>
         </div>
 
-        <button className="rounded-[16px] border border-[#060A23] px-5 py-3 font-semibold">Import</button>
+        <button className="w-full sm:w-auto rounded-[16px] border border-[#060A23] px-5 py-3 font-semibold text-center">Import</button>
       </header>
 
       <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl bg-[#F8FAFB] rounded-[30px] p-10 mx-auto flex flex-col gap-10">
@@ -202,15 +202,15 @@ export default function ManageCreateCoursePage() {
           <span className="text-[#FF435A] text-sm">{errors?.description?.message}</span>
         </div>
 
-        <div className="flex gap-5">
-          <button type="button" className="w-full rounded-full border border-[#060A23] py-4 font-semibold bg-white">
+        <div className="flex flex-col sm:flex-row gap-5 mt-4">
+          <button type="button" className="w-full rounded-full border border-[#060A23] py-4 font-semibold bg-white text-center">
             Save as Draft
           </button>
 
           <button
             type="submit"
             disabled={isPending}
-            className="w-full rounded-full py-4 font-semibold text-white bg-[#1E40AF]">
+            className="w-full rounded-full py-4 font-semibold text-white bg-[#1E40AF] text-center">
             {isEditMode ? "Edit" : "Add"} Now
           </button>
         </div>
@@ -221,8 +221,8 @@ export default function ManageCreateCoursePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl flex flex-col items-center text-center">
             <div className="w-16 h-16 border-4 border-gray-100 border-t-[#1E40AF] rounded-full animate-spin mb-4"></div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Yuklanmoqda...</h3>
-            <p className="text-sm text-gray-500 mb-6">Iltimos, oyna yopilguncha kuting. Video hajmi kattaligi sababli bu biroz vaqt olishi mumkin.</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Uploading...</h3>
+            <p className="text-sm text-gray-500 mb-6">Please wait until the window closes. Due to the large size of the video, this may take some time.</p>
             
             {uploadProgress > 0 && (
               <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden relative">

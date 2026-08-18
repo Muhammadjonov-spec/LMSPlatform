@@ -30,6 +30,7 @@ import { getSubscriptions } from "../services/subscriptionService";
 import { getRewards } from "../services/rewardService";
 import ManageStudentCreatePage from "../pages/Manager/Student-Create";
 import { getCoursesStudents, getDetailStudent, getStudents } from "../services/studentServices";
+import { getMe } from "../services/authServices";
 import StudentsCourseList from "../pages/Manager/Student-Course";
 import StudentForm from "../pages/Manager/Student-Course/student-form";
 import { getOverviews } from "../services/overvieService";
@@ -129,8 +130,25 @@ const router = createBrowserRouter([
     path: "/manager",
     id: MANAGER_SESSION,
     loader: async () => {
-      const session = secureLocalStorage.getItem(STRORAGE_KEY);
-      // session format: { data: { role, token, user } } yoki { role, token, user }
+      let session = secureLocalStorage.getItem(STRORAGE_KEY);
+      if (session) {
+        try {
+          const me = await getMe();
+          if (me?.data) {
+            if (session.data) {
+              session.data.user = me.data.user;
+              session.data.role = me.data.role;
+            } else {
+              session.user = me.data.user;
+              session.role = me.data.role;
+            }
+            secureLocalStorage.setItem(STRORAGE_KEY, session);
+          }
+        } catch (error) {
+          console.error("Failed to sync session data", error);
+        }
+      }
+
       const data = session?.data || session;
       const allowedRoles = ["teacher", "admin", "super_admin", "manager"];
       if (!data || !allowedRoles.includes(data.role)) {
@@ -340,7 +358,25 @@ const router = createBrowserRouter([
     path: "/student",
     id: STUDENT_SESSION,
     loader: async () => {
-      const session = secureLocalStorage.getItem(STRORAGE_KEY);
+      let session = secureLocalStorage.getItem(STRORAGE_KEY);
+      if (session) {
+        try {
+          const me = await getMe();
+          if (me?.data) {
+            if (session.data) {
+              session.data.user = me.data.user;
+              session.data.role = me.data.role;
+            } else {
+              session.user = me.data.user;
+              session.role = me.data.role;
+            }
+            secureLocalStorage.setItem(STRORAGE_KEY, session);
+          }
+        } catch (error) {
+          console.error("Failed to sync session data", error);
+        }
+      }
+
       const data = session?.data || session;
       if (!data || data.role !== "student") {
         throw redirect("/sign-in");

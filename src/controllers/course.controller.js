@@ -97,6 +97,13 @@ class CourseController {
     res.status(200).json({ success: true, data: result });
   }
 
+  async deleteCourse(req, res) {
+    const courseId = req.params.id;
+    const user = req.user;
+    const result = await CourseService.deleteCourse(courseId, user);
+    res.status(200).json({ success: true, message: "Kurs muvaffaqiyatli o'chirildi", data: result });
+  }
+
   async getDetailContent(req, res) {
     const contentId = req.params.id;
     const result = await CourseService.getDetailContent(contentId, req.user);

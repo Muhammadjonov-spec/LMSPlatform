@@ -34,10 +34,10 @@ export default function Header({ type = "manager" }) {
   const avatarColor = stringToHsl(fullName ?? "User");
 
   return (
-    <div id="TopBar" className="flex items-center justify-between gap-[30px]">
+    <div id="TopBar" className="flex items-center justify-between gap-4 sm:gap-[30px] flex-wrap sm:flex-nowrap">
       <form
         action=""
-        className="flex items-center w-full max-w-[450px] rounded-full border border-gray-300 dark:border-white/20 gap-3 px-5 transition-all duration-300 bg-white/50 dark:bg-black/30 backdrop-blur-md focus-within:ring-2 focus-within:ring-[#1E40AF]">
+        className="flex items-center w-full max-w-[200px] sm:max-w-[450px] rounded-full border border-gray-300 dark:border-white/20 gap-3 px-3 sm:px-5 transition-all duration-300 bg-white/50 dark:bg-black/30 backdrop-blur-md focus-within:ring-2 focus-within:ring-[#1E40AF]">
         <input
           type="text"
           name="search"

@@ -14,3 +14,6 @@ export const postLogout = async () =>
 
 export const verifyEmailToken = async (token) =>
   apiInstance.get(`/auth/verify/${token}`).then((res) => res.data);
+
+export const getMe = async () =>
+  apiInstanceAuth.get("/auth/me").then((res) => res.data);

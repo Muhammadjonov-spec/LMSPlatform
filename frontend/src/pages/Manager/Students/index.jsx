@@ -26,7 +26,7 @@ export default function ManageStudentsPage() {
       </header>
       <section id="CourseList" className="flex flex-col w-full rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]">
         {!students || students.length === 0 ? (
-          <EmptyState title="O'quvchilar mavjud emas" message="Hozircha hech qanday o'quvchi qo'shilmagan yoki tizim API ulanmagan." />
+          <EmptyState title="No students available" message="No students have been added yet or system API is not connected." />
         ) : (
           students.map((item) => (
             <StudentItem

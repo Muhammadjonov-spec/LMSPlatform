@@ -20,10 +20,10 @@ export default function TeacherApproval() {
     onSuccess: () => {
       queryClient.invalidateQueries(["allTeacherApplications"]);
       setIsViewModalOpen(false);
-      alert("O'qituvchi muvaffaqiyatli tasdiqlandi!");
+      alert("Teacher successfully approved!");
     },
     onError: (err) => {
-      alert(err?.response?.data?.message || err?.message || "Xatolik yuz berdi");
+      alert(err?.response?.data?.message || err?.message || "An error occurred");
     }
   });
 
@@ -34,10 +34,10 @@ export default function TeacherApproval() {
       setIsRejectModalOpen(false);
       setIsViewModalOpen(false);
       setRejectReason("");
-      alert("O'qituvchi arizasi bekor qilindi!");
+      alert("Teacher application rejected!");
     },
     onError: (err) => {
-      alert(err?.response?.data?.message || err?.message || "Xatolik yuz berdi");
+      alert(err?.response?.data?.message || err?.message || "An error occurred");
     }
   });
 
@@ -48,7 +48,7 @@ export default function TeacherApproval() {
 
   const handleRejectSubmit = (e) => {
     e.preventDefault();
-    if (!rejectReason.trim()) return alert("Bekor qilish sababini yozing");
+    if (!rejectReason.trim()) return alert("Please enter a reason for rejection");
     reject({ id: selectedTeacher._id, reason: rejectReason });
   };
 
@@ -68,7 +68,7 @@ export default function TeacherApproval() {
   if (isError) {
     return (
       <div className="p-8 text-center text-red-600">
-        <h2 className="text-xl font-bold">Ma'lumotlarni yuklashda xatolik yuz berdi.</h2>
+        <h2 className="text-xl font-bold">An error occurred while loading data.</h2>
       </div>
     );
   }
@@ -76,9 +76,9 @@ export default function TeacherApproval() {
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8 relative">
       <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">O'qituvchi arizalari</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Teacher Applications</h1>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          O'qituvchi bo'lish uchun yuborilgan arizalarni ko'rib chiqing va tasdiqlang.
+          Review and approve applications submitted for teaching.
         </p>
       </div>
 
@@ -89,8 +89,8 @@ export default function TeacherApproval() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Yangi arizalar yo'q</h3>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Hozircha o'qituvchi bo'lish uchun hech qanday ariza kelib tushmagan.</p>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">No new applications</h3>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">No teacher applications have been received yet.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -99,9 +99,9 @@ export default function TeacherApproval() {
               
               {/* Status Badge */}
               <div className="absolute top-4 right-4">
-                {teacher.status === 'pending' && <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full">Kutmoqda</span>}
-                {teacher.status === 'approved' && <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">Tasdiqlangan</span>}
-                {teacher.status === 'rejected' && <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-bold rounded-full">Bekor qilingan</span>}
+                {teacher.status === 'pending' && <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full">Pending</span>}
+                {teacher.status === 'approved' && <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">Approved</span>}
+                {teacher.status === 'rejected' && <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-bold rounded-full">Rejected</span>}
               </div>
 
               <div className="flex items-center gap-4 mb-4">
@@ -122,13 +122,13 @@ export default function TeacherApproval() {
               
               <div className="flex-1 space-y-3 mb-6 mt-2">
                 <div>
-                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Tajriba:</span>
-                  <p className="text-sm text-gray-800 dark:text-gray-200">{teacher.experienceYears} yil</p>
+                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Experience:</span>
+                  <p className="text-sm text-gray-800 dark:text-gray-200">{teacher.experienceYears} years</p>
                 </div>
                 
                 <div>
-                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Telefon raqam:</span>
-                  <p className="text-sm text-gray-800 dark:text-gray-200">{teacher.phone || "Ko'rsatilmagan"}</p>
+                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Phone Number:</span>
+                  <p className="text-sm text-gray-800 dark:text-gray-200">{teacher.phone || "Not specified"}</p>
                 </div>
               </div>
 
@@ -147,7 +147,7 @@ export default function TeacherApproval() {
                       onClick={() => handleOpenRejectModal(teacher)}
                       disabled={isRejecting || isApproving}
                     >
-                      Bekor qilish
+                      Reject
                     </Button>
                     <Button 
                       variant="primary" 
@@ -155,7 +155,7 @@ export default function TeacherApproval() {
                       onClick={() => approve(teacher._id)}
                       disabled={isApproving || isRejecting}
                     >
-                      {isApproving ? "..." : "Tasdiqlash"}
+                      {isApproving ? "..." : "Approve"}
                     </Button>
                   </div>
                 )}
@@ -169,22 +169,22 @@ export default function TeacherApproval() {
       {isRejectModalOpen && selectedTeacher && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">Arizani bekor qilish</h3>
+            <h3 className="text-xl font-bold mb-4 text-gray-900">Reject Application</h3>
             <p className="text-gray-600 mb-4 text-sm">
-              Siz <strong>{selectedTeacher.user?.firstName} {selectedTeacher.user?.lastName}</strong> ning arizasini bekor qilmoqchisiz. Iltimos, sababini ko'rsating.
+              You are rejecting the application of <strong>{selectedTeacher.user?.firstName} {selectedTeacher.user?.lastName}</strong>. Please provide a reason.
             </p>
             <form onSubmit={handleRejectSubmit}>
               <textarea
                 className="w-full border border-gray-300 rounded-xl p-3 mb-4 outline-none focus:border-blue-500 min-h-[100px]"
-                placeholder="Bekor qilish sababini yozing..."
+                placeholder="Write a reason for rejection..."
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 required
               />
               <div className="flex gap-3 justify-end">
-                <Button type="button" variant="outline" onClick={() => setIsRejectModalOpen(false)}>Yopish</Button>
+                <Button type="button" variant="outline" onClick={() => setIsRejectModalOpen(false)}>Close</Button>
                 <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white" disabled={isRejecting}>
-                  {isRejecting ? "Bekor qilinmoqda..." : "Bekor qilish"}
+                  {isRejecting ? "Rejecting..." : "Reject"}
                 </Button>
               </div>
             </form>
@@ -197,7 +197,7 @@ export default function TeacherApproval() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-start mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">O'qituvchi arizasi</h3>
+              <h3 className="text-2xl font-bold text-gray-900">Teacher Application</h3>
               <button onClick={() => setIsViewModalOpen(false)} className="text-gray-400 hover:text-gray-600">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -222,23 +222,23 @@ export default function TeacherApproval() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-50 p-4 rounded-xl">
-                  <p className="text-xs text-gray-500 font-bold uppercase mb-1">Tajriba</p>
-                  <p className="text-gray-900 font-medium">{selectedTeacher.experienceYears} yil</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-1">Experience</p>
+                  <p className="text-gray-900 font-medium">{selectedTeacher.experienceYears} years</p>
                 </div>
                 <div className="bg-gray-50 p-4 rounded-xl">
-                  <p className="text-xs text-gray-500 font-bold uppercase mb-1">Telefon raqam</p>
-                  <p className="text-gray-900 font-medium">{selectedTeacher.phone || "Kiritilmagan"}</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-1">Phone Number</p>
+                  <p className="text-gray-900 font-medium">{selectedTeacher.phone || "Not specified"}</p>
                 </div>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-xl">
-                <p className="text-xs text-gray-500 font-bold uppercase mb-2">O'zi haqida (Bio)</p>
+                <p className="text-xs text-gray-500 font-bold uppercase mb-2">About (Bio)</p>
                 <p className="text-gray-900 leading-relaxed whitespace-pre-wrap">{selectedTeacher.bio}</p>
               </div>
 
               {selectedTeacher.socialLinks?.linkedin && (
                 <div className="bg-gray-50 p-4 rounded-xl">
-                  <p className="text-xs text-gray-500 font-bold uppercase mb-2">LinkedIn Profil</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-2">LinkedIn Profile</p>
                   <a href={selectedTeacher.socialLinks.linkedin} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
                     {selectedTeacher.socialLinks.linkedin}
                   </a>
@@ -248,12 +248,12 @@ export default function TeacherApproval() {
 
             {selectedTeacher.status === 'pending' ? (
               <div className="flex gap-3 justify-end mt-8 border-t border-gray-100 pt-6">
-                <Button type="button" variant="outline" onClick={() => setIsViewModalOpen(false)}>Yopish</Button>
+                <Button type="button" variant="outline" onClick={() => setIsViewModalOpen(false)}>Close</Button>
                 <Button 
                   className="bg-red-600 hover:bg-red-700 text-white"
                   onClick={() => { setIsViewModalOpen(false); handleOpenRejectModal(selectedTeacher); }}
                 >
-                  Bekor qilish
+                  Reject
                 </Button>
                 <Button 
                   variant="primary" 
@@ -261,12 +261,12 @@ export default function TeacherApproval() {
                   onClick={() => approve(selectedTeacher._id)}
                   disabled={isApproving}
                 >
-                  {isApproving ? "Tasdiqlanmoqda..." : "Tasdiqlash"}
+                  {isApproving ? "Approving..." : "Approve"}
                 </Button>
               </div>
             ) : (
               <div className="flex gap-3 justify-end mt-8 border-t border-gray-100 pt-6">
-                <Button type="button" variant="outline" onClick={() => setIsViewModalOpen(false)}>Yopish</Button>
+                <Button type="button" variant="outline" onClick={() => setIsViewModalOpen(false)}>Close</Button>
               </div>
             )}
           </div>

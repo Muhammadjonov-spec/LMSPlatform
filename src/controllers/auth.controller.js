@@ -25,6 +25,9 @@ class AuthController {
   const result = await AuthService.googleAuth(idToken);
   res.status(200).json({ success: true, data: result });
  }
+ async me(req, res) {
+  res.status(200).json({ success: true, data: { user: req.user, role: req.user.role } });
+ }
 }
 
 module.exports = new AuthController()

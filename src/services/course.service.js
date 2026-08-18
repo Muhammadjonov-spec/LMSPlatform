@@ -2,6 +2,8 @@ const CourseRepository = require('../repositories/CourseRepository');
 const TeacherRepository = require('../repositories/TeacherRepository');
 const AppError = require('../utils/AppError');
 const VideoQueueService = require('./videoQueue.service');
+const fs = require('fs');
+const path = require('path');
 
 class CourseService {
   async createCourse(data, user) {
@@ -111,6 +113,47 @@ class CourseService {
     return await CourseRepository.update(courseId, data);
   }
 
+  async deleteCourse(courseId, user) {
+    const course = await CourseRepository.findById(courseId);
+    if (!course) throw new AppError(404, "Kurs topilmadi");
+
+    if (!['admin', 'super_admin'].includes(user.role)) {
+      const teacherProfile = await TeacherRepository.findByUserId(user._id);
+      if (!teacherProfile || course.teacher?.toString() !== teacherProfile._id.toString()) {
+        throw new AppError(403, "Bu kursni o'chirish huquqingiz yo'q");
+      }
+    }
+    try {
+      if (course.thumbnail) {
+        const thumbnailPath = path.join(__dirname, '..', '..', course.thumbnail);
+        if (fs.existsSync(thumbnailPath)) fs.unlinkSync(thumbnailPath);
+      }
+      if (course.previewVideo) {
+        const previewPath = path.join(__dirname, '..', '..', course.previewVideo);
+        if (fs.existsSync(previewPath)) fs.unlinkSync(previewPath);
+      }
+      if (course.modules) {
+        course.modules.forEach(m => {
+          if (m.lessons) {
+            m.lessons.forEach(l => {
+              if (l.videoPath) {
+                const videoFolder = path.join(__dirname, '..', '..', 'public', 'uploads', 'courses', courseId.toString());
+                if (fs.existsSync(videoFolder)) {
+                   fs.rmSync(videoFolder, { recursive: true, force: true });
+                }
+              }
+            });
+          }
+        });
+      }
+    } catch (err) {
+      console.error("Error deleting course files:", err);
+    }
+    
+    await CourseRepository.delete(courseId);
+    return { message: "O'chirildi" };
+  }
+
   async getDetailContent(contentId, user) {
     const course = await CourseRepository.findByLessonId(contentId);
     if (!course) throw new AppError(404, "Kontent topilmadi");
@@ -145,18 +188,19 @@ class CourseService {
       }
     });
 
-    if (data.title) course.modules[targetModuleIndex].lessons[targetLessonIndex].title = data.title;
-    if (data.text) course.modules[targetModuleIndex].lessons[targetLessonIndex].text = data.text;
+    const updatedModules = JSON.parse(JSON.stringify(course.modules));
+    if (data.title) updatedModules[targetModuleIndex].lessons[targetLessonIndex].title = data.title;
+    if (data.text) updatedModules[targetModuleIndex].lessons[targetLessonIndex].text = data.text;
     
     if (data.videoPath) {
-      course.modules[targetModuleIndex].lessons[targetLessonIndex].status = "processing";
-      course.modules[targetModuleIndex].lessons[targetLessonIndex].videoPath = null;
+      updatedModules[targetModuleIndex].lessons[targetLessonIndex].status = "processing";
+      updatedModules[targetModuleIndex].lessons[targetLessonIndex].videoPath = null;
       const outputFolder = `lesson_${Date.now()+Math.round(Math.random()*10)}`;
-      VideoQueueService.addJob(course._id, course.modules[targetModuleIndex]._id, contentId, data.videoPath, outputFolder);
+      VideoQueueService.addJob(course._id, updatedModules[targetModuleIndex]._id, contentId, data.videoPath, outputFolder);
     }
 
-    await CourseRepository.update(course._id, { modules: course.modules });
-    return course.modules[targetModuleIndex].lessons[targetLessonIndex];
+    await CourseRepository.update(course._id, { modules: updatedModules });
+    return updatedModules[targetModuleIndex].lessons[targetLessonIndex];
   }
 
   async deleteDetailContent(contentId, user) {
@@ -175,11 +219,32 @@ class CourseService {
       const lIndex = m.lessons.findIndex(l => l._id.toString() === contentId.toString());
       if (lIndex !== -1) {
         targetModuleIndex = mIndex;
+        const lesson = m.lessons[lIndex];
+        if (lesson.videoPath) {
+          try {
+            // lesson.videoPath is like /videos/lesson_123/index.m3u8
+            // we should delete the folder lesson_123
+            const folderName = lesson.videoPath.split('/')[2];
+            if (folderName) {
+              const videoFolder = path.join(__dirname, '..', '..', 'public', 'videos', folderName);
+              if (fs.existsSync(videoFolder)) {
+                fs.rmSync(videoFolder, { recursive: true, force: true });
+              }
+            }
+          } catch (err) {
+            console.error("Error deleting lesson video folder:", err);
+          }
+        }
       }
     });
 
-    course.modules[targetModuleIndex].lessons = course.modules[targetModuleIndex].lessons.filter(l => l._id.toString() !== contentId.toString());
-    await CourseRepository.update(course._id, { modules: course.modules });
+    if (targetModuleIndex === -1) {
+      throw new AppError(404, "Kontent topilmadi (modul ichida)");
+    }
+
+    const updatedModules = JSON.parse(JSON.stringify(course.modules));
+    updatedModules[targetModuleIndex].lessons = updatedModules[targetModuleIndex].lessons.filter(l => l._id.toString() !== contentId.toString());
+    await CourseRepository.update(course._id, { modules: updatedModules });
     return { message: "O'chirildi" };
   }
 }

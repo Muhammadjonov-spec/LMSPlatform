@@ -14,16 +14,16 @@ export default function ManagerHome() {
           <h1 className="font-extrabold text-[28px] leading-[42px] dark:text-white">Dashboard Overview</h1>
           <p className="text-[#838C9D] dark:text-gray-400 mt-[1]">Here's a quick summary of your courses, achievements, and upcoming tasks.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto mt-4 sm:mt-0">
           <button 
-            onClick={() => alert("Customize funksiyasi tez orada ishga tushadi")}
-            className="w-fit rounded-[16px] border border-[#1E40AF] p-[14px_20px] font-semibold text-nowrap hover:bg-[#1E40AF]/5 transition-colors dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400/10"
+            onClick={() => alert("Customize function will be available soon")}
+            className="w-full sm:w-fit rounded-[16px] border border-[#1E40AF] p-[14px_20px] font-semibold text-center hover:bg-[#1E40AF]/5 transition-colors dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400/10"
           >
             Customize
           </button>
           <button 
-            onClick={() => alert("Ma'lumotlarni yuklab olish tez orada ishga tushadi")}
-            className="w-fit rounded-[16px] p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#1E40AF] text-nowrap hover:bg-blue-800 transition-colors"
+            onClick={() => alert("Data export will be available soon")}
+            className="w-full sm:w-fit rounded-[16px] p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#1E40AF] text-center hover:bg-blue-800 transition-colors"
           >
             Export Data
           </button>
@@ -32,7 +32,7 @@ export default function ManagerHome() {
 
       {!overview ? (
         <div className="mt-8">
-          <EmptyState title="Dashboard statistikasi mavjud emas" message="Hozircha tizimda yetarli ma'lumot yo'q yoki orqa qism (backend) API ulanmagan." />
+          <EmptyState title="Dashboard statistics not available" message="There is currently not enough data in the system or backend API is not connected." />
         </div>
       ) : (
         <>

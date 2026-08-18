@@ -48,13 +48,13 @@ export default function CardCourse({
 
   return (
     <>
-      <div className="card flex items-center gap-5">
-        <div className="flex shrink-0 w-[140px] h-[110px] rounded-[20px] bg-[#D9D9D9] overflow-hidden">
+      <div className="card flex flex-col md:flex-row items-start md:items-center gap-5 w-full">
+        <div className="flex shrink-0 w-full md:w-[140px] h-[180px] md:h-[110px] rounded-[20px] bg-[#D9D9D9] overflow-hidden">
           <img src={imageUrl} className="w-full h-full object-cover" alt={`${name} thumbnail`} loading="lazy" />
         </div>
 
         <div className="w-full">
-          <h3 className="font-bold text-xl leading-[30px] line-clamp-1" title={name}>
+          <h3 className="font-bold text-xl leading-[30px] line-clamp-2 md:line-clamp-1" title={name}>
             {name}
           </h3>
           <div className="flex items-center gap-5">
@@ -69,10 +69,10 @@ export default function CardCourse({
           </div>
         </div>
 
-        <div className="flex justify-end items-center gap-3">
+        <div className="flex flex-wrap md:flex-nowrap justify-start md:justify-end items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
           <Link
             to={`/manager/courses/students/${id}`}
-            className="w-fit rounded-[16px] border border-[#060A23] p-[14px_20px] font-semibold text-nowrap hover:bg-gray-50 transition-colors"
+            className="w-full md:w-fit text-center rounded-[16px] border border-[#060A23] p-[14px_20px] font-semibold hover:bg-gray-50 transition-colors"
             aria-label={`Manage ${name} course`}>
             Students
           </Link>
@@ -80,14 +80,14 @@ export default function CardCourse({
             type="button"
             disabled={isPending}
             onClick={handleDeleteClick}
-            className="w-fit rounded-[16px] bg-[#FF435A] text-white p-[14px_20px] font-semibold text-nowrap hover:bg-[#E63950] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full md:w-fit text-center rounded-[16px] bg-[#FF435A] text-white p-[14px_20px] font-semibold hover:bg-[#E63950] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={`Delete ${name} course`}>
             Delete
           </button>
 
           <Link
             to={`/manager/courses/${id}`}
-            className="w-fit rounded-[16px] border border-[#060A23] p-[14px_20px] font-semibold text-nowrap hover:bg-gray-50 transition-colors"
+            className="w-full md:w-fit text-center rounded-[16px] border border-[#060A23] p-[14px_20px] font-semibold hover:bg-gray-50 transition-colors"
             aria-label={`Manage ${name} course`}>
             Manage
           </Link>
