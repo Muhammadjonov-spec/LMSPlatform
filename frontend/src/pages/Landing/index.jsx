@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { getPublicCourses } from "../../services/courseService";
+import { getImageUrl } from "../../utils/helpers";
 
 export default function LandingPage() {
   const [popularCourses, setPopularCourses] = useState([]);
@@ -109,9 +110,9 @@ export default function LandingPage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {popularCourses.map((course) => (
-              <Link key={course.id} to={`/courses/${course.id}`} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
+              <Link key={course._id || course.id} to={`/courses/${course._id || course.id}`} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
                 <div className="relative h-48 overflow-hidden">
-                  <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={getImageUrl(course.thumbnail || course.thumbnail_url || course.image)} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-black bg-opacity-10 group-hover:bg-opacity-0 transition-all"></div>
                 </div>
                 <div className="p-6 flex-1 flex flex-col">

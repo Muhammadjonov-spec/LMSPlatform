@@ -3,6 +3,7 @@ import CardCourse from "./CardCourse";
 import { useLoaderData } from "react-router-dom";
 import { STRORAGE_KEY } from "../../../utils/const";
 import secureLocalStorage from "react-secure-storage";
+import { getImageUrl } from "../../../utils/helpers";
 
 export default function StudentPage() {
   const courses = useLoaderData();
@@ -52,7 +53,7 @@ export default function StudentPage() {
                 category={item.category?.name || "Other"} 
                 title={item.name} 
                 id={item._id} 
-                imageUrl={item.thumbnail_url} 
+                imageUrl={getImageUrl(item.thumbnail || item.thumbnail_url)} 
               />
             ))}
           </div>

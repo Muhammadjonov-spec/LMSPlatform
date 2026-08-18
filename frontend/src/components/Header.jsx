@@ -5,6 +5,7 @@ import { useNavigate, useRouteLoaderData, Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faUser, faSignOutAlt, faCog, faMoneyCheckAlt } from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "../store/authStore";
+import { getImageUrl } from "../utils/helpers";
 
 export default function Header({ type = "manager" }) {
   const isManagerType = type !== "student";
@@ -58,8 +59,8 @@ export default function Header({ type = "manager" }) {
           type="button"
           id="profileButton"
           className="flex shrink-0 w-[50px] h-[50px] rounded-full overflow-hidden ring-2 ring-gray-200 dark:ring-white/20 hover:scale-105 transition-transform duration-200 shadow-md">
-          {session?.role === "student" && session?.photo_url ? (
-            <img src={session.photo_url} className="w-full h-full object-cover" alt="profile" />
+          {session?.avatar ? (
+            <img src={getImageUrl(session.avatar)} className="w-full h-full object-cover" alt="profile" />
           ) : (
             <div
               className="w-full h-full flex items-center justify-center text-white font-semibold text-lg"

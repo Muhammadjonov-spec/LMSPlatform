@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { getPublicCourses, getCategories } from "../../services/courseService";
+import { getImageUrl } from "../../utils/helpers";
 
 export default function PublicCourses() {
   const [courses, setCourses] = useState([]);
@@ -88,7 +89,7 @@ export default function PublicCourses() {
           {filteredCourses.map((course) => (
             <Link key={course._id || course.id} to={`/courses/${course._id || course.id}`} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
               <div className="relative h-48 overflow-hidden">
-                <img src={course.thumbnail_url || course.image || "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop&q=60"} alt={course.name || course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <img src={getImageUrl(course.thumbnail || course.thumbnail_url || course.image)} alt={course.name || course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-black bg-opacity-10 group-hover:bg-opacity-0 transition-all"></div>
               </div>
               <div className="p-6 flex-1 flex flex-col">

@@ -1,8 +1,11 @@
-import React, { useState } from "react";
-import { useRouteLoaderData } from "react-router-dom";
+import React, { useState, useRef } from "react";
+import { useRouteLoaderData, useNavigate } from "react-router-dom";
 import { MANAGER_SESSION, STUDENT_SESSION } from "../../../utils/const";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faLock, faCamera, faServer } from "@fortawesome/free-solid-svg-icons";
+import { uploadProfileAvatar } from "../../../services/authServices";
+import secureLocalStorage from "react-secure-storage";
+import { getImageUrl } from "../../../utils/helpers";
 
 export default function SettingsPage() {
   const managerSession = useRouteLoaderData(MANAGER_SESSION);
@@ -34,6 +37,42 @@ export default function SettingsPage() {
 
   const [activeTab, setActiveTab] = useState("profile");
   const [saveMessage, setSaveMessage] = useState("");
+  const fileInputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const res = await uploadProfileAvatar(formData);
+      if (res.success) {
+        setSaveMessage("Profile picture updated successfully!");
+        
+        // Update local session
+        const currentSession = secureLocalStorage.getItem(session.role === 'student' ? STUDENT_SESSION : MANAGER_SESSION);
+        if (currentSession) {
+          currentSession.avatar = res.data.avatar;
+          secureLocalStorage.setItem(session.role === 'student' ? STUDENT_SESSION : MANAGER_SESSION, currentSession);
+        }
+        
+        // Temporarily reload to reflect changes
+        setTimeout(() => {
+          navigate(0);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error(error);
+      setSaveMessage("Failed to upload profile picture");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleProfileChange = (e) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
@@ -118,13 +157,28 @@ export default function SettingsPage() {
         {activeTab === "profile" && (
           <div className="bg-white dark:bg-white/5 rounded-xl shadow-sm border border-gray-200 dark:border-white/10 overflow-hidden">
             <div className="p-6 sm:p-8 border-b border-gray-100 dark:border-white/10 flex items-center gap-6">
-              <div className="relative">
-                <div
-                  className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-md"
-                  style={{ backgroundColor: `hsl(${(fullName).charCodeAt(0) * 7 % 360}, 70%, 60%)` }}
-                >
-                  {fullName?.charAt(0)?.toUpperCase() || "U"}
-                </div>
+              <div className="relative cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  hidden 
+                  accept="image/*" 
+                  onChange={handleAvatarChange} 
+                />
+                {session?.avatar ? (
+                  <img
+                    src={getImageUrl(session.avatar)}
+                    alt="avatar"
+                    className={`w-20 h-20 rounded-full object-cover shadow-md ${isUploading ? 'opacity-50' : ''}`}
+                  />
+                ) : (
+                  <div
+                    className={`w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-md ${isUploading ? 'opacity-50' : ''}`}
+                    style={{ backgroundColor: `hsl(${(fullName).charCodeAt(0) * 7 % 360}, 70%, 60%)` }}
+                  >
+                    {fullName?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                )}
                 <button className="absolute bottom-0 right-0 w-7 h-7 bg-[#1E40AF] text-white rounded-full flex items-center justify-center shadow-md hover:bg-blue-800 transition-colors">
                   <FontAwesomeIcon icon={faCamera} className="w-3 h-3" />
                 </button>

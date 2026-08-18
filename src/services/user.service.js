@@ -131,6 +131,29 @@ class UserService {
       .lean();
     return student ? student.enrolledCourses : [];
   }
+
+  async updateAvatar(userId, avatarPath) {
+    const user = await UserRepository.findById(userId);
+    if (!user) {
+      throw new AppError(404, "Foydalanuvchi topilmadi");
+    }
+    
+    if (user.avatar) {
+      try {
+        const fs = require('fs');
+        const path = require('path');
+        const oldAvatarPath = path.join(__dirname, '..', '..', user.avatar);
+        if (fs.existsSync(oldAvatarPath)) {
+          fs.unlinkSync(oldAvatarPath);
+        }
+      } catch (err) {
+        console.error("Eski rasmni o'chirishda xatolik:", err);
+      }
+    }
+    
+    const updatedUser = await UserRepository.update(userId, { avatar: avatarPath });
+    return { avatar: updatedUser.avatar };
+  }
 }
 
 module.exports = new UserService();

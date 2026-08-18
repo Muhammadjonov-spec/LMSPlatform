@@ -1,6 +1,9 @@
 const router = require("express").Router();
 const UserController = require("../controllers/user.controller");
 const { isAuth, restrictTo } = require("../middlewares/auth.middleware");
+const { uploadImage } = require("../middlewares/upload.middleware");
+
+router.put("/profile/avatar", isAuth, uploadImage.single("avatar"), UserController.updateAvatar);
 
 router.get("/", isAuth, restrictTo("super_admin", "admin"), UserController.getAllUsers);
 router.post("/", isAuth, restrictTo("super_admin", "admin"), UserController.createUser);

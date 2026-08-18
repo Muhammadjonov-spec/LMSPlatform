@@ -58,9 +58,10 @@ class AuthService {
     await UserRepository.update(user._id, {refreshToken:refreshToken, sessionVersion:newSessionVersion})
     return{user:{id:user._id,
       email:user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role || 'student'
+      firstName:user.firstName,
+      lastName:user.lastName,
+      role:user.role || 'student',
+      avatar:user.avatar
     }, accessToken, refreshToken}
   }
   async googleAuth(idToken){

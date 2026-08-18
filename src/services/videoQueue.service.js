@@ -25,6 +25,7 @@ class VideoQueueService {
       const hlsUrl=await VideoService.convertToHls(job.inputPath, job.outputFolder)
       await CourseRepository.updateLessonStatus(job.courseId, job.moduleId, job.lessonId, hlsUrl, "ready")
     } catch (error) {
+      console.error("Video processing failed:", error);
       await CourseRepository.updateLessonStatus(job.courseId, job.moduleId, job.lessonId, null, "failed")
       if (fs.existsSync(job.inputPath)) {
         fs.unlinkSync(job.inputPath);

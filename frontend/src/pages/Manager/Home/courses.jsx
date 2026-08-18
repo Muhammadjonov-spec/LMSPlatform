@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLoaderData } from "react-router-dom";
+import { getImageUrl } from "../../../utils/helpers";
 
 export default function Courses() {
   const overview = useLoaderData();
@@ -17,7 +18,7 @@ export default function Courses() {
             className="flex items-center gap-5 p-4 bg-white dark:bg-white/10 rounded-2xl border border-gray-100 dark:border-white/10 shadow-[0_2px_6px_0_#E0E2EF] dark:shadow-none hover:shadow-[0_4px_12px_0_#D5D8E6] dark:hover:bg-white/20 transition-all duration-300"
           >
             <div className="flex shrink-0 w-[90px] h-[70px] rounded-[16px] bg-[#D9D9D9] dark:bg-gray-800 overflow-hidden">
-              <img src={item.thumbnail_url} className="w-full h-full object-cover" alt="thumbnail" />
+              <img src={getImageUrl(item.thumbnail || item.thumbnail_url)} className="w-full h-full object-cover" alt="thumbnail" />
             </div>
 
             <div className="flex flex-col flex-1 overflow-hidden">

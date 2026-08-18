@@ -1,5 +1,5 @@
 const UserService = require('../services/user.service');
-
+const AppError = require('../utils/AppError');
 class UserController {
   async getAllUsers(req, res) {
     const users = await UserService.getAllUsers();
@@ -34,6 +34,15 @@ class UserController {
   async getStudentCourses(req, res) {
     const courses = await UserService.getStudentCourses(req.user._id);
     res.status(200).json({ success: true, data: courses });
+  }
+
+  async updateAvatar(req, res) {
+    if (!req.file) {
+      throw new AppError(400, "Iltimos rasmni yuklang");
+    }
+    const avatarPath = req.file.path;
+    const result = await UserService.updateAvatar(req.user._id, avatarPath);
+    res.status(200).json({ success: true, message: "Profil rasmi yangilandi", data: result });
   }
 }
 

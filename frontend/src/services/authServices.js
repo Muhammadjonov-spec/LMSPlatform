@@ -17,3 +17,8 @@ export const verifyEmailToken = async (token) =>
 
 export const getMe = async () =>
   apiInstanceAuth.get("/auth/me").then((res) => res.data);
+
+export const uploadProfileAvatar = async (formData) =>
+  apiInstanceAuth.put("/users/profile/avatar", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  }).then((res) => res.data);

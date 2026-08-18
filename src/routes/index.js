@@ -13,5 +13,6 @@ router.use("/reviews", require("./review.route"))
 router.use("/progress", require("./progress.route"))
 router.use("/overviews", require("./overview.route"))
 router.use("/users", require("./user.route"))
+router.use("/orders", require("./order.route"))
 
 module.exports = router

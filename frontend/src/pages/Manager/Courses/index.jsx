@@ -2,6 +2,7 @@ import React from "react";
 import CardCouse from "./card";
 import { Link, useLoaderData } from "react-router-dom";
 import EmptyState from "../../../components/EmptyState";
+import { getImageUrl } from "../../../utils/helpers";
 
 export default function ManageCoursePage() {
   const courses = useLoaderData();
@@ -33,7 +34,7 @@ export default function ManageCoursePage() {
               key={item._id}
               category={item.category?.name || 'Kategoriya'}
               id={item._id}
-              imageUrl={item.thumbnail_url}
+              imageUrl={getImageUrl(item.thumbnail || item.thumbnail_url)}
               name={item.name || item.title}
               totalStudents={item.total_students ?? 0}
             />

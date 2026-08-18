@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
     password:{type:String, select:false, trim:true},
     googleId:{type:String},
     role:{type:String, enum: ['student', 'teacher', 'admin', 'super_admin'], default: 'student'},
+    avatar:{type:String, default:null},
     authProvider:{type:String},
     isVerified:{type:Boolean, default:false},
     enrolledCourses:[{type:mongoose.Schema.Types.ObjectId, ref:"Course"}],
