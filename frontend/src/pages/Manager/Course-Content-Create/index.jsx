@@ -66,7 +66,9 @@ export default function ManageCourseContentCreatePage() {
         await mutateUpdate.mutateAsync(formData);
       }
 
-      navigate(`/manager/courses/${id}`);
+      setTimeout(() => {
+        navigate(`/manager/courses/${id}`);
+      }, 500);
     } catch (error) {
       console.error(error);
       alert(error?.response?.data?.message || error?.message || "An unexpected error occurred");

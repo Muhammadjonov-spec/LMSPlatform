@@ -24,10 +24,8 @@ export default function ManageCoursePreviewPage({ isAdmin = true }) {
   const [progressData, setProgressData] = React.useState(null);
 
   React.useEffect(() => {
-    if (!isAdmin) {
-      getProgress(id).then(res => setProgressData(res.data)).catch(console.error);
-    }
-  }, [id, isAdmin]);
+    getProgress(id).then(res => setProgressData(res.data)).catch(console.error);
+  }, [id]);
 
   const completedLessons = progressData?.completedLessons || [];
   const percentComplete = allLessons.length > 0 
@@ -39,19 +37,17 @@ export default function ManageCoursePreviewPage({ isAdmin = true }) {
   };
 
   const handleNextContent = async (content) => {
-    if (!isAdmin) {
-      try {
-        await markLessonCompleted(id, content._id);
-        setProgressData(prev => {
-           if(prev && prev.completedLessons.includes(content._id)) return prev;
-           return {
-             ...prev,
-             completedLessons: [...(prev?.completedLessons || []), content._id]
-           }
-        });
-      } catch (err) {
-        console.error(err);
-      }
+    try {
+      await markLessonCompleted(id, content._id);
+      setProgressData(prev => {
+         if(prev && prev.completedLessons.includes(content._id)) return prev;
+         return {
+           ...prev,
+           completedLessons: [...(prev?.completedLessons || []), content._id]
+         }
+      });
+    } catch (err) {
+      console.error(err);
     }
     const currIndex = allLessons.findIndex((val) => val._id === content._id);
     if (currIndex < allLessons.length - 1) {

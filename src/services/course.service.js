@@ -4,7 +4,7 @@ const AppError = require('../utils/AppError');
 const VideoQueueService = require('./videoQueue.service');
 const fs = require('fs');
 const path = require('path');
-
+const { Types } = require('mongoose');
 class CourseService {
   async createCourse(data, user) {
     let teacherId = null;
@@ -33,7 +33,7 @@ class CourseService {
   }
 
   async getCourseDetails(courseId, user) {
-    const course = await CourseRepository.findById(courseId);
+    const course = await CourseRepository.findDetailsById(courseId);
     if (!course) {
       throw new AppError(404, "Kurs topilmadi");
     }
@@ -99,7 +99,7 @@ class CourseService {
     const moduleIndex = course.modules.findIndex(m => m._id.toString() === moduleId.toString())
     if (moduleIndex === -1) throw new AppError(404, "Modul topilmadi")
     
-    const { Types } = require('mongoose');
+    
     const newLessonId = new Types.ObjectId();
     const newLesson = { _id: newLessonId, title: title, videoPath: null, status: "processing" };
     course.modules[moduleIndex].lessons.push(newLesson);

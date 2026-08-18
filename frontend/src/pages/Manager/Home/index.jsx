@@ -65,7 +65,7 @@ export default function ManagerHome() {
               </div>
               <div className="overflow-hidden">
                 <p className="text-[#838C9D] dark:text-gray-400 text-xs sm:text-sm truncate">Video</p>
-                <p className="text-lg sm:text-[20px] font-bold dark:text-white truncate">{overview?.totalVideos}</p>
+                <p className="text-lg sm:text-[20px] font-bold dark:text-white truncate">{overview?.totalVideo || 0}</p>
               </div>
             </div>
 
@@ -75,7 +75,7 @@ export default function ManagerHome() {
               </div>
               <div className="overflow-hidden">
                 <p className="text-[#838C9D] dark:text-gray-400 text-xs sm:text-sm truncate">Text</p>
-                <p className="text-lg sm:text-[20px] font-bold dark:text-white truncate">{overview?.totalText}</p>
+                <p className="text-lg sm:text-[20px] font-bold dark:text-white truncate">{overview?.totalText || 0}</p>
               </div>
             </div>
           </div>
@@ -95,17 +95,17 @@ export default function ManagerHome() {
                     className="stroke-[#1E40AF] dark:stroke-blue-400"
                     strokeWidth="4"
                     strokeDasharray="100"
-                    strokeDashoffset="25"
+                    strokeDashoffset={100 - (overview?.averageCompletion || 0)}
                     strokeLinecap="round"
                   />
                 </svg>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <span className="text-4xl font-bold text-black dark:text-white">75%</span>
+                  <span className="text-4xl font-bold text-black dark:text-white">{overview?.averageCompletion || 0}%</span>
                 </div>
               </div>
 
               <div className="flex justify-between w-full items-center">
-                <p className="text-sm font-medium text-[#1E40AF] dark:text-blue-400 opacity-80">Not Completed 25%</p>
+                <p className="text-sm font-medium text-[#1E40AF] dark:text-blue-400 opacity-80">Not Completed {100 - (overview?.averageCompletion || 0)}%</p>
                 <Link to="#" className="text-[#1E40AF] dark:text-blue-400 hover:underline text-sm font-semibold">
                   See all courses →
                 </Link>

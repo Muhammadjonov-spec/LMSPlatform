@@ -22,29 +22,33 @@ function HlsPlayer({ src }) {
     const video = videoRef.current;
     if (!video || !src) return;
 
+    let hls;
+    let isMounted = true;
+
     // Safari natively supports HLS
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
-      return;
+    } else {
+      // Chrome/Firefox — hls.js kerak
+      import("hls.js").then((module) => {
+        if (!isMounted) return;
+        const Hls = module.default || module;
+        if (Hls.isSupported()) {
+          hls = new Hls({
+            enableWorker: true,
+            lowLatencyMode: false,
+          });
+          hls.loadSource(src);
+          hls.attachMedia(video);
+        } else {
+          // Fallback
+          video.src = src;
+        }
+      }).catch(err => console.error("hls.js failed to load", err));
     }
 
-    // Chrome/Firefox — hls.js kerak
-    let hls;
-    import("hls.js").then(({ default: Hls }) => {
-      if (Hls.isSupported()) {
-        hls = new Hls({
-          enableWorker: true,
-          lowLatencyMode: false,
-        });
-        hls.loadSource(src);
-        hls.attachMedia(video);
-      } else {
-        // Fallback: to'g'ridan-to'g'ri src
-        video.src = src;
-      }
-    });
-
     return () => {
+      isMounted = false;
       if (hls) hls.destroy();
     };
   }, [src]);
