@@ -22,7 +22,7 @@ const baseContentSchema = z.object({
   title: z.string().min(5),
   type: z.string().min(3, { message: "Type is required" }),
   video: z.any().optional(),
-  text: z.string().optional()
+  text: z.any().optional()
 });
 
 export const createContentSchema = baseContentSchema.superRefine((val, ctx) => {
@@ -50,9 +50,8 @@ export const createContentSchema = baseContentSchema.superRefine((val, ctx) => {
 });
 
 export const updateContentSchema = baseContentSchema.superRefine((val, ctx) => {
-  const parseText = z.string().min(4).safeParse(val.text);
-
   if (val.type === "text") {
+    const parseText = z.string().min(4).safeParse(val.text);
     if (!parseText.success) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

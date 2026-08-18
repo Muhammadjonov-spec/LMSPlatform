@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLoaderData } from "react-router-dom";
 import StudentItem from "./student-item";
 import EmptyState from "../../../components/EmptyState";
+import { getImageUrl } from "../../../utils/helpers";
 
 export default function ManageStudentsPage() {
   const students = useLoaderData();
@@ -28,15 +29,19 @@ export default function ManageStudentsPage() {
         {!students || students.length === 0 ? (
           <EmptyState title="No students available" message="No students have been added yet or system API is not connected." />
         ) : (
-          students.map((item) => (
-            <StudentItem
-              key={item._id}
-              id={item._id}
-              imageUrl={item.photo_url || item.avatar}
-              name={item.name || `${item.firstName || ''} ${item.lastName || ''}`.trim()}
-              totalCourse={item.courses?.length ?? 0}
-            />
-          ))
+          students.map((item) => {
+            const photo = item.photo_url || item.avatar;
+            const imageSrc = photo ? getImageUrl(photo) : "/assets/images/photos/photo-3.png";
+            return (
+              <StudentItem
+                key={item._id}
+                id={item._id}
+                imageUrl={imageSrc}
+                name={item.name || `${item.firstName || ''} ${item.lastName || ''}`.trim()}
+                totalCourse={item.courses?.length ?? 0}
+              />
+            );
+          })
         )}
 
         <div id="Pagination" className="flex items-center gap-3">

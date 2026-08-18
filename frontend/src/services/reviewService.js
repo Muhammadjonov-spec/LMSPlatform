@@ -7,3 +7,7 @@ export const getCourseReviews = async (courseId) => {
 export const createReview = async (courseId, data) => {
   return apiInstanceAuth.post(`/reviews/${courseId}`, data).then((res) => res.data);
 };
+
+export const getLatestReviews = async () => {
+  return apiInstance.get("/reviews").then((res) => res.data);
+};

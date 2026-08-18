@@ -32,8 +32,7 @@ class ReviewService {
     const average = reviews.length > 0 ? (sum / reviews.length) : 0;
     const course = await CourseRepository.findById(courseId);
     if (course) {
-      course.averageRating = average;
-      await course.save()
+      await CourseRepository.update(courseId, { averageRating: average });
       await this.updateTeacherAverageRating(course.teacher);
     }
   }
@@ -52,13 +51,16 @@ class ReviewService {
     const average = count > 0 ? (sum / count) : 0;
     const teacher = await TeacherRepository.findById(teacherId);
     if (teacher) {
-      teacher.averageRating = average;
-      await teacher.save();
+      await TeacherRepository.update(teacherId, { averageRating: average });
     }
   }
 
   async getCourseReviews(courseId) {
     return await ReviewRepository.find({ courceId: courseId }, { populate: 'studentId' });
+  }
+
+  async getAllReviews() {
+    return await ReviewRepository.find({}, { populate: 'studentId', sort: { rating: -1, createdAt: -1 }, limit: 3 });
   }
 }
 

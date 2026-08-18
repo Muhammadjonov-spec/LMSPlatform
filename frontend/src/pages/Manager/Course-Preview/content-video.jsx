@@ -7,11 +7,9 @@ const getVideoSrc = (videoUrl) => {
   // Agar to'liq URL bo'lsa
   if (videoUrl.startsWith("http")) return videoUrl;
   // Server URL dan olish
-  const base = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace("/api/v1", "").replace("/api", "")
-    : "http://localhost:5000";
+  const base = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
   const separator = videoUrl.startsWith('/') ? '' : '/';
-  return `${base}${separator}${videoUrl}`;
+  return `${base}${separator}${videoUrl.replace(/\\/g, '/')}`;
 };
 
 // HLS video player (Chrome/Firefox uchun hls.js ishlatiladi)
@@ -132,7 +130,7 @@ export default function ContentVideo({ content, handleNext }) {
             {isYoutube
               ? "YouTube orqali ko'rilmoqda"
               : isHls
-              ? "HLS stream orqali ko'rilmoqda"
+              ? "To'liq darsni ko'ring va keyingisiga o'ting"
               : "To'liq darsni ko'ring va keyingisiga o'ting"}
           </p>
         </div>

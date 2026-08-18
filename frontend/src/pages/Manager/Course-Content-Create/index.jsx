@@ -173,6 +173,12 @@ export default function ManageCourseContentCreatePage() {
         )}
 
         <div className="flex flex-col sm:flex-row items-center gap-[14px]">
+          {Object.keys(errors).length > 0 && (
+             <div className="w-full text-red-500 font-bold bg-red-50 p-4 rounded-xl border border-red-200">
+               <p>Xatoliklar (Debug):</p>
+               <pre className="text-xs">{JSON.stringify(errors, null, 2)}</pre>
+             </div>
+          )}
           <button type="button" onClick={() => navigate(-1)} className="w-full sm:w-auto flex-1 rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-center">
             Cancel
           </button>

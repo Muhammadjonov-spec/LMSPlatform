@@ -22,7 +22,15 @@ class CourseRepository extends BaseRepository{
   }
 
   async findWithCategory(filter = {}) {
-    return await this.model.find(filter).populate('category');
+    return await this.model.find(filter)
+      .populate('category')
+      .populate({
+        path: 'teacher',
+        populate: {
+          path: 'user',
+          select: 'firstName lastName avatar'
+        }
+      });
   }
 
   async findDetailsById(id) {

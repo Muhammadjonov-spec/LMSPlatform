@@ -2,26 +2,34 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { getPublicCourses } from "../../services/courseService";
+import { getLatestReviews } from "../../services/reviewService";
 import { getImageUrl } from "../../utils/helpers";
 
 export default function LandingPage() {
   const [popularCourses, setPopularCourses] = useState([]);
+  const [latestReviews, setLatestReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchData = async () => {
       try {
-        const res = await getPublicCourses();
-        if (res && res.data) {
-          setPopularCourses(res.data.slice(0, 3)); // show top 3 courses
+        const [coursesRes, reviewsRes] = await Promise.all([
+          getPublicCourses(),
+          getLatestReviews().catch(() => null)
+        ]);
+        if (coursesRes && coursesRes.data) {
+          setPopularCourses(coursesRes.data.slice(0, 3));
+        }
+        if (reviewsRes && reviewsRes.data) {
+          setLatestReviews(reviewsRes.data);
         }
       } catch (error) {
-        console.error("Error fetching courses", error);
+        console.error("Error fetching data", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchCourses();
+    fetchData();
   }, []);
 
   const features = [
@@ -120,12 +128,12 @@ export default function LandingPage() {
                     <span className="text-xs font-semibold text-[#1E40AF] bg-blue-50 px-2 py-1 rounded-md">New</span>
                     <div className="flex items-center text-sm text-yellow-500">
                       <span className="material-symbols-rounded text-base mr-1">star</span>
-                      <span>{course.rating}</span>
-                      <span className="text-gray-400 ml-1">({course.students})</span>
+                      <span>{course.rating || 4.8}</span>
+                      <span className="text-gray-400 ml-1">({course.students?.length || course.studentCount || 0})</span>
                     </div>
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-1 leading-tight line-clamp-2">{course.title}</h3>
-                  <p className="text-sm text-gray-500 mb-4 flex-1">Instructor: {course.instructor}</p>
+                  <p className="text-sm text-gray-500 mb-4 flex-1">Instructor: {course.teacher?.user?.firstName ? `${course.teacher.user.firstName} ${course.teacher.user.lastName || ''}`.trim() : 'EduStack'}</p>
                   
                   <div className="border-t border-gray-100 pt-4 flex justify-between items-center mt-auto">
                     <span className="font-extrabold text-lg text-gray-900">{course.price ? course.price.toLocaleString() : 0} UZS</span>
@@ -219,50 +227,30 @@ export default function LandingPage() {
             <p className="mt-2 text-gray-500">Real stories from our graduated learners</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 flex flex-col justify-between">
-              <p className="text-gray-600 italic mb-6">
-                "The React and Node.js courses on EduStack gave me real-world skills that helped me land my first Frontend Developer job within 3 months!"
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center">
-                  AV
+            {latestReviews.length > 0 ? (
+              latestReviews.map((review) => (
+                <div key={review._id} className="bg-gray-50 rounded-2xl p-8 border border-gray-100 flex flex-col justify-between">
+                  <p className="text-gray-600 italic mb-6">"{review.comment}"</p>
+                  <div className="flex items-center gap-4">
+                    {review.studentId?.avatar ? (
+                      <img src={getImageUrl(review.studentId.avatar)} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center uppercase">
+                        {review.studentId?.firstName?.[0] || review.studentId?.name?.[0] || "S"}
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="font-bold text-gray-900">{review.studentId?.firstName || review.studentId?.name || "Student"} {review.studentId?.lastName || ''}</h4>
+                      <div className="text-yellow-500 text-sm">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">Ali Valiyev</h4>
-                  <p className="text-xs text-gray-500">Junior Frontend Developer</p>
-                </div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-10 text-gray-500 border border-dashed border-gray-200 rounded-xl">
+                Hozircha sharhlar yo'q
               </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 flex flex-col justify-between">
-              <p className="text-gray-600 italic mb-6">
-                "The mentorship and practical assignments are second to none. Having code reviews on real projects made all the difference."
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center">
-                  SK
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">Sanjar Karimov</h4>
-                  <p className="text-xs text-gray-500">UI/UX Designer</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 flex flex-col justify-between">
-              <p className="text-gray-600 italic mb-6">
-                "Outstanding platform with clean video lessons and interactive content. Highly recommended for anyone wanting to level up in tech."
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center">
-                  MT
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">Malika Tursunova</h4>
-                  <p className="text-xs text-gray-500">Full Stack Engineer</p>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
