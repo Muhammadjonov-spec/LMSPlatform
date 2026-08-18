@@ -203,8 +203,8 @@ export default function ManageCreateCoursePage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-5 mt-4">
-          <button type="button" className="w-full rounded-full border border-[#060A23] py-4 font-semibold bg-white text-center">
-            Save as Draft
+          <button type="button" onClick={() => navigate(-1)} className="w-full rounded-full border border-[#060A23] py-4 font-semibold bg-white text-center">
+            Cancel
           </button>
 
           <button

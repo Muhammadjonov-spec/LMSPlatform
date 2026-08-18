@@ -13,45 +13,55 @@ export const createCourseSchema = z.object({
   tagline: z.string().min(5),
   description: z.string().min(10),
   isFree: z.boolean().default(false).optional(),
-  price: z.string().optional(),
-  previewVideo: z.any().refine((file) => file?.name, { message: "Video is required" })
+  price: z.string().optional()
 });
 
-export const updateCourseSchema = createCourseSchema.partial({
-  previewVideo: true
+export const updateCourseSchema = createCourseSchema;
+
+const baseContentSchema = z.object({
+  title: z.string().min(5),
+  type: z.string().min(3, { message: "Type is required" }),
+  video: z.any().optional(),
+  text: z.string().optional()
 });
 
-export const mutateContentSchema = z
-  .object({
-    title: z.string().min(5),
-    type: z.string().min(3, { message: "Type is required" }),
-    video: z.any().optional(),
-    text: z.string().optional()
-  })
-  .superRefine((val, ctx) => {
-    const parseText = z.string().min(4).safeParse(val.text);
+export const createContentSchema = baseContentSchema.superRefine((val, ctx) => {
+  const parseText = z.string().min(4).safeParse(val.text);
 
-    if (val.type === "video") {
-      // In create mode, if type is video, a file is required (we will handle edit mode logic later or allow empty if it's edit)
-      if (!val.video || (val.video.length === 0 && !val.video.name)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Video file is required",
-          path: ["video"]
-        });
-      }
+  if (val.type === "video") {
+    if (!val.video || (val.video.length === 0 && !val.video.name)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Video file is required",
+        path: ["video"]
+      });
     }
+  }
 
-    if (val.type === "text") {
-      if (!parseText.success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Text is required for text content",
-          path: ["text"]
-        });
-      }
+  if (val.type === "text") {
+    if (!parseText.success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Text is required for text content",
+        path: ["text"]
+      });
     }
-  });
+  }
+});
+
+export const updateContentSchema = baseContentSchema.superRefine((val, ctx) => {
+  const parseText = z.string().min(4).safeParse(val.text);
+
+  if (val.type === "text") {
+    if (!parseText.success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Text is required for text content",
+        path: ["text"]
+      });
+    }
+  }
+});
 
 export const createStudentSchema = z.object({
   name: z.string().min(5),

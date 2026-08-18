@@ -54,7 +54,8 @@ export default function ManageStudentCreatePage() {
 
       navigate("/manager/students");
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      alert(error?.response?.data?.message || error?.message || "An unexpected error occurred");
     }
   };
 
@@ -172,8 +173,8 @@ export default function ManageStudentCreatePage() {
         )}
 
         <div className="flex items-center gap-[14px]">
-          <button type="button" className="w-full rounded-full border border-[#060A23] p-[14px_20px] font-semibold">
-            Save as Draft
+          <button type="button" onClick={() => navigate(-1)} className="w-full rounded-full border border-[#060A23] p-[14px_20px] font-semibold">
+            Cancel
           </button>
           <button
             type="submit"

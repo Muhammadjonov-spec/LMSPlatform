@@ -3,7 +3,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { mutateContentSchema } from "../../../utils/zodSchema";
+import { createContentSchema, updateContentSchema } from "../../../utils/zodSchema";
 import { useMutation } from "@tanstack/react-query";
 import { createLesson, updateContent } from "../../../services/courseService";
 import { useLoaderData, useNavigate, useParams } from "react-router-dom";
@@ -23,7 +23,7 @@ export default function ManageCourseContentCreatePage() {
     setValue,
     watch
   } = useForm({
-    resolver: zodResolver(mutateContentSchema),
+    resolver: zodResolver(content === undefined ? createContentSchema : updateContentSchema),
     defaultValues: {
       title: content?.title,
       type: content?.type,
@@ -68,7 +68,8 @@ export default function ManageCourseContentCreatePage() {
 
       navigate(`/manager/courses/${id}`);
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      alert(error?.response?.data?.message || error?.message || "An unexpected error occurred");
     }
   };
 
@@ -170,8 +171,8 @@ export default function ManageCourseContentCreatePage() {
         )}
 
         <div className="flex flex-col sm:flex-row items-center gap-[14px]">
-          <button type="button" className="w-full sm:w-auto flex-1 rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-center">
-            Save as Draft
+          <button type="button" onClick={() => navigate(-1)} className="w-full sm:w-auto flex-1 rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-center">
+            Cancel
           </button>
           <button
             type="submit"

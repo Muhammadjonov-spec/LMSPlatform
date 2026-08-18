@@ -34,6 +34,7 @@ export default function StudentForm() {
       navigate(`/manager/courses/students/${id}`);
     } catch (error) {
       console.error(error);
+      alert(error?.response?.data?.message || error?.message || "An unexpected error occurred");
     }
   };
 
@@ -73,8 +74,8 @@ export default function StudentForm() {
         </div>
 
         <div className="flex items-center gap-[14px]">
-          <button type="button" className="w-full rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap">
-            Save as Draft
+          <button type="button" onClick={() => navigate(-1)} className="w-full rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap">
+            Cancel
           </button>
           <button
             type="submit"
