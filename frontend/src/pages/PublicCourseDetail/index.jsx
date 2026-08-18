@@ -92,7 +92,7 @@ export default function PublicCourseDetail() {
 
             <div className="rounded-[20px] overflow-hidden mb-10 border border-gray-200 bg-white">
               <img 
-                src={course.thumbnail_url || "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop&q=60"} 
+                src={getImageUrl(course.thumbnail || course.thumbnail_url || course.image)} 
                 alt={course.name} 
                 className="w-full h-[400px] object-cover" 
               />

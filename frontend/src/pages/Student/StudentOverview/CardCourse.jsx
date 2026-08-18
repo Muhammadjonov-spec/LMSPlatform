@@ -12,7 +12,7 @@ export default function CardCourse({
   return (
     <div className="bg-white rounded-[20px] overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all flex flex-col group">
       <div className="relative h-40 w-full overflow-hidden bg-gray-200">
-        <img src={imageUrl || "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=500&auto=format&fit=crop&q=60"} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="thumbnail" />
+        <img src={imageUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="thumbnail" />
         <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-[#1E40AF]">
           {category}
         </div>

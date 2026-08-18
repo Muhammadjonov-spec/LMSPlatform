@@ -90,7 +90,6 @@ export default function PublicCourses() {
             <Link key={course._id || course.id} to={`/courses/${course._id || course.id}`} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
               <div className="relative h-48 overflow-hidden">
                 <img src={getImageUrl(course.thumbnail || course.thumbnail_url || course.image)} alt={course.name || course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-black bg-opacity-10 group-hover:bg-opacity-0 transition-all"></div>
               </div>
               <div className="p-6 flex-1 flex flex-col">
                 <div className="flex justify-between items-center mb-2">
