@@ -40,12 +40,14 @@ class CourseService {
     let isEnrolled = false;
     
     if (user) {
-      const enrolled = user.enrolledCourses.find(c => c.toString() === courseId.toString());
+      const enrolledCourses = user.enrolledCourses || [];
+      const enrolled = enrolledCourses.find(c => c.toString() === courseId.toString());
+      
       if (enrolled || ['admin', 'super_admin'].includes(user.role)) {
          isEnrolled = true;
       } else if (user.role === 'teacher') {
          const teacherProfile = await TeacherRepository.findByUserId(user._id);
-         if (teacherProfile && course.teacher?.toString() === teacherProfile._id.toString()) {
+         if (teacherProfile && course.teacher?._id?.toString() === teacherProfile._id.toString()) {
             isEnrolled = true;
          }
       }
