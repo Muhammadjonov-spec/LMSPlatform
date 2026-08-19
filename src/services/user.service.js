@@ -1,7 +1,7 @@
 const UserRepository = require('../repositories/UserRepository');
 const TeacherRepository = require('../repositories/TeacherRepository');
 const AppError = require('../utils/AppError');
-const { hashPassword } = require('../utils/hashPassword.util');
+const { hashPassword, comparePassword } = require('../utils/hashPassword.util');
 const { sendVerificationEmail } = require('../utils/email.util');
 const crypto = require('crypto');
 
@@ -154,6 +154,21 @@ class UserService {
     const updatedUser = await UserRepository.update(userId, { avatar: avatarPath });
     return { avatar: updatedUser.avatar };
   }
+  async changePassword(userId, currentPassword, newPassword) {
+    if (!currentPassword || !newPassword) {
+      throw new AppError(400, "Parollarni to'liq kiriting!")
+    }
+    const user = await UserRepository.model.findById(userId).select("+password")
+    if (!user) {
+      throw new AppError(404, "User not found")
+    }
+    const isMatch = await comparePassword(currentPassword, user.password)
+    if (!isMatch) {
+      throw new AppError(400, "Joriy parol noto'g'ri kiritildi!")
+    }
+    user.password = await hashPassword(newPassword)
+    await user.save()
+    return "Parol muvaffaqiyatli o'zgartirildi!"
+  }
 }
-
 module.exports = new UserService();

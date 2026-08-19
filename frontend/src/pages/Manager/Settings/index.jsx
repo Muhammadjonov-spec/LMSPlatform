@@ -3,7 +3,7 @@ import { useRouteLoaderData, useNavigate } from "react-router-dom";
 import { MANAGER_SESSION, STUDENT_SESSION } from "../../../utils/const";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faLock, faCamera, faServer } from "@fortawesome/free-solid-svg-icons";
-import { uploadProfileAvatar } from "../../../services/authServices";
+import { uploadProfileAvatar, changePassword } from "../../../services/authServices";
 import secureLocalStorage from "react-secure-storage";
 import { getImageUrl } from "../../../utils/helpers";
 
@@ -39,6 +39,7 @@ export default function SettingsPage() {
   const [saveMessage, setSaveMessage] = useState("");
   const fileInputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleAvatarChange = async (e) => {
@@ -84,7 +85,7 @@ export default function SettingsPage() {
     setTimeout(() => setSaveMessage(""), 3000);
   };
 
-  const handlePasswordSave = (e) => {
+  const handlePasswordSave = async (e) => {
     e.preventDefault();
     if (profileData.newPassword !== profileData.confirmPassword) {
       setSaveMessage("New passwords do not match!");
@@ -96,9 +97,24 @@ export default function SettingsPage() {
       setTimeout(() => setSaveMessage(""), 3000);
       return;
     }
-    setSaveMessage("Password changed successfully!");
-    setProfileData({ ...profileData, currentPassword: "", newPassword: "", confirmPassword: "" });
-    setTimeout(() => setSaveMessage(""), 3000);
+
+    try {
+      setIsSavingPassword(true);
+      const res = await changePassword({
+        currentPassword: profileData.currentPassword,
+        newPassword: profileData.newPassword
+      });
+      if (res.success) {
+        setSaveMessage("Password changed successfully!");
+        setProfileData({ ...profileData, currentPassword: "", newPassword: "", confirmPassword: "" });
+      }
+    } catch (error) {
+      console.error("Change password error:", error);
+      setSaveMessage(error?.response?.data?.message || "Failed to change password. Please try again.");
+    } finally {
+      setIsSavingPassword(false);
+      setTimeout(() => setSaveMessage(""), 3000);
+    }
   };
 
   const handleSystemSave = (e) => {

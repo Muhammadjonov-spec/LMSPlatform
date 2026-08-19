@@ -56,22 +56,28 @@ export default function ContentItem({ id, index, type, title, courseId, status }
   return (
     <>
       <div className="card flex flex-col md:flex-row items-start md:items-center gap-5 w-full">
-        <div className="relative flex shrink-0 w-full md:w-[140px] h-[180px] md:h-[110px]">
+        <div 
+          onClick={() => window.location.href = `/manager/courses/${courseId}/preview?lessonId=${id}`}
+          className="relative flex shrink-0 w-full md:w-[140px] h-[180px] md:h-[110px] cursor-pointer group"
+        >
           <p className="absolute -top-[10px] -left-[10px] flex shrink-0 w-[30px] h-[30px] rounded-full items-center justify-center text-center bg-[#1E40AF] text-white z-10">
             <span className="font-bold text-sm leading-[21px]">{index}</span>
           </p>
-          <div className="rounded-[20px] border border-[#CFDBEF] bg-[#D9D9D9] overflow-hidden w-full h-full">
+          <div className="rounded-[20px] border border-[#CFDBEF] bg-[#D9D9D9] overflow-hidden w-full h-full group-hover:ring-2 ring-[#1E40AF] transition-all">
             <img
               src={`/assets/images/thumbnails/cover-${type}.png`}
-              className="w-full h-full object-cover "
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
               alt={`${title} thumbnail`}
               loading="lazy"
             />
+            <div className="absolute inset-0 bg-black/20 hidden group-hover:flex items-center justify-center text-white">
+               <span className="material-symbols-rounded text-3xl">play_circle</span>
+            </div>
           </div>
         </div>
 
-        <div className="w-full">
-          <h3 className="font-bold text-xl leading-[30px] line-clamp-2 md:line-clamp-1" title={title}>
+        <div className="w-full cursor-pointer group" onClick={() => window.location.href = `/manager/courses/${courseId}/preview?lessonId=${id}`}>
+          <h3 className="font-bold text-xl leading-[30px] line-clamp-2 md:line-clamp-1 group-hover:text-[#1E40AF] transition-colors" title={title}>
             {title}
           </h3>
           <div className="flex items-center gap-5 flex-wrap">

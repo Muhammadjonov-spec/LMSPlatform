@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ContentText from "./content-text";
 import ContentVideo from "./content-video";
-import { Link, useLoaderData, useParams, useNavigate } from "react-router-dom";
+import { Link, useLoaderData, useParams, useNavigate, useLocation } from "react-router-dom";
 import { getProgress, markLessonCompleted } from "../../../services/progressService";
 
 export default function ManageCoursePreviewPage({ isAdmin = true }) {
@@ -20,7 +20,17 @@ export default function ManageCoursePreviewPage({ isAdmin = true }) {
     return [...acc, ...lessons];
   }, []) || [];
 
-  const [activeContent, setActiveContent] = useState(allLessons[0]);
+  const location = useLocation();
+  
+  const [activeContent, setActiveContent] = useState(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const lessonId = searchParams.get('lessonId');
+    if (lessonId) {
+      const target = allLessons.find(l => l._id === lessonId);
+      if (target) return target;
+    }
+    return allLessons[0];
+  });
   const [progressData, setProgressData] = React.useState(null);
 
   React.useEffect(() => {

@@ -5,7 +5,12 @@ class UserController {
     const users = await UserService.getAllUsers();
     res.status(200).json({ success: true, data: users });
   }
-
+  async changePassword(req, res){
+    const userId = req.user._id;
+    const { currentPassword, newPassword } = req.body;
+    const result = await UserService.changePassword(userId, currentPassword, newPassword)
+    res.status(200).json({success:true, data:result});
+  }
   async createUser(req, res) {
     const data = await UserService.createUser(req.body);
     res.status(201).json({ success: true, message: "Foydalanuvchi yaratildi. Tasdiqlash emaili yuborildi.", data });

@@ -22,3 +22,6 @@ export const uploadProfileAvatar = async (formData) =>
   apiInstanceAuth.put("/users/profile/avatar", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   }).then((res) => res.data);
+
+export const changePassword = async (data) =>
+  apiInstanceAuth.put("/users/change-password", data).then((res) => res.data);
