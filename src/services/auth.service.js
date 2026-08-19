@@ -34,7 +34,7 @@ class AuthService {
   }
   async login(email, password){
     if (!email || !password) {throw new AppError(401, "Iltimos, email va parolni kiriting")}
-    const user=await UserRepository.findByEmail(email).select("+password")
+    const user=await UserRepository.findByEmailWithPassword(email)
     if(!user){
       throw new AppError(401, "Email yoki parol noto'g'ri")
     }
@@ -50,16 +50,18 @@ class AuthService {
     if(!isMatch){
       throw new AppError(400, "Email yoki parol noto'g'ri")
     }
-    const newSessionVersion = user.sessionVersion + 1
+    const currentSessionVersion = user.sessionVersion || 0;
+    const newSessionVersion = currentSessionVersion + 1
     const accessToken=generateAccessToken(user._id, newSessionVersion )
     const refreshToken=generateRefreshToken(user._id, newSessionVersion)
     
     await UserRepository.update(user._id, {refreshToken:refreshToken, sessionVersion:newSessionVersion})
     return{user:{id:user._id,
       email:user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role:user.role
+      firstName:user.firstName,
+      lastName:user.lastName,
+      role:user.role || 'student',
+      avatar:user.avatar
     }, accessToken, refreshToken}
   }
   async googleAuth(idToken){
@@ -86,14 +88,15 @@ class AuthService {
     }else if(!user.googleId){
       await UserRepository.update(user._id, {googleId:sub, isVerified:true})
     }
-    let newSessionVersion=user.sessionVersion + 1
+    const currentSessionVersion = user.sessionVersion || 0;
+    let newSessionVersion = currentSessionVersion + 1;
     const accessToken = generateAccessToken(user._id, newSessionVersion);
     const refreshToken = generateRefreshToken(user._id, newSessionVersion);
-    await UserRepository.update(user._id, { refreshToken: refreshToken })
+    await UserRepository.update(user._id, { refreshToken: refreshToken, sessionVersion: newSessionVersion })
     return {
       user:{id:user._id,
         email:user.email,
-        role:user.role,
+        role: user.role || 'student',
         firstName: user.firstName,
         lastName: user.lastName,
         avatar: user.avatar},

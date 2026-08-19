@@ -63,19 +63,10 @@ router.post("/register", validate(registerSchema), authController.register);
  */
 router.post("/login", validate(loginSchema), authController.login);
 
-/**
- * @swagger
- * /api/auth/logout:
- *   post:
- *     summary: Tizimdan chiqish
- *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Muvaffaqiyatli chiqildi
- */
+router.get("/verify/:token", authController.verifyEmail);
+
 router.post("/logout", isAuth, authController.logout);
 router.post("/google", authController.googleAuth);
+router.get("/me", isAuth, authController.me);
 
 module.exports = router;

@@ -13,7 +13,8 @@ class VideoService {
       }
       const outputFileName = path.join(outputDir, 'index.m3u8')
       ffmpeg(inputPath).outputOptions([
-        '-codec: copy',      
+          '-c:v libx264',
+          '-c:a aac',
           '-start_number 0',   
           '-hls_time 10',      
           '-hls_list_size 0',  

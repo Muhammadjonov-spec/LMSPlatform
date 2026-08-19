@@ -1,0 +1,174 @@
+const UserRepository = require('../repositories/UserRepository');
+const TeacherRepository = require('../repositories/TeacherRepository');
+const AppError = require('../utils/AppError');
+const { hashPassword, comparePassword } = require('../utils/hashPassword.util');
+const { sendVerificationEmail } = require('../utils/email.util');
+const crypto = require('crypto');
+
+class UserService {
+  async getAllUsers() {
+    const users = await UserRepository.model.find().select("-password -verificationToken -refreshToken");
+    return users;
+  }
+
+  async createUser(data) {
+    const { firstName, lastName, email, password, role } = data;
+    
+    const existingUser = await UserRepository.findByEmail(email);
+    if (existingUser) {
+      throw new AppError(400, "Bu email allaqachon ro'yxatdan o'tgan");
+    }
+
+    const hashedPassword = await hashPassword(password);
+    const verifyToken = crypto.randomBytes(32).toString("hex");
+    
+    const newUser = await UserRepository.create({
+      firstName,
+      lastName,
+      email,
+      role: role || 'student',
+      password: hashedPassword,
+      isVerified: false,
+      verificationToken: verifyToken
+    });
+
+    if (newUser.role === 'teacher') {
+      await TeacherRepository.create({
+        user: newUser._id,
+        bio: "Admin tomonidan qo'shilgan o'qituvchi",
+        experties: [],
+        experienceYears: 0,
+        status: 'approved',
+        isApproved: true
+      });
+    }
+
+    await sendVerificationEmail(newUser.email, verifyToken);
+    
+    return {
+      _id: newUser._id,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      email: newUser.email,
+      role: newUser.role
+    };
+  }
+
+  async updateUser(id, data) {
+    const { firstName, lastName, email, role } = data;
+    
+    const user = await UserRepository.findById(id);
+    if (!user) {
+      throw new AppError(404, "Foydalanuvchi topilmadi");
+    }
+
+    const updatedUser = await UserRepository.update(id, {
+      firstName,
+      lastName,
+      email,
+      role
+    });
+
+    if (role === 'teacher') {
+      const existingProfile = await TeacherRepository.findByUserId(id);
+      if (!existingProfile) {
+        await TeacherRepository.create({
+          user: id,
+          bio: "Admin tomonidan roli o'zgartirilgan o'qituvchi",
+          experties: [],
+          experienceYears: 0,
+          status: 'approved',
+          isApproved: true
+        });
+      } else if (!existingProfile.isApproved) {
+        await TeacherRepository.update(existingProfile._id, {
+          status: 'approved',
+          isApproved: true
+        });
+      }
+    }
+
+    return {
+      _id: updatedUser._id,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
+      email: updatedUser.email,
+      role: updatedUser.role
+    };
+  }
+
+  async deleteUser(id, requestUser) {
+    const user = await UserRepository.findById(id);
+    if (!user) {
+      throw new AppError(404, "Foydalanuvchi topilmadi");
+    }
+    
+    if (requestUser._id.toString() === id) {
+      throw new AppError(400, "O'zingizni o'chira olmaysiz");
+    }
+
+    await UserRepository.model.findByIdAndDelete(id);
+    return true;
+  }
+
+  async getStudents() {
+    return await UserRepository.model.find({ role: 'student' }).select('-password').lean();
+  }
+
+  async getStudentById(id) {
+    const student = await UserRepository.model.findOne({ _id: id, role: 'student' }).select('-password').lean();
+    if (!student) {
+      throw new AppError(404, "Talaba topilmadi");
+    }
+    return student;
+  }
+
+  async getStudentCourses(userId) {
+    const student = await UserRepository.model
+      .findById(userId)
+      .populate('enrolledCourses')
+      .select('enrolledCourses')
+      .lean();
+    return student ? student.enrolledCourses : [];
+  }
+
+  async updateAvatar(userId, avatarPath) {
+    const user = await UserRepository.findById(userId);
+    if (!user) {
+      throw new AppError(404, "Foydalanuvchi topilmadi");
+    }
+    
+    if (user.avatar) {
+      try {
+        const fs = require('fs');
+        const path = require('path');
+        const oldAvatarPath = path.join(__dirname, '..', '..', user.avatar);
+        if (fs.existsSync(oldAvatarPath)) {
+          fs.unlinkSync(oldAvatarPath);
+        }
+      } catch (err) {
+        console.error("Eski rasmni o'chirishda xatolik:", err);
+      }
+    }
+    
+    const updatedUser = await UserRepository.update(userId, { avatar: avatarPath });
+    return { avatar: updatedUser.avatar };
+  }
+  async changePassword(userId, currentPassword, newPassword) {
+    if (!currentPassword || !newPassword) {
+      throw new AppError(400, "Parollarni to'liq kiriting!")
+    }
+    const user = await UserRepository.model.findById(userId).select("+password")
+    if (!user) {
+      throw new AppError(404, "User not found")
+    }
+    const isMatch = await comparePassword(currentPassword, user.password)
+    if (!isMatch) {
+      throw new AppError(400, "Joriy parol noto'g'ri kiritildi!")
+    }
+    user.password = await hashPassword(newPassword)
+    await user.save()
+    return "Parol muvaffaqiyatli o'zgartirildi!"
+  }
+}
+module.exports = new UserService();

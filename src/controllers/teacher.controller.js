@@ -21,8 +21,22 @@ class TeacherController{
     const userData=req.body
     const result=await TeacherService.applyForTeacher(teacherId, userData)
     res.status(200).json({success:true, data:result})
-
+  }
+  async rejectTeacher(req, res){
+    const teacherId=req.params.id
+    const { reason } = req.body
+    const result = await TeacherService.rejectTeacher(teacherId, reason)
+    res.status(200).json({success:true, data:result})
+  }
+  async getMyApplication(req, res) {
+    const userId = req.user._id;
+    const result = await TeacherService.getMyApplication(userId);
+    res.status(200).json({ success: true, data: result });
+  }
+  async getAllApplications(req, res){
+    const result = await TeacherService.getAllApplications()
+    res.status(200).json({success:true, data:result})
   }
 }
 
-module.exports=new TeacherController()
+module.exports=new TeacherController()  

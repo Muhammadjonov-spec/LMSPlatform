@@ -5,6 +5,10 @@ class TeacherRepository extends BaseRepository{
   constructor(){
     super(Teacher) 
   }
+
+  async findByUserId(userId) {
+    return await this.model.findOne({ user: userId });
+  }
 }
 
 

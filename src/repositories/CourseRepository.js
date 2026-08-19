@@ -16,6 +16,35 @@ class CourseRepository extends BaseRepository{
       { arrayFilters: [{ "mod._id": moduleId }, { "les._id": lessonId }], new: true }
     );
   }
+
+  async findByLessonId(lessonId) {
+    return await this.model.findOne({ "modules.lessons._id": lessonId });
+  }
+
+  async findWithCategory(filter = {}) {
+    return await this.model.find(filter)
+      .populate('category')
+      .populate({
+        path: 'teacher',
+        populate: {
+          path: 'user',
+          select: 'firstName lastName avatar'
+        }
+      });
+  }
+
+  async findDetailsById(id) {
+    return await this.model.findById(id)
+      .populate('category')
+      .populate({
+        path: 'teacher',
+        populate: {
+          path: 'user',
+          select: 'firstName lastName avatar'
+        }
+      })
+      .lean();
+  }
 }
 
 

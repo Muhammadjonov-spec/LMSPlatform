@@ -10,6 +10,11 @@ class AuthController {
   const result=await AuthService.login(email, password)
   res.status(201).json({success:true, data:result})
  }
+ async verifyEmail(req, res){
+  const { token } = req.params
+  await AuthService.verifyEmail(token)
+  res.status(200).json({success: true, message: "Email muvaffaqiyatli tasdiqlandi"})
+ }
  async logout(req, res){
   const userId=req.user._id
   const result=await AuthService.logout(userId)
@@ -20,6 +25,10 @@ class AuthController {
   const result = await AuthService.googleAuth(idToken);
   res.status(200).json({ success: true, data: result });
  }
+ async me(req, res) {
+  res.status(200).json({ success: true, data: { user: req.user, role: req.user.role } });
+ }
 }
 
 module.exports = new AuthController()
+

@@ -1,11 +1,22 @@
 const CourseController=require("../controllers/course.controller")
 const router=require("express").Router()
-const {isAuth, restrictTo}=require("../middlewares/auth.middleware")
-const { uploadVideo } = require('../middlewares/upload.middleware')
-router.post("/create", isAuth, restrictTo("teacher", "admin", "super_admin"), CourseController.createCourse)
-router.get("/:id", isAuth, CourseController.getCourceDetails)
+const {isAuth, restrictTo, checkTeacherProfile}=require("../middlewares/auth.middleware")
+const { uploadVideo, uploadImage } = require('../middlewares/upload.middleware')
 
-router.post("/:id/modules", isAuth, restrictTo("teacher", "admin", "super_admin"), CourseController.addModule)
-router.post("/:courseId/modules/:moduleId/lessons", isAuth, restrictTo("teacher", "admin", "super_admin"), uploadVideo.single("video"), CourseController.addLesson)
+router.get("/", isAuth, restrictTo("teacher", "admin", "super_admin"), CourseController.getAllCourses)
+router.get("/public", CourseController.getPublicCourses)
+router.get("/public/:id", CourseController.getPublicCourseDetails)
+router.post("/create", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, uploadVideo.single("previewVideo"), CourseController.createCourse)
+router.get("/:id", isAuth, CourseController.getCourceDetails)
+router.delete("/:id", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, CourseController.deleteCourse)
+
+router.put("/:id", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, uploadVideo.single("previewVideo"), CourseController.updateCourse)
+router.put("/:id/thumbnail", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, uploadImage.single("thumbnail"), CourseController.updateThumbnail)
+router.get("/contents/:id", isAuth, CourseController.getDetailContent)
+router.put("/contents/:id", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, uploadVideo.single("video"), CourseController.updateContent)
+router.delete("/contents/:id", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, CourseController.deleteDetailContent)
+
+router.post("/:id/modules", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, CourseController.addModule)
+router.post("/:courseId/modules/:moduleId/lessons", isAuth, restrictTo("teacher", "admin", "super_admin"), checkTeacherProfile, uploadVideo.single("video"), CourseController.addLesson)
 
 module.exports=router

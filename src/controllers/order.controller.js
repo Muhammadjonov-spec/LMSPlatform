@@ -14,6 +14,11 @@ class OrderController {
     const result = await OrderService.createOrder(studentId, courseId, receiptImage);
     res.status(201).json({ success: true, data: result });
   }
+
+  async getPendingOrders(req, res) {
+    const result = await OrderService.getPendingOrders();
+    res.status(200).json({ success: true, data: result });
+  }
   
   async approveOrder(req, res) {
     const orderId = req.params.id;
@@ -22,4 +27,5 @@ class OrderController {
     res.status(200).json({ success: true, data: result });
   }
 }
-module.exports = new OrderController()
+
+module.exports = new OrderController();

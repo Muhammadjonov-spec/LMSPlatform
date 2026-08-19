@@ -15,6 +15,11 @@ class ReviewController {
     const result = await ReviewService.getCourseReviews(courseId)
     res.status(200).json({ success: true, data: result })
   }
+
+  async getAllReviews(req, res) {
+    const result = await ReviewService.getAllReviews();
+    res.status(200).json({ success: true, data: result });
+  }
 }
 
 module.exports = new ReviewController()
