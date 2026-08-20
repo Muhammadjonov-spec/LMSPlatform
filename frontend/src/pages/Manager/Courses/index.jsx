@@ -1,11 +1,11 @@
 import React from "react";
 import CardCouse from "./card";
 import { Link, useLoaderData } from "react-router-dom";
+import EmptyState from "../../../components/EmptyState";
+import { getImageUrl } from "../../../utils/helpers";
 
 export default function ManageCoursePage() {
   const courses = useLoaderData();
-
-  console.log(courses);
 
   return (
     <>
@@ -26,16 +26,20 @@ export default function ManageCoursePage() {
         </div>
       </header>
       <section id="CourseList" className="flex flex-col w-full rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]">
-        {courses?.data?.map((item) => (
-          <CardCouse
-            key={item._id}
-            category={item.category.name}
-            id={item._id}
-            imageUrl={item.thumbnail_url}
-            name={item.name}
-            totalStudents={item.total_students}
-          />
-        ))}
+        {!courses || !courses.data || courses.data.length === 0 ? (
+          <EmptyState title="Kurslar mavjud emas" message="Hozircha hech qanday kurs qo'shilmagan yoki API ma'lumot qaytarmadi." />
+        ) : (
+          courses.data.map((item) => (
+            <CardCouse
+              key={item._id}
+              category={item.category?.name || 'Kategoriya'}
+              id={item._id}
+              imageUrl={getImageUrl(item.thumbnail || item.thumbnail_url)}
+              name={item.name || item.title}
+              totalStudents={item.total_students ?? 0}
+            />
+          ))
+        )}
         <div id="Pagination" className="flex items-center gap-3">
           <button
             type="button"

@@ -3,8 +3,8 @@ import { useParams, useRevalidator } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
 import ConfirmModal from "../../../components/common/confirmModal";
-import ErrorToast from "../../../components/common/errorToast";
-import { useConfirmModal } from "../../../components/common/useConfirmModal";
+import ErrorToast from "../../../components/common/ErrorToast";
+import { useConfirmModal } from "../../../components/common/UseConfirmModal";
 import { deleteStudentsCourse } from "../../../services/courseService";
 
 export default function StudentItem({ imageUrl, name, id }) {
@@ -25,7 +25,7 @@ export default function StudentItem({ imageUrl, name, id }) {
   const initial = name?.charAt(0)?.toUpperCase() ?? "U";
   const avatarColor = stringToHsl(name ?? "User");
 
-  const { isLoading, mutateAsync } = useMutation({
+  const { isPending, mutateAsync } = useMutation({
     mutationFn: () => deleteStudentsCourse(id, params.id),
     onError: (err) => {
       setError(err.message || "Failed to delete student from course");
@@ -48,7 +48,7 @@ export default function StudentItem({ imageUrl, name, id }) {
   };
 
   const handleCloseModal = () => {
-    if (!isLoading) {
+    if (!isPending) {
       confirmModal.close();
     }
   };
@@ -85,10 +85,10 @@ export default function StudentItem({ imageUrl, name, id }) {
         <div className="flex justify-end items-center gap-3">
           <button
             type="button"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={handleDeleteClick}
             className="w-fit rounded-full p-[14px_20px] bg-[#FF435A] font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed">
-            {isLoading ? "Deleting..." : "Delete"}
+            {isPending ? "Deleting..." : "Delete"}
           </button>
         </div>
       </div>
@@ -108,7 +108,7 @@ export default function StudentItem({ imageUrl, name, id }) {
         }
         confirmText="Remove"
         cancelText="Cancel"
-        isLoading={isLoading}
+        isLoading={isPending}
         variant="danger"
       />
     </>

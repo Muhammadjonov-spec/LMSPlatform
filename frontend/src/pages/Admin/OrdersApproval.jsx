@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { orderService } from "../../services/orderService";
 import { Button, Card, CardBody, CardHeader } from "../../components/ui";
+import { getImageUrl } from "../../utils/helpers";
 
 export default function OrdersApproval() {
   const { data: ordersData, refetch, isLoading } = useQuery({
@@ -9,7 +10,7 @@ export default function OrdersApproval() {
     queryFn: () => orderService.getPendingOrders()
   });
 
-  const { mutateAsync: approveMutate, isLoading: isApproving } = useMutation({
+  const { mutateAsync: approveMutate, isPending: isApproving } = useMutation({
     mutationFn: (id) => orderService.approveOrder(id)
   });
 
@@ -59,9 +60,11 @@ export default function OrdersApproval() {
                 <tbody className="divide-y divide-gray-100">
                   {orders.map((order) => (
                     <tr key={order._id}>
-                      <td className="p-4">{order.student?.name} <br/><span className="text-sm text-gray-400">{order.student?.email}</span></td>
+                      <td className="p-4">{order.student?.firstName} {order.student?.lastName} <br/><span className="text-sm text-gray-400">{order.student?.email}</span></td>
                       <td className="p-4">{order.course?.title}</td>
-                      <td className="p-4 text-blue-500 underline cursor-pointer">View Receipt</td>
+                      <td className="p-4 text-blue-500 underline cursor-pointer">
+                        <a href={getImageUrl(order.receiptImage)} target="_blank" rel="noreferrer">View Receipt</a>
+                      </td>
                       <td className="p-4 text-right">
                         <Button 
                           variant="primary" 

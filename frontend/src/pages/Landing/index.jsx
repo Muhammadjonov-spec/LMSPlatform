@@ -1,37 +1,36 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
+import { getPublicCourses } from "../../services/courseService";
+import { getLatestReviews } from "../../services/reviewService";
+import { getImageUrl } from "../../utils/helpers";
 
 export default function LandingPage() {
-  const popularCourses = [
-    {
-      id: 1,
-      title: "Frontend Development (React.js)",
-      instructor: "Sardorbek",
-      price: 490000,
-      rating: 4.8,
-      students: 1250,
-      image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=500&auto=format&fit=crop&q=60"
-    },
-    {
-      id: 2,
-      title: "Backend Development (Node.js)",
-      instructor: "Alisher",
-      price: 590000,
-      rating: 4.9,
-      students: 980,
-      image: "https://images.unsplash.com/photo-1627398240411-8bbeb449711c?w=500&auto=format&fit=crop&q=60"
-    },
-    {
-      id: 3,
-      title: "Python From Zero to Hero",
-      instructor: "Olimjon",
-      price: 390000,
-      rating: 4.7,
-      students: 2100,
-      image: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=500&auto=format&fit=crop&q=60"
-    }
-  ];
+  const [popularCourses, setPopularCourses] = useState([]);
+  const [latestReviews, setLatestReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [coursesRes, reviewsRes] = await Promise.all([
+          getPublicCourses(),
+          getLatestReviews().catch(() => null)
+        ]);
+        if (coursesRes && coursesRes.data) {
+          setPopularCourses(coursesRes.data.slice(0, 3));
+        }
+        if (reviewsRes && reviewsRes.data) {
+          setLatestReviews(reviewsRes.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const features = [
     {
@@ -54,21 +53,9 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex-1">
-              <Navbar />
-            </div>
-            <div className="flex items-center space-x-4 ml-8">
-              <Link to="/sign-in" className="text-sm font-semibold text-[#1E40AF] hover:text-blue-800 transition-colors hidden sm:block">
-                Sign In
-              </Link>
-              <Link to="/sign-up" className="bg-[#1E40AF] text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-blue-800 transition-colors shadow-sm">
-                Sign Up
-              </Link>
-            </div>
-          </div>
+      <header className="bg-white/70 dark:bg-black/40 backdrop-blur-md border-b border-gray-200 dark:border-white/10 sticky top-0 z-50 py-4 px-6 md:px-12 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <Navbar />
         </div>
       </header>
 
@@ -87,7 +74,7 @@ export default function LandingPage() {
               <Link to="/sign-up" className="bg-[#1E40AF] text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-blue-800 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                 Get Started
               </Link>
-              <Link to="#" className="bg-white text-[#1E40AF] border-2 border-[#1E40AF] px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-50 transition-colors">
+              <Link to="/courses" className="bg-white text-[#1E40AF] border-2 border-[#1E40AF] px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-50 transition-colors">
                 Browse Courses
               </Link>
             </div>
@@ -101,7 +88,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-gray-50">
+      <section id="features" className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-extrabold text-gray-900">Why choose us?</h2>
@@ -126,30 +113,29 @@ export default function LandingPage() {
               <h2 className="text-3xl font-extrabold text-gray-900">Popular Courses</h2>
               <p className="mt-2 text-gray-500">The most chosen learning paths by our students</p>
             </div>
-            <Link to="#" className="text-[#1E40AF] font-semibold hover:underline hidden sm:block">View all &rarr;</Link>
+            <Link to="/courses" className="text-[#1E40AF] font-semibold hover:underline hidden sm:block">View all &rarr;</Link>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {popularCourses.map((course) => (
-              <Link key={course.id} to={`/courses/${course.id}`} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
+              <Link key={course._id || course.id} to={`/courses/${course._id || course.id}`} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
                 <div className="relative h-48 overflow-hidden">
-                  <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-black bg-opacity-10 group-hover:bg-opacity-0 transition-all"></div>
+                  <img src={getImageUrl(course.thumbnail || course.thumbnail_url || course.image)} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-6 flex-1 flex flex-col">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xs font-semibold text-[#1E40AF] bg-blue-50 px-2 py-1 rounded-md">New</span>
                     <div className="flex items-center text-sm text-yellow-500">
                       <span className="material-symbols-rounded text-base mr-1">star</span>
-                      <span>{course.rating}</span>
-                      <span className="text-gray-400 ml-1">({course.students})</span>
+                      <span>{course.rating || 4.8}</span>
+                      <span className="text-gray-400 ml-1">({course.students?.length || course.studentCount || 0})</span>
                     </div>
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-1 leading-tight line-clamp-2">{course.title}</h3>
-                  <p className="text-sm text-gray-500 mb-4 flex-1">Instructor: {course.instructor}</p>
+                  <p className="text-sm text-gray-500 mb-4 flex-1">Instructor: {course.teacher?.user?.firstName ? `${course.teacher.user.firstName} ${course.teacher.user.lastName || ''}`.trim() : 'EduStack'}</p>
                   
                   <div className="border-t border-gray-100 pt-4 flex justify-between items-center mt-auto">
-                    <span className="font-extrabold text-lg text-gray-900">{course.price.toLocaleString()} UZS</span>
+                    <span className="font-extrabold text-lg text-gray-900">{course.price ? course.price.toLocaleString() : 0} UZS</span>
                     <button className="bg-gray-50 text-[#1E40AF] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#1E40AF] hover:text-white transition-colors">
                       Details
                     </button>
@@ -157,9 +143,113 @@ export default function LandingPage() {
                 </div>
               </Link>
             ))}
+            {loading && <div className="col-span-3 text-center py-10 text-gray-500">Yuklanmoqda...</div>}
+            {!loading && popularCourses.length === 0 && (
+              <div className="col-span-3 text-center py-10 text-gray-500 border border-dashed border-gray-200 rounded-xl">
+                Hozircha kurslar yo'q
+              </div>
+            )}
           </div>
           <div className="mt-8 text-center sm:hidden">
-            <Link to="#" className="text-[#1E40AF] font-semibold hover:underline">View all &rarr;</Link>
+            <Link to="/courses" className="text-[#1E40AF] font-semibold hover:underline">View all &rarr;</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-extrabold text-gray-900">Flexible Pricing Plans</h2>
+            <p className="mt-2 text-gray-500">Choose the plan that fits your learning journey</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Free Plan</h3>
+                <p className="text-gray-500 text-sm mb-4">For beginners starting out</p>
+                <div className="text-4xl font-extrabold text-[#1E40AF] mb-6">0 <span className="text-base text-gray-500 font-normal">UZS/mo</span></div>
+                <ul className="space-y-3 text-sm text-gray-600 mb-6">
+                  <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Access to basic courses</li>
+                  <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Community discussions</li>
+                  <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Self-paced learning</li>
+                </ul>
+              </div>
+              <Link to="/sign-up" className="w-full text-center py-3 rounded-full border border-[#1E40AF] text-[#1E40AF] font-semibold hover:bg-blue-50 transition-colors">
+                Get Started
+              </Link>
+            </div>
+
+            <div className="bg-[#1E40AF] rounded-2xl p-8 shadow-lg text-white flex flex-col justify-between transform md:-translate-y-2">
+              <div>
+                <span className="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Most Popular</span>
+                <h3 className="text-xl font-bold text-white mt-3 mb-2">Pro Plan</h3>
+                <p className="text-blue-100 text-sm mb-4">For ambitious learners & professionals</p>
+                <div className="text-4xl font-extrabold text-white mb-6">490,000 <span className="text-base text-blue-200 font-normal">UZS/mo</span></div>
+                <ul className="space-y-3 text-sm text-blue-100 mb-6">
+                  <li className="flex items-center gap-2"><span className="text-white">✓</span> All courses included</li>
+                  <li className="flex items-center gap-2"><span className="text-white">✓</span> Mentor support & code reviews</li>
+                  <li className="flex items-center gap-2"><span className="text-white">✓</span> Verified Certificate of Completion</li>
+                  <li className="flex items-center gap-2"><span className="text-white">✓</span> Offline downloads</li>
+                </ul>
+              </div>
+              <Link to="/sign-up" className="w-full text-center py-3 rounded-full bg-white text-[#1E40AF] font-bold hover:bg-gray-100 transition-colors shadow-md">
+                Start Pro Trial
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Enterprise Plan</h3>
+                <p className="text-gray-500 text-sm mb-4">For teams & organizations</p>
+                <div className="text-4xl font-extrabold text-[#1E40AF] mb-6">990,000 <span className="text-base text-gray-500 font-normal">UZS/mo</span></div>
+                <ul className="space-y-3 text-sm text-gray-600 mb-6">
+                  <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Everything in Pro</li>
+                  <li className="flex items-center gap-2"><span className="text-green-500">✓</span> 1-on-1 Dedicated Mentor</li>
+                  <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Team progress analytics</li>
+                  <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Job placement assistance</li>
+                </ul>
+              </div>
+              <Link to="/sign-up" className="w-full text-center py-3 rounded-full border border-[#1E40AF] text-[#1E40AF] font-semibold hover:bg-blue-50 transition-colors">
+                Contact Sales
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-extrabold text-gray-900">What Our Students Say</h2>
+            <p className="mt-2 text-gray-500">Real stories from our graduated learners</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {latestReviews.length > 0 ? (
+              latestReviews.map((review) => (
+                <div key={review._id} className="bg-gray-50 rounded-2xl p-8 border border-gray-100 flex flex-col justify-between">
+                  <p className="text-gray-600 italic mb-6">"{review.comment}"</p>
+                  <div className="flex items-center gap-4">
+                    {review.studentId?.avatar ? (
+                      <img src={getImageUrl(review.studentId.avatar)} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center uppercase">
+                        {review.studentId?.firstName?.[0] || review.studentId?.name?.[0] || "S"}
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="font-bold text-gray-900">{review.studentId?.firstName || review.studentId?.name || "Student"} {review.studentId?.lastName || ''}</h4>
+                      <div className="text-yellow-500 text-sm">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-10 text-gray-500 border border-dashed border-gray-200 rounded-xl">
+                Hozircha sharhlar yo'q
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -188,9 +278,9 @@ export default function LandingPage() {
                 Empowering learners worldwide with cutting-edge tools and resources for career advancement.
               </p>
               <div className="flex space-x-6">
-                <Link to="#" className="text-blue-200 hover:text-white transition-colors">Telegram</Link>
-                <Link to="#" className="text-blue-200 hover:text-white transition-colors">Instagram</Link>
-                <Link to="#" className="text-blue-200 hover:text-white transition-colors">YouTube</Link>
+                <Link to="https://t.me/S_150907" className="text-blue-200 hover:text-white transition-colors">Telegram</Link>
+                <Link to="https://sardorbekcoder.uz" className="text-blue-200 hover:text-white transition-colors">Personal Site</Link>
+                <Link to="https://github.com/muhammadjonov-spec" className="text-blue-200 hover:text-white transition-colors">GitHub</Link>
               </div>
             </div>
             
@@ -207,17 +297,17 @@ export default function LandingPage() {
             <div className="md:col-span-1">
               <h4 className="font-bold text-lg mb-4">Support</h4>
               <ul className="space-y-3">
-                <li><Link to="#" className="text-blue-200 hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link to="#" className="text-blue-200 hover:text-white transition-colors">Terms of Service</Link></li>
-                <li><Link to="#" className="text-blue-200 hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link to="#" className="text-blue-200 hover:text-white transition-colors">Contact Us</Link></li>
+                <li><Link to="/support/help" className="text-blue-200 hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link to="/support/terms" className="text-blue-200 hover:text-white transition-colors">Terms of Service</Link></li>
+                <li><Link to="/support/privacy" className="text-blue-200 hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/support/contact" className="text-blue-200 hover:text-white transition-colors">Contact Us</Link></li>
               </ul>
             </div>
           </div>
           
           <div className="pt-8 text-center text-blue-200 text-sm flex flex-col md:flex-row justify-between items-center">
             <p>&copy; 2026 EduStack LMS. All rights reserved.</p>
-            <p className="mt-2 md:mt-0">Made with ❤️ for education</p>
+            <p className="mt-2 md:mt-0">Created by Muhammadjonov Sardorbek for education</p>
           </div>
         </div>
       </footer>

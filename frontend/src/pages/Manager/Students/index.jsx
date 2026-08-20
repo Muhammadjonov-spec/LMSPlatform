@@ -1,11 +1,11 @@
 import React from "react";
 import { Link, useLoaderData } from "react-router-dom";
 import StudentItem from "./student-item";
+import EmptyState from "../../../components/EmptyState";
+import { getImageUrl } from "../../../utils/helpers";
 
 export default function ManageStudentsPage() {
   const students = useLoaderData();
-
-  console.log(students);
 
   return (
     <>
@@ -26,15 +26,23 @@ export default function ManageStudentsPage() {
         </div>
       </header>
       <section id="CourseList" className="flex flex-col w-full rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]">
-        {students?.map((item) => (
-          <StudentItem
-            key={item._id}
-            id={item._id}
-            imageUrl={item.photo_url}
-            name={item.name}
-            totalCourse={item.courses.length}
-          />
-        ))}
+        {!students || students.length === 0 ? (
+          <EmptyState title="No students available" message="No students have been added yet or system API is not connected." />
+        ) : (
+          students.map((item) => {
+            const photo = item.photo_url || item.avatar;
+            const imageSrc = photo ? getImageUrl(photo) : "/assets/images/photos/photo-3.png";
+            return (
+              <StudentItem
+                key={item._id}
+                id={item._id}
+                imageUrl={imageSrc}
+                name={item.name || `${item.firstName || ''} ${item.lastName || ''}`.trim()}
+                totalCourse={item.courses?.length ?? 0}
+              />
+            );
+          })
+        )}
 
         <div id="Pagination" className="flex items-center gap-3">
           <button

@@ -1,12 +1,12 @@
 import { apiInstanceAuth } from "../utils/axios";
 
-export const getStudents = async () => apiInstanceAuth.get("/students").then((res) => res.data);
+export const getStudents = async () => apiInstanceAuth.get("/users/students").then((res) => res.data);
 
-export const getDetailStudent = async (id) => apiInstanceAuth.get(`/students/${id}`).then((res) => res.data);
+export const getDetailStudent = async (id) => apiInstanceAuth.get(`/users/students/${id}`).then((res) => res.data);
 
 export const createStudents = async (data) =>
   apiInstanceAuth
-    .post("/students", data, {
+    .post("/users/students", data, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
@@ -15,13 +15,13 @@ export const createStudents = async (data) =>
 
 export const updateStudents = async (data, id) =>
   apiInstanceAuth
-    .put(`/students/${id}`, data, {
+    .put(`/users/students/${id}`, data, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
     })
     .then((res) => res.data);
 
-export const deleteStudent = async (id) => apiInstanceAuth.delete(`/students/${id}`).then((res) => res.data);
+export const deleteStudent = async (id) => apiInstanceAuth.delete(`/users/students/${id}`).then((res) => res.data);
 
-export const getCoursesStudents = async () => apiInstanceAuth.get("/students-courses").then((res) => res.data);
+export const getCoursesStudents = async () => apiInstanceAuth.get("/users/students-courses").then((res) => res.data);

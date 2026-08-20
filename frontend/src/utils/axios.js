@@ -2,16 +2,14 @@ import axios from "axios";
 import secureLocalStorage from "react-secure-storage";
 import { STRORAGE_KEY } from "./const";
 
-const baseURL = import.meta?.env?.VITE_API_URL ?? "http://localhost:3000/api";
+const baseURL = import.meta?.env?.VITE_API_URL ?? "http://localhost:5000/api";
 
 const apiInstance = axios.create({
-  baseURL,
-  timeout: 3000
+  baseURL
 });
 
 export const apiInstanceAuth = axios.create({
-  baseURL,
-  timeout: 3000
+  baseURL
 });
 
 apiInstanceAuth.interceptors.request.use(
@@ -27,7 +25,7 @@ apiInstanceAuth.interceptors.request.use(
 
       config.headers = {
         ...(config.headers || {}),
-        Authorization: `JWT ${token}`
+        Authorization: `Bearer ${token}`
       };
     } catch (err) {
       void err;
@@ -48,7 +46,7 @@ apiInstanceAuth.interceptors.response.use(
         void removeErr;
       }
       if (typeof window !== "undefined") {
-        window.location.replace("/manager/sign-in");
+        window.location.replace("/sign-in");
       }
     }
     return Promise.reject(err);

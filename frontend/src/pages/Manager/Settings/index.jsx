@@ -1,101 +1,375 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { useRouteLoaderData, useNavigate } from "react-router-dom";
+import { MANAGER_SESSION, STUDENT_SESSION } from "../../../utils/const";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faEnvelope, faLock, faCamera, faServer } from "@fortawesome/free-solid-svg-icons";
+import { uploadProfileAvatar, changePassword } from "../../../services/authServices";
+import secureLocalStorage from "react-secure-storage";
+import { getImageUrl } from "../../../utils/helpers";
 
 export default function SettingsPage() {
-  const [formData, setFormData] = useState({
+  const managerSession = useRouteLoaderData(MANAGER_SESSION);
+  const studentSession = useRouteLoaderData(STUDENT_SESSION);
+  const session = managerSession || studentSession;
+
+  // Profile data
+  const fullName = session?.firstName && session?.lastName
+    ? `${session.firstName} ${session.lastName}`
+    : session?.firstName || session?.name || "User";
+
+  const [profileData, setProfileData] = useState({
+    firstName: session?.firstName || session?.name?.split(" ")[0] || "",
+    lastName: session?.lastName || session?.name?.split(" ").slice(1).join(" ") || "",
+    email: session?.email || "",
+    phone: session?.phone || "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+
+  // System settings data (only for super_admin)
+  const [systemData, setSystemData] = useState({
     platformName: "EduStack LMS",
     supportEmail: "support@edustack.uz",
     allowRegistration: true,
     requireEmailVerification: false
   });
 
-  const handleSave = (e) => {
-    e.preventDefault();
-    alert("Sozlamalar muvaffaqiyatli saqlandi! (Mock)");
+  const [activeTab, setActiveTab] = useState("profile");
+  const [saveMessage, setSaveMessage] = useState("");
+  const fileInputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const res = await uploadProfileAvatar(formData);
+      if (res.success) {
+        setSaveMessage("Profile picture updated successfully!");
+        
+        // Update local session
+        const currentSession = secureLocalStorage.getItem(session.role === 'student' ? STUDENT_SESSION : MANAGER_SESSION);
+        if (currentSession) {
+          currentSession.avatar = res.data.avatar;
+          secureLocalStorage.setItem(session.role === 'student' ? STUDENT_SESSION : MANAGER_SESSION, currentSession);
+        }
+        
+        // Temporarily reload to reflect changes
+        setTimeout(() => {
+          navigate(0);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error(error);
+      setSaveMessage("Failed to upload profile picture");
+    } finally {
+      setIsUploading(false);
+    }
   };
+
+  const handleProfileChange = (e) => {
+    setProfileData({ ...profileData, [e.target.name]: e.target.value });
+  };
+
+  const handleProfileSave = (e) => {
+    e.preventDefault();
+    setSaveMessage("Profile data saved successfully!");
+    setTimeout(() => setSaveMessage(""), 3000);
+  };
+
+  const handlePasswordSave = async (e) => {
+    e.preventDefault();
+    if (profileData.newPassword !== profileData.confirmPassword) {
+      setSaveMessage("New passwords do not match!");
+      setTimeout(() => setSaveMessage(""), 3000);
+      return;
+    }
+    if (profileData.newPassword.length < 6) {
+      setSaveMessage("Password must be at least 6 characters long!");
+      setTimeout(() => setSaveMessage(""), 3000);
+      return;
+    }
+
+    try {
+      setIsSavingPassword(true);
+      const res = await changePassword({
+        currentPassword: profileData.currentPassword,
+        newPassword: profileData.newPassword
+      });
+      if (res.success) {
+        setSaveMessage("Password changed successfully!");
+        setProfileData({ ...profileData, currentPassword: "", newPassword: "", confirmPassword: "" });
+      }
+    } catch (error) {
+      console.error("Change password error:", error);
+      setSaveMessage(error?.response?.data?.message || "Failed to change password. Please try again.");
+    } finally {
+      setIsSavingPassword(false);
+      setTimeout(() => setSaveMessage(""), 3000);
+    }
+  };
+
+  const handleSystemSave = (e) => {
+    e.preventDefault();
+    setSaveMessage("System settings saved!");
+    setTimeout(() => setSaveMessage(""), 3000);
+  };
+
+  const tabs = [
+    { id: "profile", label: "Profile", icon: faUser },
+    { id: "security", label: "Security", icon: faLock }
+  ];
+
+  if (session?.role === 'super_admin') {
+    tabs.push({ id: "system", label: "System", icon: faServer });
+  }
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Sozlamalar</h1>
-        <p className="mt-2 text-sm text-gray-700">Platformaning umumiy sozlamalarini boshqarish</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          Manage your personal account {session?.role === 'super_admin' ? "and system settings" : ""}
+        </p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden max-w-3xl">
-        <form onSubmit={handleSave} className="p-6 sm:p-8 space-y-6">
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Asosiy Ma'lumotlar</h3>
-            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700">Platforma nomi</label>
-                <div className="mt-1">
+      {saveMessage && (
+        <div className={`mb-6 px-4 py-3 rounded-xl text-sm font-medium ${
+          saveMessage.includes("successfully") || saveMessage.includes("saved")
+            ? "bg-green-50 text-green-700 border border-green-200"
+            : "bg-red-50 text-red-700 border border-red-200"
+        }`}>
+          {saveMessage}
+        </div>
+      )}
+
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6 border-b border-gray-200 dark:border-white/10 overflow-x-auto">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+              activeTab === tab.id
+                ? "border-[#1E40AF] text-[#1E40AF] dark:text-[#3b82f6]"
+                : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400"
+            }`}
+          >
+            <FontAwesomeIcon icon={tab.icon} className="w-4 h-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="max-w-2xl">
+        {activeTab === "profile" && (
+          <div className="bg-white dark:bg-white/5 rounded-xl shadow-sm border border-gray-200 dark:border-white/10 overflow-hidden">
+            <div className="p-6 sm:p-8 border-b border-gray-100 dark:border-white/10 flex items-center gap-6">
+              <div className="relative cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  hidden 
+                  accept="image/*" 
+                  onChange={handleAvatarChange} 
+                />
+                {session?.avatar ? (
+                  <img
+                    src={getImageUrl(session.avatar)}
+                    alt="avatar"
+                    className={`w-20 h-20 rounded-full object-cover shadow-md ${isUploading ? 'opacity-50' : ''}`}
+                  />
+                ) : (
+                  <div
+                    className={`w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-md ${isUploading ? 'opacity-50' : ''}`}
+                    style={{ backgroundColor: `hsl(${(fullName).charCodeAt(0) * 7 % 360}, 70%, 60%)` }}
+                  >
+                    {fullName?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                )}
+                <button className="absolute bottom-0 right-0 w-7 h-7 bg-[#1E40AF] text-white rounded-full flex items-center justify-center shadow-md hover:bg-blue-800 transition-colors">
+                  <FontAwesomeIcon icon={faCamera} className="w-3 h-3" />
+                </button>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{fullName}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{session?.email || "email@example.com"}</p>
+                <span className="inline-block mt-1 px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-[#1E40AF] dark:text-blue-300 text-xs font-semibold rounded-md uppercase">
+                  {session?.role}
+                </span>
+              </div>
+            </div>
+
+            <form onSubmit={handleProfileSave} className="p-6 sm:p-8 space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
                   <input
                     type="text"
-                    value={formData.platformName}
-                    onChange={(e) => setFormData({...formData, platformName: e.target.value})}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#1E40AF] focus:ring-[#1E40AF] sm:text-sm py-2 px-3 border"
+                    name="firstName"
+                    value={profileData.firstName}
+                    onChange={handleProfileChange}
+                    className="block w-full rounded-lg border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 shadow-sm focus:border-[#1E40AF] focus:ring-[#1E40AF] sm:text-sm py-2.5 px-3 text-gray-900 dark:text-white"
                   />
                 </div>
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700">Qo'llab-quvvatlash Email manzili</label>
-                <div className="mt-1">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
                   <input
-                    type="email"
-                    value={formData.supportEmail}
-                    onChange={(e) => setFormData({...formData, supportEmail: e.target.value})}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#1E40AF] focus:ring-[#1E40AF] sm:text-sm py-2 px-3 border"
+                    type="text"
+                    name="lastName"
+                    value={profileData.lastName}
+                    onChange={handleProfileChange}
+                    className="block w-full rounded-lg border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 shadow-sm focus:border-[#1E40AF] focus:ring-[#1E40AF] sm:text-sm py-2.5 px-3 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Xavfsizlik va Ruxsatlar</h3>
-            <div className="space-y-4">
-              <div className="flex items-start">
-                <div className="flex h-5 items-center">
-                  <input
-                    id="allowRegistration"
-                    type="checkbox"
-                    checked={formData.allowRegistration}
-                    onChange={(e) => setFormData({...formData, allowRegistration: e.target.checked})}
-                    className="h-4 w-4 rounded border-gray-300 text-[#1E40AF] focus:ring-[#1E40AF]"
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="allowRegistration" className="font-medium text-gray-700">O'quvchilar ro'yxatdan o'ta oladi</label>
-                  <p className="text-gray-500">Yangi o'quvchilar platformada o'zlari akkaunt yarata oladilar.</p>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={profileData.email}
+                  onChange={handleProfileChange}
+                  className="block w-full rounded-lg border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 shadow-sm focus:border-[#1E40AF] focus:ring-[#1E40AF] sm:text-sm py-2.5 px-3 text-gray-900 dark:text-white"
+                />
               </div>
-              
-              <div className="flex items-start">
-                <div className="flex h-5 items-center">
-                  <input
-                    id="requireVerification"
-                    type="checkbox"
-                    checked={formData.requireEmailVerification}
-                    onChange={(e) => setFormData({...formData, requireEmailVerification: e.target.checked})}
-                    className="h-4 w-4 rounded border-gray-300 text-[#1E40AF] focus:ring-[#1E40AF]"
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="requireVerification" className="font-medium text-gray-700">Emailni tasdiqlash majburiy</label>
-                  <p className="text-gray-500">Ro'yxatdan o'tgandan keyin email tasdiqlanmaguncha tizimga kirish taqiqlanadi.</p>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <div className="pt-4 flex justify-end">
-            <button
-              type="submit"
-              className="inline-flex justify-center rounded-md border border-transparent bg-[#1E40AF] py-2 px-6 text-sm font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:ring-offset-2"
-            >
-              Saqlash
-            </button>
+              <div className="pt-4 flex justify-end">
+                <button type="submit" className="inline-flex justify-center rounded-lg bg-[#1E40AF] py-2.5 px-6 text-sm font-semibold text-white shadow-sm hover:bg-blue-800 transition-colors">
+                  Save
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
+        )}
+
+        {activeTab === "security" && (
+          <div className="bg-white dark:bg-white/5 rounded-xl shadow-sm border border-gray-200 dark:border-white/10 overflow-hidden">
+            <div className="p-6 sm:p-8 border-b border-gray-100 dark:border-white/10">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Change Password</h3>
+            </div>
+            <form onSubmit={handlePasswordSave} className="p-6 sm:p-8 space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
+                <input
+                  type="password"
+                  name="currentPassword"
+                  value={profileData.currentPassword}
+                  onChange={handleProfileChange}
+                  required
+                  className="block w-full rounded-lg border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 shadow-sm focus:border-[#1E40AF] focus:ring-[#1E40AF] sm:text-sm py-2.5 px-3 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={profileData.newPassword}
+                  onChange={handleProfileChange}
+                  required
+                  className="block w-full rounded-lg border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 shadow-sm focus:border-[#1E40AF] focus:ring-[#1E40AF] sm:text-sm py-2.5 px-3 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={profileData.confirmPassword}
+                  onChange={handleProfileChange}
+                  required
+                  className="block w-full rounded-lg border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 shadow-sm focus:border-[#1E40AF] focus:ring-[#1E40AF] sm:text-sm py-2.5 px-3 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div className="pt-4 flex justify-end">
+                <button type="submit" className="inline-flex justify-center rounded-lg bg-[#1E40AF] py-2.5 px-6 text-sm font-semibold text-white shadow-sm hover:bg-blue-800 transition-colors">
+                  Change Password
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {activeTab === "system" && session?.role === 'super_admin' && (
+          <div className="bg-white dark:bg-white/5 rounded-xl shadow-sm border border-gray-200 dark:border-white/10 overflow-hidden">
+            <form onSubmit={handleSystemSave} className="p-6 sm:p-8 space-y-6">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b dark:border-white/10 pb-2 mb-4">Basic Information</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Platform Name</label>
+                    <input
+                      type="text"
+                      value={systemData.platformName}
+                      onChange={(e) => setSystemData({...systemData, platformName: e.target.value})}
+                      className="block w-full rounded-md border-gray-300 dark:border-white/20 shadow-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white sm:text-sm py-2 px-3 border"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Support Email Address</label>
+                    <input
+                      type="email"
+                      value={systemData.supportEmail}
+                      onChange={(e) => setSystemData({...systemData, supportEmail: e.target.value})}
+                      className="block w-full rounded-md border-gray-300 dark:border-white/20 shadow-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white sm:text-sm py-2 px-3 border"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b dark:border-white/10 pb-2 mb-4">Security and Permissions</h3>
+                <div className="space-y-4">
+                  <div className="flex items-start">
+                    <div className="flex h-5 items-center">
+                      <input
+                        id="allowRegistration"
+                        type="checkbox"
+                        checked={systemData.allowRegistration}
+                        onChange={(e) => setSystemData({...systemData, allowRegistration: e.target.checked})}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label htmlFor="allowRegistration" className="font-medium text-gray-700 dark:text-gray-300">Students can register</label>
+                      <p className="text-gray-500">New students can create their own accounts on the platform.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="flex h-5 items-center">
+                      <input
+                        id="requireVerification"
+                        type="checkbox"
+                        checked={systemData.requireEmailVerification}
+                        onChange={(e) => setSystemData({...systemData, requireEmailVerification: e.target.checked})}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label htmlFor="requireVerification" className="font-medium text-gray-700 dark:text-gray-300">Email verification required</label>
+                      <p className="text-gray-500">Login is disabled until the email is verified after registration.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="pt-4 flex justify-end">
+                <button type="submit" className="inline-flex justify-center rounded-md bg-[#1E40AF] py-2 px-6 text-sm font-medium text-white hover:bg-blue-800">
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );

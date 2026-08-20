@@ -2,6 +2,11 @@ import React from "react";
 import { User, Mail, Lock, Bell, Moon, LogOut } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
+import { useRef, useState } from "react";
+import { uploadProfileAvatar } from "../../services/authServices";
+import { getImageUrl } from "../../utils/helpers";
+import secureLocalStorage from "react-secure-storage";
+import { STRORAGE_KEY } from "../../utils/const";
 
 export default function SettingsPage() {
   const { user, logout } = useAuthStore();
@@ -10,6 +15,45 @@ export default function SettingsPage() {
   const handleLogout = () => {
     logout();
     navigate("/sign-in");
+  };
+
+  const fileInputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const res = await uploadProfileAvatar(formData);
+      if (res.success) {
+        const newAvatar = res.data.avatar;
+        // Update local storage
+        const currentSession = secureLocalStorage.getItem(STRORAGE_KEY);
+        if (currentSession) {
+          if (currentSession.data?.user) {
+            currentSession.data.user.avatar = newAvatar;
+          } else if (currentSession.user) {
+            currentSession.user.avatar = newAvatar;
+          } else {
+            currentSession.avatar = newAvatar;
+          }
+          secureLocalStorage.setItem(STRORAGE_KEY, currentSession);
+        }
+        
+        // Update user store
+        useAuthStore.setState({ user: { ...user, avatar: newAvatar } });
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Failed to upload profile picture");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -42,13 +86,34 @@ export default function SettingsPage() {
         {/* Content area */}
         <div className="flex-1 p-8 md:p-10">
           <div className="flex items-center gap-6 mb-10">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 text-white flex items-center justify-center text-3xl font-bold shadow-lg">
-              {user?.firstName?.[0] || "U"}
-            </div>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              hidden 
+              accept="image/*" 
+              onChange={handleAvatarChange} 
+            />
+            {user?.avatar ? (
+              <img
+                src={getImageUrl(user.avatar)}
+                alt="avatar"
+                className={`w-24 h-24 rounded-full object-cover shadow-lg ${isUploading ? 'opacity-50' : ''}`}
+              />
+            ) : (
+              <div className={`w-24 h-24 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 text-white flex items-center justify-center text-3xl font-bold shadow-lg ${isUploading ? 'opacity-50' : ''}`}>
+                {user?.firstName?.[0] || "U"}
+              </div>
+            )}
             <div>
               <h2 className="text-2xl font-bold text-gray-900">{user?.firstName} {user?.lastName}</h2>
               <p className="text-gray-500">{user?.role?.toUpperCase()} Account</p>
-              <button className="mt-3 px-4 py-1.5 border border-gray-200 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors">Change Avatar</button>
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="mt-3 px-4 py-1.5 border border-gray-200 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors"
+              >
+                {isUploading ? "Uploading..." : "Change Avatar"}
+              </button>
             </div>
           </div>
 

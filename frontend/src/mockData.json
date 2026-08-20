@@ -24,23 +24,34 @@
     "data": {
       "totalStudents": 120,
       "totalCourses": 15,
-      "totalRevenue": 24000
+      "totalCourse": 15,
+      "totalVideos": 48,
+      "totalText": 12,
+      "totalRevenue": 24000,
+      "courses": [
+        { "_id": "1", "name": "Frontend Web Development", "category": { "name": "Programming" }, "thumbnail_url": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=500&auto=format&fit=crop&q=60", "total_students": 34 },
+        { "_id": "2", "name": "UI/UX Design Masterclass", "category": { "name": "Design" }, "thumbnail_url": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&auto=format&fit=crop&q=60", "total_students": 21 },
+        { "_id": "3", "name": "React.js Advanced", "category": { "name": "Programming" }, "thumbnail_url": "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=500&auto=format&fit=crop&q=60", "total_students": 18 },
+        { "_id": "4", "name": "Node.js Backend", "category": { "name": "Backend" }, "thumbnail_url": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=500&auto=format&fit=crop&q=60", "total_students": 15 },
+        { "_id": "5", "name": "Python for Data Science", "category": { "name": "Data Science" }, "thumbnail_url": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60", "total_students": 29 },
+        { "_id": "6", "name": "Mobile App with Flutter", "category": { "name": "Mobile" }, "thumbnail_url": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500&auto=format&fit=crop&q=60", "total_students": 11 }
+      ],
+      "students": [
+        { "_id": "s1", "name": "Ali Valiyev", "photo_url": "https://i.pravatar.cc/150?img=1", "courses": ["1", "2"] },
+        { "_id": "s2", "name": "Malika Tursunova", "photo_url": "https://i.pravatar.cc/150?img=5", "courses": ["1"] },
+        { "_id": "s3", "name": "Jasur Karimov", "photo_url": "https://i.pravatar.cc/150?img=3", "courses": ["1", "3", "5"] },
+        { "_id": "s4", "name": "Zulfiya Rahimova", "photo_url": "https://i.pravatar.cc/150?img=9", "courses": ["2", "4"] }
+      ]
     }
   },
   "courses": {
     "data": [
-      {
-        "_id": "1",
-        "name": "Frontend Web Development",
-        "category": { "name": "Programming" },
-        "thumbnail_url": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=500&auto=format&fit=crop&q=60"
-      },
-      {
-        "_id": "2",
-        "name": "UI/UX Design Masterclass",
-        "category": { "name": "Design" },
-        "thumbnail_url": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&auto=format&fit=crop&q=60"
-      }
+      { "_id": "1", "name": "Frontend Web Development", "category": { "name": "Programming" }, "thumbnail_url": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=500&auto=format&fit=crop&q=60", "total_students": 34, "isPublished": true },
+      { "_id": "2", "name": "UI/UX Design Masterclass", "category": { "name": "Design" }, "thumbnail_url": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&auto=format&fit=crop&q=60", "total_students": 21, "isPublished": true },
+      { "_id": "3", "name": "React.js Advanced", "category": { "name": "Programming" }, "thumbnail_url": "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=500&auto=format&fit=crop&q=60", "total_students": 18, "isPublished": true },
+      { "_id": "4", "name": "Node.js Backend Development", "category": { "name": "Backend" }, "thumbnail_url": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=500&auto=format&fit=crop&q=60", "total_students": 15, "isPublished": false },
+      { "_id": "5", "name": "Python for Data Science", "category": { "name": "Data Science" }, "thumbnail_url": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60", "total_students": 29, "isPublished": true },
+      { "_id": "6", "name": "Mobile App with Flutter", "category": { "name": "Mobile" }, "thumbnail_url": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500&auto=format&fit=crop&q=60", "total_students": 11, "isPublished": true }
     ]
   },
   "courseDetail": {
@@ -48,14 +59,49 @@
       "_id": "1",
       "name": "Frontend Web Development",
       "details": [
-        { "_id": "c1", "title": "Introduction to HTML", "type": "video", "youtubeId": "dQw4w9WgXcQ", "description": "In this lesson we learn HTML." },
-        { "_id": "c2", "title": "CSS Basics", "type": "video", "youtubeId": "jNQXAC9IVRw", "description": "Learning CSS styles." },
-        { "_id": "c3", "title": "JavaScript Fundamentals", "type": "text", "description": "Read this article on JS basics." }
+        {
+          "_id": "c1",
+          "title": "Introduction to HTML",
+          "type": "video",
+          "videoUrl": null,
+          "youtubeId": "dQw4w9WgXcQ",
+          "description": "Bu darsda HTML asoslarini o'rganamiz. HTML - veb sahifalarning skeletidir."
+        },
+        {
+          "_id": "c2",
+          "title": "CSS Basics & Flexbox",
+          "type": "video",
+          "videoUrl": null,
+          "youtubeId": "yfoY53QXEnI",
+          "description": "CSS bilan sahifani chiroyli qilamiz. Flexbox layout tizimini o'rganamiz."
+        },
+        {
+          "_id": "c3",
+          "title": "JavaScript Fundamentals",
+          "type": "text",
+          "text": "<h2>JavaScript nima?</h2><p>JavaScript - bu veb sahifalarni interaktiv qilish uchun ishlatiladigan dasturlash tili.</p><h3>O'zgaruvchilar</h3><p><code>let</code>, <code>const</code>, <code>var</code> - o'zgaruvchi e'lon qilish usullari.</p><ul><li><strong>let</strong> - o'zgartirilishi mumkin bo'lgan o'zgaruvchi</li><li><strong>const</strong> - o'zgartirib bo'lmaydigan o'zgaruvchi</li></ul>",
+          "description": "JavaScript asoslarini o'rganamiz."
+        },
+        {
+          "_id": "c4",
+          "title": "React.js Introduction",
+          "type": "video",
+          "videoUrl": null,
+          "youtubeId": "Tn6-PIqc4UM",
+          "description": "React.js - Facebook tomonidan yaratilgan UI kutubxonasi."
+        }
       ]
     }
   },
   "students": {
-    "data": []
+    "data": [
+      { "_id": "s1", "name": "Ali Valiyev", "photo_url": "https://i.pravatar.cc/150?img=1", "email": "ali@gmail.com", "courses": ["1", "2"], "createdAt": "2024-01-15" },
+      { "_id": "s2", "name": "Malika Tursunova", "photo_url": "https://i.pravatar.cc/150?img=5", "email": "malika@gmail.com", "courses": ["1"], "createdAt": "2024-02-20" },
+      { "_id": "s3", "name": "Jasur Karimov", "photo_url": "https://i.pravatar.cc/150?img=3", "email": "jasur@gmail.com", "courses": ["1", "3", "5"], "createdAt": "2024-03-10" },
+      { "_id": "s4", "name": "Zulfiya Rahimova", "photo_url": "https://i.pravatar.cc/150?img=9", "email": "zulfiya@gmail.com", "courses": ["2", "4"], "createdAt": "2024-03-22" },
+      { "_id": "s5", "name": "Bobur Xasanov", "photo_url": "https://i.pravatar.cc/150?img=11", "email": "bobur@gmail.com", "courses": ["3", "5", "6"], "createdAt": "2024-04-05" },
+      { "_id": "s6", "name": "Nilufar Yusupova", "photo_url": "https://i.pravatar.cc/150?img=20", "email": "nilufar@gmail.com", "courses": ["1", "2", "4"], "createdAt": "2024-04-18" }
+    ]
   },
   "categories": {
     "data": [
@@ -73,16 +119,20 @@
     ]
   },
   "rewards": {
-    "leaderboard": [
-      { "id": 1, "studentName": "Ali Valiyev", "points": 1250, "rank": 1 },
-      { "id": 2, "studentName": "Sanjar Karimov", "points": 980, "rank": 2 },
-      { "id": 3, "studentName": "Olim Rustamov", "points": 850, "rank": 3 },
-      { "id": 4, "studentName": "Malika Tursunova", "points": 720, "rank": 4 }
-    ],
-    "badges": [
-      { "id": 1, "name": "Faol o'quvchi", "description": "Har kuni darslarni ko'rgani uchun", "icon": "🔥" },
-      { "id": 2, "name": "A'lochi", "description": "Uy vazifalarini 100% bajargan", "icon": "⭐" },
-      { "id": 3, "name": "Yordamchi", "description": "Boshqa o'quvchilarga yordam bergani uchun", "icon": "🤝" }
-    ]
+    "data": {
+      "leaderboard": [
+        { "id": 1, "studentName": "Ali Valiyev", "points": 1250, "rank": 1 },
+        { "id": 2, "studentName": "Sanjar Karimov", "points": 980, "rank": 2 },
+        { "id": 3, "studentName": "Olim Rustamov", "points": 850, "rank": 3 },
+        { "id": 4, "studentName": "Malika Tursunova", "points": 720, "rank": 4 },
+        { "id": 5, "studentName": "Bobur Xasanov", "points": 610, "rank": 5 }
+      ],
+      "badges": [
+        { "id": 1, "name": "Faol o'quvchi", "description": "Har kuni darslarni ko'rgani uchun", "icon": "🔥" },
+        { "id": 2, "name": "A'lochi", "description": "Uy vazifalarini 100% bajargan", "icon": "⭐" },
+        { "id": 3, "name": "Yordamchi", "description": "Boshqa o'quvchilarga yordam bergani uchun", "icon": "🤝" },
+        { "id": 4, "name": "Tez o'rganuvchi", "description": "1 haftada 5 ta dars tugatgan", "icon": "🚀" }
+      ]
+    }
   }
 }

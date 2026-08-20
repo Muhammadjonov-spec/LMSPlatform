@@ -12,44 +12,55 @@ export const createCourseSchema = z.object({
   categoryId: z.string().min(5, { message: "Please select a category" }),
   tagline: z.string().min(5),
   description: z.string().min(10),
-  thumbnail: z.any().refine((file) => file?.name, { message: "Thumbnail is required" })
+  isFree: z.boolean().default(false).optional(),
+  price: z.string().optional()
 });
 
-export const updateCourseSchema = createCourseSchema.partial({
-  thumbnail: true
+export const updateCourseSchema = createCourseSchema;
+
+const baseContentSchema = z.object({
+  title: z.string().min(5),
+  type: z.string().min(3, { message: "Type is required" }),
+  video: z.any().optional(),
+  text: z.any().optional()
 });
 
-export const mutateContentSchema = z
-  .object({
-    title: z.string().min(5),
-    type: z.string().min(3, { message: "Type is required" }),
-    youtubeId: z.string().optional(),
-    text: z.string().optional()
-  })
-  .superRefine((val, ctx) => {
-    const parseVideoId = z.string().min(4).safeParse(val.youtubeId);
+export const createContentSchema = baseContentSchema.superRefine((val, ctx) => {
+  const parseText = z.string().min(4).safeParse(val.text);
+
+  if (val.type === "video") {
+    if (!val.video || (val.video.length === 0 && !val.video.name)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Video file is required",
+        path: ["video"]
+      });
+    }
+  }
+
+  if (val.type === "text") {
+    if (!parseText.success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Text is required for text content",
+        path: ["text"]
+      });
+    }
+  }
+});
+
+export const updateContentSchema = baseContentSchema.superRefine((val, ctx) => {
+  if (val.type === "text") {
     const parseText = z.string().min(4).safeParse(val.text);
-
-    if (val.type === "Video") {
-      if (!parseVideoId.success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Youtube ID is required for video content",
-          path: ["youtubeId"]
-        });
-      }
+    if (!parseText.success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Text is required for text content",
+        path: ["text"]
+      });
     }
-
-    if (val.type === "Text") {
-      if (!parseText.success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Text is required for text content",
-          path: ["text"]
-        });
-      }
-    }
-  });
+  }
+});
 
 export const createStudentSchema = z.object({
   name: z.string().min(5),

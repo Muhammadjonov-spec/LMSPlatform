@@ -1,21 +1,36 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { orderService } from "../../services/orderService";
 
 export default function Checkout() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [receipt, setReceipt] = useState(null);
 
-  const handlePayment = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handlePayment = async (e) => {
     e.preventDefault();
     if (!receipt) {
       alert("Iltimos, to'lov chekini yuklang!");
       return;
     }
-    // Simulate payment processing...
-    setTimeout(() => {
-      navigate("/success-checkout");
-    }, 1500);
+    
+    try {
+      setIsSubmitting(true);
+      const formData = new FormData();
+      formData.append("receiptImage", receipt);
+      
+      const res = await orderService.createOrder(id, formData);
+      if (res.success) {
+        navigate("/success-checkout");
+      }
+    } catch (error) {
+      console.error("Order error:", error);
+      alert(error.response?.data?.message || "Xatolik yuz berdi");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -37,7 +52,7 @@ export default function Checkout() {
 
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-8 text-center">
           <p className="text-sm text-gray-600 mb-2">Quyidagi karta raqamiga to'lovni amalga oshiring:</p>
-          <div className="text-xl font-extrabold text-[#1E40AF] tracking-widest mb-1">8600 1234 5678 9012</div>
+          <div className="text-xl font-extrabold text-[#1E40AF] tracking-widest mb-1">9860 3501 4332 1650</div>
           <p className="text-xs font-semibold text-gray-500">Qabul qiluvchi: EduStack O'quv Markazi</p>
           <div className="mt-4 pt-4 border-t border-blue-200">
             <p className="text-sm text-gray-600">To'lov summasi:</p>
@@ -71,8 +86,9 @@ export default function Checkout() {
 
           <button 
             type="submit"
-            className="w-full py-4 rounded-xl bg-[#1E40AF] text-white font-bold text-lg hover:bg-blue-800 transition-colors shadow-md hover:shadow-lg mt-8">
-            Tasdiqlash uchun yuborish
+            disabled={isSubmitting}
+            className="w-full py-4 rounded-xl bg-[#1E40AF] text-white font-bold text-lg hover:bg-blue-800 transition-colors shadow-md hover:shadow-lg mt-8 disabled:opacity-50">
+            {isSubmitting ? "Yuborilmoqda..." : "Tasdiqlash uchun yuborish"}
           </button>
         </form>
       </div>
