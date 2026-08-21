@@ -10,27 +10,28 @@ import ManageCreateCoursePage from "../pages/Manager/Create-Courses";
 import ManageCourseDetailPage from "../pages/Manager/Courses-Detail";
 import ManageCourseContentCreatePage from "../pages/Manager/Course-Content-Create";
 import ManageCoursePreviewPage from "../pages/Manager/Course-Preview";
+import ManageTestCreatePage from "../pages/Manager/Test-Create";
 import ManageStudentsPage from "../pages/Manager/Students";
 import CategoriesPage from "../pages/Manager/Categories";
 import SubscriptionPage from "../pages/Manager/Subscription";
 import RewardsPage from "../pages/Manager/Rewards";
 import SettingsPage from "../pages/Manager/Settings";
-import StudentSettingsPage from "../pages/Manager/Settings";
-import StudentSubscriptionPage from "../pages/Shared/Subscription";
-import StudentRewardsPage from "../pages/Shared/Rewards";
+import StudentSettingsPage from "../pages/Student/StudentSettings";
+import StudentSubscriptionPage from "../pages/Student/StudentSubscription";
+import StudentRewardsPage from "../pages/Student/StudentRewards";
+import StudentTestTake from "../pages/Student/Test-Take";
+import StudentTestResult from "../pages/Student/Test-Result";
 import OrdersApproval from "../pages/Admin/OrdersApproval";
 import CreateAdmin from "../pages/Admin/CreateAdmin";
-import TeacherApproval from "../pages/Admin/TeacherApproval";
 import StudentPage from "../pages/Student/StudentOverview";
 import { MANAGER_SESSION, STRORAGE_KEY, STUDENT_SESSION } from "../utils/const";
 import secureLocalStorage from "react-secure-storage";
-import { getCategories, getCourseDetail, getPublicCourseDetail, getCourses, getDetailContent, getStudentsCourse } from "../services/courseService";
+import { getCategories, getCourseDetail, getCourses, getDetailContent, getStudentsCourse } from "../services/courseService";
 import { getCategories as getCategoriesList } from "../services/categoryService";
 import { getSubscriptions } from "../services/subscriptionService";
 import { getRewards } from "../services/rewardService";
 import ManageStudentCreatePage from "../pages/Manager/Student-Create";
 import { getCoursesStudents, getDetailStudent, getStudents } from "../services/studentServices";
-import { getMe } from "../services/authServices";
 import StudentsCourseList from "../pages/Manager/Student-Course";
 import StudentForm from "../pages/Manager/Student-Course/student-form";
 import { getOverviews } from "../services/overvieService";
@@ -43,7 +44,6 @@ import HelpCenter from "../pages/Support/HelpCenter";
 import TermsOfService from "../pages/Support/TermsOfService";
 import PrivacyPolicy from "../pages/Support/PrivacyPolicy";
 import ContactUs from "../pages/Support/ContactUs";
-import VerifyEmailPage from "../pages/VerifyEmail";
 
 const router = createBrowserRouter([
   {
@@ -67,21 +67,18 @@ const router = createBrowserRouter([
     element: <ContactUs />
   },
   {
-    path: "/verify-email",
-    element: <VerifyEmailPage />
-  },
-  {
     path: "/courses",
     element: <PublicCourses />
   },
   {
     path: "/courses/:id",
     loader: async ({ params }) => {
-           try {
-        const course = await getPublicCourseDetail(params.id);
+      // Allow fetching without token for public access. If getCourseDetail needs a non-auth version, we handle it in mock.
+      // But getCourseDetail uses apiInstanceAuth which might fail without a token unless we mock it correctly.
+      try {
+        const course = await getCourseDetail(params.id);
         return course?.data;
-      } catch (error) {
-        
+      } catch (e) {
         return null;
       }
     },
@@ -96,10 +93,8 @@ const router = createBrowserRouter([
     loader: async () => {
       const session = secureLocalStorage.getItem(STRORAGE_KEY);
       if (session) {
-        // session format: { data: { role, token, user } } yoki { role, token, user }
-        const role = session?.data?.role || session?.role;
-        if (role === "manager" || role === "admin" || role === "super_admin" || role === "teacher") throw redirect("/manager");
-        if (role === "student") throw redirect("/student");
+        if (session.role === "manager") throw redirect("/manager");
+        if (session.role === "student") throw redirect("/student");
       }
       return true;
     },
@@ -110,9 +105,8 @@ const router = createBrowserRouter([
     loader: async () => {
       const session = secureLocalStorage.getItem(STRORAGE_KEY);
       if (session) {
-        const role = session?.data?.role || session?.role;
-        if (role === "manager" || role === "admin" || role === "super_admin" || role === "teacher") throw redirect("/manager");
-        if (role === "student") throw redirect("/student");
+        if (session.role === "manager") throw redirect("/manager");
+        if (session.role === "student") throw redirect("/student");
       }
       return true;
     },
@@ -130,133 +124,89 @@ const router = createBrowserRouter([
     path: "/manager",
     id: MANAGER_SESSION,
     loader: async () => {
-      let session = secureLocalStorage.getItem(STRORAGE_KEY);
-      if (session) {
-        try {
-          const me = await getMe();
-          if (me?.data) {
-            if (session.data) {
-              session.data.user = me.data.user;
-              session.data.role = me.data.role;
-            } else {
-              session.user = me.data.user;
-              session.role = me.data.role;
-            }
-            secureLocalStorage.setItem(STRORAGE_KEY, session);
-          }
-        } catch (error) {
-          console.error("Failed to sync session data", error);
-        }
-      }
-
-      const data = session?.data || session;
+      const session = secureLocalStorage.getItem(STRORAGE_KEY);
       const allowedRoles = ["teacher", "admin", "super_admin", "manager"];
-      if (!data || !allowedRoles.includes(data.role)) {
+      if (!session || !allowedRoles.includes(session.role)) {
         throw redirect("/sign-in");
       }
-      // Header uchun flat object qaytaramiz: { name, role, ... }
-      return { ...data.user, role: data.role, token: data.token };
+      return session;
     },
     element: <LayoutDashboard />,
     children: [
       {
         index: true,
         loader: async () => {
-          try {
-            const overviews = await getOverviews();
-            return overviews?.data || null;
-          } catch (e) {
-            return null;
-          }
+          const overviews = await getOverviews();
+          return overviews?.data;
         },
         element: <ManagerHomePage />
       },
       {
         path: "courses",
         loader: async () => {
-          try {
-            const data = await getCourses();
-            return data || null;
-          } catch (e) {
-            return null;
-          }
+          const data = await getCourses();
+          return data;
         },
         element: <ManageCoursePage />
       },
       {
         path: "courses/create",
         loader: async () => {
-          try {
-            const categories = await getCategories();
-            return { categories: categories || [], course: null };
-          } catch (e) {
-            return { categories: [], course: null };
-          }
+          const categories = await getCategories();
+          return { categories, course: null };
         },
         element: <ManageCreateCoursePage />
       },
       {
         path: "courses/edit/:id",
         loader: async ({ params }) => {
-          try {
-            const categories = await getCategories();
-            const course = await getCourseDetail(params.id);
-            return { categories: categories || [], course: course?.data ?? null };
-          } catch (e) {
-            return { categories: [], course: null };
-          }
+          const categories = await getCategories();
+          const course = await getCourseDetail(params.id);
+          return { categories, course: course?.data ?? null };
         },
         element: <ManageCreateCoursePage />
       },
       {
         path: "courses/:id",
         loader: async ({ params }) => {
-          try {
-            const course = await getCourseDetail(params.id);
-            return course?.data || null;
-          } catch (e) {
-            return null;
-          }
+          const course = await getCourseDetail(params.id);
+          return course?.data;
         },
         element: <ManageCourseDetailPage />
       },
       {
-        path: "courses/:id/modules/:moduleId/lessons/create",
+        path: "courses/:id/create",
         element: <ManageCourseContentCreatePage />
       },
       {
         path: "courses/:id/edit/:contentId",
         loader: async ({ params }) => {
-          try {
-            const content = await getDetailContent(params.contentId);
-            return content?.data || null;
-          } catch (e) {
-            return null;
-          }
+          const content = await getDetailContent(params.contentId);
+          return content?.data;
         },
         element: <ManageCourseContentCreatePage />
       },
       {
+        path: "courses/:courseId/modules/:moduleId/test-create",
+        element: <ManageTestCreatePage />
+      },
+      {
+        path: "courses/:courseId/test-create/final",
+        element: <ManageTestCreatePage />
+      },
+      {
         path: "courses/:id/preview",
         loader: async ({ params }) => {
-          try {
-            const course = await getCourseDetail(params.id, true);
-            return course?.data || null;
-          } catch (e) {
-            return null;
-          }
+          const course = await getCourseDetail(params.id, true);
+          return course?.data;
         },
         element: <ManageCoursePreviewPage />
       },
       {
         path: "/manager/students",
         loader: async () => {
-          try {
-            const students = await getStudents();
-            return students?.data || null;
-          } catch (e) {
-            return null;
-          }
+          const students = await getStudents();
+          return students?.data;
         },
         element: <ManageStudentsPage />
       },
@@ -267,72 +217,48 @@ const router = createBrowserRouter([
       {
         path: "/manager/students/edit/:id",
         loader: async ({ params }) => {
-          try {
-            const student = await getDetailStudent(params.id);
-            return student?.data || null;
-          } catch (e) {
-            return null;
-          }
+          const student = await getDetailStudent(params.id);
+          return student?.data;
         },
         element: <ManageStudentCreatePage />
       },
       {
         path: "/manager/courses/students/:id",
         loader: async ({ params }) => {
-          try {
-            const course = await getStudentsCourse(params.id);
-            return course?.data || null;
-          } catch (e) {
-            return null;
-          }
+          const course = await getStudentsCourse(params.id);
+          return course?.data;
         },
         element: <StudentsCourseList />
       },
       {
         path: "/manager/courses/students/:id/add",
         loader: async () => {
-          try {
-            const students = await getStudents();
-            return students?.data || null;
-          } catch (e) {
-            return null;
-          }
+          const students = await getStudents();
+          return students?.data;
         },
         element: <StudentForm />
       },
       {
         path: "/manager/categories",
         loader: async () => {
-          try {
-            const categories = await getCategoriesList();
-            return categories || null;
-          } catch (e) {
-            return null;
-          }
+          const categories = await getCategoriesList();
+          return categories;
         },
         element: <CategoriesPage />
       },
       {
         path: "/manager/subscription",
         loader: async () => {
-          try {
-            const subscriptions = await getSubscriptions();
-            return subscriptions || null;
-          } catch (e) {
-            return null;
-          }
+          const subscriptions = await getSubscriptions();
+          return subscriptions;
         },
         element: <SubscriptionPage />
       },
       {
         path: "/manager/rewards",
         loader: async () => {
-          try {
-            const rewards = await getRewards();
-            return rewards || null;
-          } catch (e) {
-            return null;
-          }
+          const rewards = await getRewards();
+          return rewards;
         },
         element: <RewardsPage />
       },
@@ -347,10 +273,6 @@ const router = createBrowserRouter([
       {
         path: "/manager/admin/users",
         element: <CreateAdmin />
-      },
-      {
-        path: "/manager/admin/teachers",
-        element: <TeacherApproval />
       }
     ]
   },
@@ -358,31 +280,11 @@ const router = createBrowserRouter([
     path: "/student",
     id: STUDENT_SESSION,
     loader: async () => {
-      let session = secureLocalStorage.getItem(STRORAGE_KEY);
-      if (session) {
-        try {
-          const me = await getMe();
-          if (me?.data) {
-            if (session.data) {
-              session.data.user = me.data.user;
-              session.data.role = me.data.role;
-            } else {
-              session.user = me.data.user;
-              session.role = me.data.role;
-            }
-            secureLocalStorage.setItem(STRORAGE_KEY, session);
-          }
-        } catch (error) {
-          console.error("Failed to sync session data", error);
-        }
-      }
-
-      const data = session?.data || session;
-      if (!data || data.role !== "student") {
+      const session = secureLocalStorage.getItem(STRORAGE_KEY);
+      if (!session || session.role !== "student") {
         throw redirect("/sign-in");
       }
-      // Header uchun flat object qaytaramiz
-      return { ...data.user, role: data.role, token: data.token };
+      return session;
     },
     element: <LayoutDashboard isAdmin={false} />,
     children: [
@@ -421,6 +323,14 @@ const router = createBrowserRouter([
       {
         path: "/student/settings",
         element: <StudentSettingsPage />
+      },
+      {
+        path: "/student/test/:testId",
+        element: <StudentTestTake />
+      },
+      {
+        path: "/student/test-result/:resultId",
+        element: <StudentTestResult />
       }
     ]
   }

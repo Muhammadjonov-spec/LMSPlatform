@@ -46,10 +46,10 @@ export default function signUpPage() {
         password: data.password
       };
       
-      await mutateAsync(payload);
-      // Register muvaffaqiyatli bo'ldi — foydalanuvchi emailni tasdiqlashi kerak
-      // Hech qanday token qaytmaydi, shuning uchun login qilmaymiz
-      navigate("/sign-in?registered=true");
+      const response = await mutateAsync(payload);
+      // Registration successful, ask user to verify email instead of logging in
+      alert("Emailingizga tasdiqlash xati yuborildi. Iltimos emailingizni tekshiring va tasdiqlaganingizdan so'ng tizimga kiring.");
+      navigate("/sign-in");
     } catch (error) {
       console.error("Sign up error:", error);
       const msg = error?.response?.data?.message || error?.message || "Registration failed. Please check your details.";

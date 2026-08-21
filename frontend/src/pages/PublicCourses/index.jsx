@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
@@ -129,3 +130,6 @@ export default function PublicCourses() {
     </div>
   );
 }
+=======
+﻿export default () => <div>Public Courses</div>
+>>>>>>> ce5b19a (added test frontend feature)

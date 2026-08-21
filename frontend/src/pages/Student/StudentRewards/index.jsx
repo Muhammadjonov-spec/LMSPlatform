@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 import { useLoaderData, useRouteLoaderData } from "react-router-dom";
 import { STUDENT_SESSION } from "../../../utils/const";
@@ -94,3 +95,6 @@ export default function StudentRewardsPage() {
     </div>
   );
 }
+=======
+﻿export default () => <div>Student Rewards</div>
+>>>>>>> ce5b19a (added test frontend feature)
